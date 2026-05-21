@@ -1,0 +1,9 @@
+# Production-ish pin set for reproducibility.
+# Bump freqtrade first if you want a newer baseline; the rest are its
+# transitive deps that we touch directly from our own scripts/tests.
+freqtrade==2026.4
+ccxt==4.5.54
+pandas==3.0.3
+pyarrow==24.0.0
+requests==2.34.2
+TA-Lib==0.6.8
