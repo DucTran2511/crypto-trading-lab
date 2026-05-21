@@ -81,17 +81,28 @@ class EMACrossover(IStrategy):
     }
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe["ema_fast"] = ta.EMA(dataframe, timeperiod=int(self.ema_fast.value))
-        dataframe["ema_slow"] = ta.EMA(dataframe, timeperiod=int(self.ema_slow.value))
-        dataframe["ema_trend"] = ta.EMA(dataframe, timeperiod=int(self.ema_trend.value))
+        # Pre-compute every candidate EMA period across the hyperopt search space.
+        # Freqtrade caches the output of populate_indicators() once per pair, so
+        # consuming ``self.ema_fast.value`` here would lock the EMA periods to
+        # their defaults for every hyperopt trial. By materialising one column
+        # per candidate period we let populate_entry_trend / populate_exit_trend
+        # select the right one per trial from the cached frame.
+        for val in self.ema_fast.range:
+            dataframe[f"ema_fast_{val}"] = ta.EMA(dataframe, timeperiod=val)
+        for val in self.ema_slow.range:
+            dataframe[f"ema_slow_{val}"] = ta.EMA(dataframe, timeperiod=val)
+        for val in self.ema_trend.range:
+            dataframe[f"ema_trend_{val}"] = ta.EMA(dataframe, timeperiod=val)
         dataframe["volume_mean"] = dataframe["volume"].rolling(window=20).mean()
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        ema_fast = dataframe[f"ema_fast_{self.ema_fast.value}"]
+        ema_slow = dataframe[f"ema_slow_{self.ema_slow.value}"]
+
         conditions = [
             # Fast EMA crossed above slow EMA on this candle.
-            (dataframe["ema_fast"] > dataframe["ema_slow"])
-            & (dataframe["ema_fast"].shift(1) <= dataframe["ema_slow"].shift(1)),
+            (ema_fast > ema_slow) & (ema_fast.shift(1) <= ema_slow.shift(1)),
             # Volume confirmation.
             dataframe["volume"] > dataframe["volume_mean"] * float(self.min_volume_factor.value),
             # Non-zero volume sanity.
@@ -99,18 +110,19 @@ class EMACrossover(IStrategy):
         ]
 
         if self.use_trend_filter.value:
-            conditions.append(dataframe["close"] > dataframe["ema_trend"])
+            ema_trend = dataframe[f"ema_trend_{self.ema_trend.value}"]
+            conditions.append(dataframe["close"] > ema_trend)
 
         dataframe.loc[reduce(lambda a, b: a & b, conditions), "enter_long"] = 1
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        ema_fast = dataframe[f"ema_fast_{self.ema_fast.value}"]
+        ema_slow = dataframe[f"ema_slow_{self.ema_slow.value}"]
+
         # Exit when fast EMA crosses back below slow EMA.
         dataframe.loc[
-            (
-                (dataframe["ema_fast"] < dataframe["ema_slow"])
-                & (dataframe["ema_fast"].shift(1) >= dataframe["ema_slow"].shift(1))
-            ),
+            (ema_fast < ema_slow) & (ema_fast.shift(1) >= ema_slow.shift(1)),
             "exit_long",
         ] = 1
         return dataframe
