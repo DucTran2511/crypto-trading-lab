@@ -1,0 +1,6 @@
+-r requirements.txt
+pytest==8.4.1
+pytest-cov==6.0.0
+ruff==0.14.7
+ipykernel==6.30.0
+matplotlib==3.10.0

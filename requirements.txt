@@ -1,0 +1,11 @@
+# Production-ish pin set for reproducibility.
+# Bump freqtrade first if you want a newer baseline; the rest are its
+# transitive deps that we touch directly from our own scripts/tests.
+freqtrade==2025.6
+# ccxt is intentionally unpinned — freqtrade 2025.6 requires >=4.4.87
+# and pip will resolve it to the latest compatible release (currently 4.5.54).
+pandas==2.2.3
+pyarrow==16.1.0
+requests==2.32.3
+# TA-Lib is intentionally unpinned — freqtrade 2025.6 requires <0.6,
+# so pip will resolve to the latest 0.5.x release.
