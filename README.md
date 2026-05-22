@@ -9,6 +9,19 @@ live-trading crypto strategies with [Freqtrade](https://www.freqtrade.io/).
 > can spend your time on the only thing that actually makes money: finding,
 > validating, and risk-managing real edges.
 
+## Documentation
+
+Full docs live in [`docs/`](docs/README.md). Highlights:
+
+- [Setup](docs/01-setup.md) — Python 3.10–3.13, TA-Lib install per OS, Docker option.
+- [Quickstart](docs/02-quickstart.md) — clone → backtest in 10 minutes.
+- [Strategy walkthrough](docs/03-strategy.md) — `EMACrossover` line-by-line, including the hyperopt caching gotcha.
+- [Hyperopt + walk-forward](docs/06-hyperopt.md) — the part most people get wrong.
+- [Paper & live trading](docs/07-paper-and-live-trading.md) — dry-run, web UI, Telegram, pre-live checklist.
+- [Risk & position sizing](docs/08-risk-and-position-sizing.md) — the single most important page.
+- [Troubleshooting](docs/10-troubleshooting.md) — indexed by error message.
+- [Roadmap](docs/11-roadmap.md), [Glossary](docs/12-glossary.md).
+
 ## What's in here
 
 ```
@@ -24,12 +37,18 @@ crypto-trading-lab/
 ├── risk/
 │   └── position_size.py             # CLI position-sizing calculator
 ├── tests/                           # pytest suite for the utility code
+├── docs/                            # long-form documentation
 ├── requirements.txt                 # production deps (pinned)
 ├── requirements-dev.txt             # + linter, pytest, jupyter, matplotlib
 └── pyproject.toml                   # ruff + pytest config
 ```
 
 ## Quick start
+
+Requires **Python 3.10, 3.11, 3.12, or 3.13** and the **TA-Lib C library**
+installed at the OS level (see [docs/01-setup.md](docs/01-setup.md) §1.2 if
+`pip install` fails on TA-Lib). For a full step-by-step, read
+[docs/02-quickstart.md](docs/02-quickstart.md).
 
 ```bash
 # 1) Set up a clean environment
