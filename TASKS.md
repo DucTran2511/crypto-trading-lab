@@ -11,7 +11,29 @@ _Nothing currently in progress._
 
 ## Up Next
 
-_Nothing currently queued._
+### Baseline Strategy Validation (Priority 1)
+- [ ] Confirm/download 5m OHLCV data for BTC/USDT, ETH/USDT, SOL/USDT, and BNB/USDT for `20250101-20250501`
+- [ ] Run same-window backtests for `EMACrossover`, `DonchianBreakout`, `BollingerMeanReversion`, `RSITrend`, and `MACDVolume`
+- [ ] Record comparable metrics: trades, win rate, total profit %, Sharpe, max drawdown, and profit factor
+- [ ] Identify which strategies are worth walk-forward validation
+
+### Walk-Forward Validation Sweep (Priority 1)
+- [ ] Run `scripts/walk_forward.py` for each baseline strategy that survives the initial backtest screen
+- [ ] Compare in-sample vs out-of-sample Sharpe, drawdown, and total profit by fold
+- [ ] Reject strategies with unstable out-of-sample results or drawdowns above the research risk tolerance
+- [ ] Save CSV summaries and stability plots for later comparison
+
+### Strategy Comparison Report (Priority 2)
+- [ ] Create a strategy comparison report that aggregates baseline backtest and walk-forward results
+- [ ] Rank strategies by out-of-sample performance, drawdown control, trade count, and fold stability
+- [ ] Add a small parser/aggregation test if report generation becomes scripted
+- [ ] Document the final baseline ranking and which strategy should receive the next research iteration
+
+### Regime Filter Experiments (Priority 3)
+- [ ] Apply the regime classifier to the strongest baseline strategy candidates
+- [ ] Compare all-regime, bull-only, bear-excluded, and trending-only variants
+- [ ] Validate any promising regime-filtered variant with walk-forward validation
+- [ ] Keep the original baseline result as the control for every regime experiment
 
 ---
 
@@ -62,3 +84,4 @@ _Nothing currently queued._
 | 2026-05-23 | Codex | Built walk-forward harness and updated docs/metadata for usage and generated outputs |
 | 2026-05-23 | Codex | Reviewed and tightened CI triggers/cache before merge |
 | 2026-05-23 | Codex | Implemented baseline strategies and regime classifier utility |
+| 2026-05-23 | Codex | Queued validation, reporting, and regime-filter experiment tasks |
