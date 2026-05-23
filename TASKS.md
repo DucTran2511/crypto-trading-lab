@@ -86,3 +86,4 @@ _Nothing currently in progress._
 | 2026-05-23 | Antigravity | Automated and ran same-window baseline backtests, generated report, selected RSITrend/BollingerMeanReversion for walk-forward sweeps |
 | 2026-05-23 | Codex | Fixed baseline validation CLI help behavior and added parser/report tests |
 | 2026-05-23 | Antigravity | Ran walk-forward validation sweeps for RSITrend and BollingerMeanReversion, analyzed results and rejected both due to overfitting |
+| 2026-05-23 | Codex | Reviewed walk-forward sweep branch and added committed results report |
