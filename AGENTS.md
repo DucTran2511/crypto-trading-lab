@@ -56,6 +56,13 @@ freqtrade hyperopt -c user_data/config.json \
     --spaces buy -e 100 \
     --timerange=20250101-20250501
 
+# Walk-forward validation
+python scripts/walk_forward.py \
+    --strategy EMACrossover \
+    --start 2025-01-01 --end 2025-05-01 \
+    --in-sample 90d --out-sample 30d --step 30d \
+    --loss SharpeHyperOptLoss --epochs 100
+
 # Position sizing calculator
 python -m risk.position_size --equity 500 --entry 65000 --stop 63050 --risk-pct 0.01
 
@@ -76,13 +83,15 @@ crypto-trading-lab/
 │   └── notebooks/
 │       └── research_template.ipynb  # Vectorised research starter
 ├── scripts/
-│   └── download_binance_vision.py   # Pull OHLCV from data.binance.vision
+│   ├── download_binance_vision.py   # Pull OHLCV from data.binance.vision
+│   └── walk_forward.py              # Hyperopt/backtest walk-forward harness
 ├── risk/
 │   ├── __init__.py
 │   └── position_size.py             # CLI position-sizing calculator
 ├── tests/
 │   ├── test_position_size.py
-│   └── test_download_binance_vision.py
+│   ├── test_download_binance_vision.py
+│   └── test_walk_forward.py
 ├── docs/                            # Numbered 01-12, long-form documentation
 ├── requirements.txt                 # Production deps (pinned)
 ├── requirements-dev.txt             # + linter, pytest, jupyter, matplotlib
@@ -107,19 +116,17 @@ crypto-trading-lab/
 
 ## Current Status & Roadmap
 
-**Last milestone:** Initial scaffold complete (EMACrossover, config, docs, risk calc, data download).
+**Last milestone:** Walk-forward harness and GitHub Actions CI complete.
 
 **See `TASKS.md` for current sprint and detailed progress.**
 
 Roadmap priority (from `docs/11-roadmap.md`):
-1. Walk-forward harness (`scripts/walk_forward.py`)
-2. GitHub Actions CI
-3. More baseline strategies (Donchian, Bollinger, RSI+trend, MACD)
-4. Regime classifier utility (`user_data/regime/classifier.py`)
-5. Switch live data to Binance.vision as default
-6. Live monitoring stack (logs, Telegram, heartbeat)
-7. Paper-trade validation (4+ weeks)
-8. Live micro-size deployment
+1. More baseline strategies (Donchian, Bollinger, RSI+trend, MACD)
+2. Regime classifier utility (`user_data/regime/classifier.py`)
+3. Switch live data to Binance.vision as default
+4. Live monitoring stack (logs, Telegram, heartbeat)
+5. Paper-trade validation (4+ weeks)
+6. Live micro-size deployment
 
 ---
 
@@ -158,8 +165,22 @@ Full docs in `docs/` (read in order):
 
 ## Git Workflow
 
-- **Main branch:** `main`
-- **Feature branches:** `<agent-or-author>/<feature-name>`
-  - e.g. `antigravity/walk-forward-harness`, `codex/github-actions-ci`
-- **Merge via PR** when feature is complete
-- Update `TASKS.md` at end of every session
+**MANDATORY: Always create a feature branch before starting any task. Never commit directly to `main`.**
+
+1. **Before writing any code**, create and switch to a feature branch:
+   ```bash
+   git checkout -b <agent-name>/<feature-name>
+   ```
+   - Branch naming: `<agent-or-author>/<short-description>`
+   - Examples: `antigravity/donchian-strategy`, `codex/regime-classifier`, `copilot/fix-tests`
+
+2. **Commit your work** on the feature branch with clear commit messages.
+
+3. **Push the branch** when work is complete:
+   ```bash
+   git push -u origin <agent-name>/<feature-name>
+   ```
+
+4. **Merge via PR** — do not merge directly into `main`.
+
+5. **Update `TASKS.md`** at the end of every session (on the feature branch).
