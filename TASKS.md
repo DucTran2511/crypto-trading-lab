@@ -11,12 +11,6 @@ _Nothing currently in progress._
 
 ## Up Next
 
-### Baseline Strategy Validation (Priority 1)
-- [ ] Confirm/download 5m OHLCV data for BTC/USDT, ETH/USDT, SOL/USDT, and BNB/USDT for `20250101-20250501`
-- [ ] Run same-window backtests for `EMACrossover`, `DonchianBreakout`, `BollingerMeanReversion`, `RSITrend`, and `MACDVolume`
-- [ ] Record comparable metrics: trades, win rate, total profit %, Sharpe, max drawdown, and profit factor
-- [ ] Identify which strategies are worth walk-forward validation
-
 ### Walk-Forward Validation Sweep (Priority 1)
 - [ ] Run `scripts/walk_forward.py` for each baseline strategy that survives the initial backtest screen
 - [ ] Compare in-sample vs out-of-sample Sharpe, drawdown, and total profit by fold
@@ -39,6 +33,11 @@ _Nothing currently in progress._
 
 ## Done
 
+- [x] Baseline Strategy Validation
+  - [x] Confirm/download 5m OHLCV data for BTC/USDT, ETH/USDT, SOL/USDT, and BNB/USDT for `20250101-20250501`
+  - [x] Run same-window backtests for `EMACrossover`, `DonchianBreakout`, `BollingerMeanReversion`, `RSITrend`, and `MACDVolume`
+  - [x] Record comparable metrics: trades, win rate, total profit %, Sharpe, max drawdown, and profit factor
+  - [x] Identify which strategies are worth walk-forward validation
 - [x] More baseline strategies
   - [x] Donchian breakout strategy
   - [x] Bollinger mean-reversion strategy
@@ -85,3 +84,5 @@ _Nothing currently in progress._
 | 2026-05-23 | Codex | Reviewed and tightened CI triggers/cache before merge |
 | 2026-05-23 | Codex | Implemented baseline strategies and regime classifier utility |
 | 2026-05-23 | Codex | Queued validation, reporting, and regime-filter experiment tasks |
+| 2026-05-23 | Antigravity | Automated and ran same-window baseline backtests, generated report, selected RSITrend/BollingerMeanReversion for walk-forward sweeps |
+| 2026-05-23 | Codex | Fixed baseline validation CLI help behavior and added parser/report tests |
