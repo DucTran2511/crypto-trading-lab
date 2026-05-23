@@ -85,3 +85,4 @@ _Nothing currently in progress._
 | 2026-05-23 | Codex | Implemented baseline strategies and regime classifier utility |
 | 2026-05-23 | Codex | Queued validation, reporting, and regime-filter experiment tasks |
 | 2026-05-23 | Antigravity | Automated and ran same-window baseline backtests, generated report, selected RSITrend/BollingerMeanReversion for walk-forward sweeps |
+| 2026-05-23 | Codex | Fixed baseline validation CLI help behavior and added parser/report tests |
