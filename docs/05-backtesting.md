@@ -75,7 +75,7 @@ These are the failure modes most people land in:
 
 Define good first: *positive Sharpe out-of-sample, drawdown below your tolerance, behaves sanely across a regime change.* If that's true:
 
-1. **Walk-forward** on at least 3 non-overlapping holdouts. If any of them is materially worse than the in-sample, distrust the result.
+1. **Walk-forward** on at least 3 non-overlapping holdouts with `scripts/walk_forward.py`. If any of them is materially worse than the in-sample, distrust the result.
 2. **Paper-trade for ≥ 4 weeks.** Match the live-paper stats to the backtest stats. If they diverge, your fee/slippage model is wrong.
 3. **Only then** size up to live, with micro position size and a kill switch.
 

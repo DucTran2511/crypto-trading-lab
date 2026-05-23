@@ -12,8 +12,10 @@ crypto-trading-lab/
 │   ├── notebooks/research_template.ipynb
 │   ├── data/<exchange>/<PAIR>-<tf>.feather   # candles (gitignored)
 │   ├── backtest_results/              # auto-generated (gitignored)
-│   └── hyperopt_results/              # auto-generated (gitignored)
+│   ├── hyperopt_results/              # auto-generated (gitignored)
+│   └── walk_forward_results/          # auto-generated (gitignored)
 ├── scripts/download_binance_vision.py # alt data source for Binance candles
+├── scripts/walk_forward.py            # hyperopt/backtest validation harness
 ├── risk/position_size.py              # position-sizing CLI
 ├── tests/                             # pytest suite for the utility code
 ├── requirements.txt / -dev.txt        # pinned deps
@@ -55,7 +57,7 @@ ruff check .
 pytest
 ```
 
-Both should be green. `pytest` covers the position-sizing CLI and the `data.binance.vision` ingest helpers.
+Both should be green. `pytest` covers the position-sizing CLI, the `data.binance.vision` ingest helpers, and the walk-forward harness orchestration.
 
 ## 2.5 Position sizing from the CLI
 
@@ -70,7 +72,7 @@ Prints how many BTC units to buy if you have a $500 account and you want to risk
 ## 2.6 Where to go next
 
 - I want to understand what the strategy actually does → [Strategy](03-strategy.md)
-- I want to tune parameters → [Hyperopt](06-hyperopt.md)
+- I want to tune and validate parameters → [Hyperopt](06-hyperopt.md)
 - I want to paper trade live → [Paper & live trading](07-paper-and-live-trading.md)
 - I want to use real Binance data → [Data](04-data.md)
 - I want to research a new strategy idea outside Freqtrade → [Research notebook](09-research-notebook.md)

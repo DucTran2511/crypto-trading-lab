@@ -33,7 +33,8 @@ crypto-trading-lab/
 │   └── notebooks/
 │       └── research_template.ipynb  # vectorised research starter
 ├── scripts/
-│   └── download_binance_vision.py   # pull Binance.com OHLCV from data.binance.vision
+│   ├── download_binance_vision.py   # pull Binance.com OHLCV from data.binance.vision
+│   └── walk_forward.py              # hyperopt/backtest walk-forward harness
 ├── risk/
 │   └── position_size.py             # CLI position-sizing calculator
 ├── tests/                           # pytest suite for the utility code
@@ -75,7 +76,14 @@ freqtrade hyperopt -c user_data/config.json \
     -e 100 \
     --timerange=20250101-20250501
 
-# 5) Paper-trade live
+# 5) Run walk-forward validation
+python scripts/walk_forward.py \
+    --strategy EMACrossover \
+    --start 2025-01-01 --end 2025-05-01 \
+    --in-sample 90d --out-sample 30d --step 30d \
+    --loss SharpeHyperOptLoss --epochs 100
+
+# 6) Paper-trade live
 freqtrade trade -c user_data/config.json --strategy EMACrossover
 ```
 
@@ -132,8 +140,8 @@ Every numeric parameter is exposed via Freqtrade's `IntParameter` /
 on in-sample data.
 
 > **Hyperopt is *not* magic.** It will happily over-fit. Always use
-> `--timerange` to hold out a forward window, then re-run `backtesting` on the
-> held-out slice to check whether the optimised parameters survive.
+> `scripts/walk_forward.py` or a manual holdout window to check whether the
+> optimised parameters survive out-of-sample.
 
 ## Position sizing
 
@@ -164,10 +172,10 @@ pytest
 
 ## Roadmap / next things to build (in order)
 
-1. **Walk-forward harness** — automate "optimise on N months, validate on next
-   M, slide the window" so you stop fooling yourself with single-fit hyperopt.
-2. **More strategies to use as research baselines** — Donchian breakout,
+1. **More strategies to use as research baselines** — Donchian breakout,
    Bollinger mean-reversion, RSI+trend, market-regime filter.
+2. **Regime classifier** — shared EMA-slope/ADX labels that strategies can use
+   as a market filter.
 3. **Live data layer** — switch from OKX backtest data to `data.binance.vision`
    downloads so you backtest on the same data you will trade against.
 4. **Telegram + Web UI alerts** — Freqtrade has both built in; just wire up

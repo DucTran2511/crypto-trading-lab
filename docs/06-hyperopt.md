@@ -77,13 +77,32 @@ in-sample          out-of-sample
 4. If out-of-sample is comparable, you have weak evidence of an edge. Repeat on a different window before you trust it.
 5. **Never** re-run hyperopt because the out-of-sample looked bad. That contaminates the holdout. If you do, start fresh on a new period that hyperopt has never seen.
 
-For a more robust check, run several non-overlapping in/out splits ("walk-forward folds") and look at the *distribution* of out-of-sample Sharpes. If half the folds are negative, you don't have an edge — you got lucky on one window.
+For a more robust check, run several in/out splits ("walk-forward folds") and look at the *distribution* of out-of-sample Sharpes. If half the folds are negative, you don't have an edge — you got lucky on one window.
 
-A walk-forward harness is on the roadmap (see [Roadmap](11-roadmap.md) §11.1) so you don't have to do this by hand every time.
+The repo includes `scripts/walk_forward.py` so you do not have to do this by hand every time:
+
+```bash
+python scripts/walk_forward.py \
+  --strategy EMACrossover \
+  --start 2025-01-01 --end 2025-05-01 \
+  --in-sample 90d --out-sample 30d --step 30d \
+  --loss SharpeHyperOptLoss \
+  --epochs 100
+```
+
+The harness writes:
+- `user_data/walk_forward_results/walk_forward_summary.csv` — one row per fold with in-sample and out-of-sample Sharpe, max drawdown %, total profit %, and the parameter file used.
+- `user_data/walk_forward_results/walk_forward_stability.png` — out-of-sample total profit bars plus out-of-sample Sharpe line.
+- `user_data/walk_forward_results/logs/` — raw Freqtrade command output per fold.
+- `user_data/walk_forward_results/params/` — best parameter JSON copied after each fold's hyperopt run.
+
+During a run, the harness backs up any existing `user_data/strategies/<Strategy>.json`, lets hyperopt overwrite it fold-by-fold, then restores the original file at the end.
 
 ## 6.5 Practical recipe (paste-friendly)
 
 ```bash
+# Manual workflow, useful when debugging a single fold:
+
 # 1) In-sample: tune the buy space.
 freqtrade hyperopt -c user_data/config.json \
   --strategy EMACrossover \
