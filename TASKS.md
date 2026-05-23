@@ -11,12 +11,6 @@ _Nothing currently in progress._
 
 ## Up Next
 
-### Walk-Forward Validation Sweep (Priority 1)
-- [ ] Run `scripts/walk_forward.py` for each baseline strategy that survives the initial backtest screen
-- [ ] Compare in-sample vs out-of-sample Sharpe, drawdown, and total profit by fold
-- [ ] Reject strategies with unstable out-of-sample results or drawdowns above the research risk tolerance
-- [ ] Save CSV summaries and stability plots for later comparison
-
 ### Strategy Comparison Report (Priority 2)
 - [ ] Create a strategy comparison report that aggregates baseline backtest and walk-forward results
 - [ ] Rank strategies by out-of-sample performance, drawdown control, trade count, and fold stability
@@ -33,6 +27,11 @@ _Nothing currently in progress._
 
 ## Done
 
+- [x] Walk-Forward Validation Sweep
+  - [x] Run `scripts/walk_forward.py` for each baseline strategy that survives the initial backtest screen
+  - [x] Compare in-sample vs out-of-sample Sharpe, drawdown, and total profit by fold
+  - [x] Reject strategies with unstable out-of-sample results or drawdowns above the research risk tolerance
+  - [x] Save CSV summaries and stability plots for later comparison
 - [x] Baseline Strategy Validation
   - [x] Confirm/download 5m OHLCV data for BTC/USDT, ETH/USDT, SOL/USDT, and BNB/USDT for `20250101-20250501`
   - [x] Run same-window backtests for `EMACrossover`, `DonchianBreakout`, `BollingerMeanReversion`, `RSITrend`, and `MACDVolume`
@@ -86,3 +85,5 @@ _Nothing currently in progress._
 | 2026-05-23 | Codex | Queued validation, reporting, and regime-filter experiment tasks |
 | 2026-05-23 | Antigravity | Automated and ran same-window baseline backtests, generated report, selected RSITrend/BollingerMeanReversion for walk-forward sweeps |
 | 2026-05-23 | Codex | Fixed baseline validation CLI help behavior and added parser/report tests |
+| 2026-05-23 | Antigravity | Ran walk-forward validation sweeps for RSITrend and BollingerMeanReversion, analyzed results and rejected both due to overfitting |
+| 2026-05-23 | Codex | Reviewed walk-forward sweep branch and added committed results report |

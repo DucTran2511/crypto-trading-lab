@@ -466,6 +466,9 @@ def run_walk_forward(
     logs_dir = config.output_dir / "logs"
     exports_dir = config.output_dir / "backtests"
     params_dir = config.output_dir / "params"
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    exports_dir.mkdir(parents=True, exist_ok=True)
+    params_dir.mkdir(parents=True, exist_ok=True)
     summary_file = config.output_dir / "walk_forward_summary.csv"
     plot_file = config.output_dir / "walk_forward_stability.png"
     params_file = strategy_params_file(config)
