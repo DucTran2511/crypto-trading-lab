@@ -11,23 +11,22 @@ _Nothing currently in progress._
 
 ## Up Next
 
-### More Baseline Strategies (Priority 1)
-- [ ] Donchian breakout strategy
-- [ ] Bollinger mean-reversion strategy
-- [ ] RSI(14) + trend filter strategy
-- [ ] MACD signal cross + volume strategy
-
-### Regime Classifier (Priority 2)
-- [ ] Create `user_data/regime/classifier.py`
-  - [ ] EMA slope sign classifier
-  - [ ] ADX threshold classifier
-  - [ ] Expose single function returning regime label per bar
-  - [ ] Importable from any strategy's `populate_indicators`
+_Nothing currently queued._
 
 ---
 
 ## Done
 
+- [x] More baseline strategies
+  - [x] Donchian breakout strategy
+  - [x] Bollinger mean-reversion strategy
+  - [x] RSI(14) + trend filter strategy
+  - [x] MACD signal cross + volume strategy
+- [x] Regime classifier (`user_data/regime/classifier.py`)
+  - [x] EMA slope sign classifier
+  - [x] ADX threshold classifier
+  - [x] Expose single function returning regime label per bar
+  - [x] Importable from any strategy's `populate_indicators`
 - [x] Walk-forward harness (`scripts/walk_forward.py`)
   - [x] Accept strategy name, date range, window sizes, step size, loss function
   - [x] Implement fold window generation logic
@@ -62,3 +61,4 @@ _Nothing currently in progress._
 | 2026-05-23 | Antigravity | Implemented GitHub Actions CI workflow with TA-Lib build and pytest/ruff checks |
 | 2026-05-23 | Codex | Built walk-forward harness and updated docs/metadata for usage and generated outputs |
 | 2026-05-23 | Codex | Reviewed and tightened CI triggers/cache before merge |
+| 2026-05-23 | Codex | Implemented baseline strategies and regime classifier utility |
