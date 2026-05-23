@@ -17,6 +17,7 @@ This folder is the long-form docs for `crypto-trading-lab`. Start here, then dri
 11. [Roadmap](11-roadmap.md) — what to build next, in priority order.
 12. [Glossary](12-glossary.md) — every acronym/term used in this repo.
 13. [Walk-forward validation results](13-walk-forward-validation-results.md) — first baseline sweep results and rejection rationale.
+14. [Strategy comparison report](14-strategy-comparison-report.md) — aggregate baseline and walk-forward ranking.
 
 ## Reference
 
