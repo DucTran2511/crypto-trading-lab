@@ -11,7 +11,4 @@
 ## Existing Scripts
 
 - `download_binance_vision.py` — downloads OHLCV candle data from data.binance.vision
-
-## Planned Scripts
-
-- `walk_forward.py` — walk-forward backtest harness (see `docs/11-roadmap.md` §11.1)
+- `walk_forward.py` — runs in-sample hyperopt and out-of-sample backtest folds, then writes a CSV summary and stability plot
