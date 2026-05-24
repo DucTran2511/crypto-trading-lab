@@ -79,20 +79,39 @@ crypto-trading-lab/
 ├── user_data/
 │   ├── config.json                  # Freqtrade config (OKX spot, dry-run, $500 wallet)
 │   ├── strategies/
-│   │   └── EMACrossover.py          # Tunable fast/slow EMA crossover w/ trend filter
+│   │   ├── AGENTS.md                # Strategy-folder conventions
+│   │   ├── EMACrossover.py          # Tunable fast/slow EMA crossover w/ trend filter
+│   │   ├── DonchianBreakout.py      # Donchian-channel breakout w/ volume + EMA trend filter
+│   │   ├── BollingerMeanReversion.py # BB lower-band dip-buy w/ RSI + optional trend filter
+│   │   ├── RSITrend.py              # RSI(14) pullback w/ long-term EMA trend filter
+│   │   └── MACDVolume.py            # MACD signal cross w/ volume confirmation
+│   ├── regime/
+│   │   ├── __init__.py
+│   │   └── classifier.py            # ADX + EMA-slope regime labels (bull/bear/range)
 │   └── notebooks/
 │       └── research_template.ipynb  # Vectorised research starter
 ├── scripts/
+│   ├── AGENTS.md                    # Scripts-folder conventions
 │   ├── download_binance_vision.py   # Pull OHLCV from data.binance.vision
-│   └── walk_forward.py              # Hyperopt/backtest walk-forward harness
+│   ├── walk_forward.py              # Hyperopt/backtest walk-forward harness
+│   ├── run_baselines.py             # Same-window backtest sweep across baselines
+│   ├── compare_strategies.py        # Aggregate baseline + walk-forward results → ranking
+│   └── regime_filter_experiments.py # Generate + backtest regime-filtered variants
 ├── risk/
 │   ├── __init__.py
 │   └── position_size.py             # CLI position-sizing calculator
-├── tests/
+├── tests/                           # pytest mirror of source structure (44+ tests)
 │   ├── test_position_size.py
 │   ├── test_download_binance_vision.py
-│   └── test_walk_forward.py
-├── docs/                            # Numbered 01-12, long-form documentation
+│   ├── test_walk_forward.py
+│   ├── test_run_baselines.py
+│   ├── test_compare_strategies.py
+│   ├── test_regime_classifier.py
+│   └── test_regime_filter_experiments.py
+├── docs/                            # Numbered 01-15, long-form documentation
+├── .github/workflows/ci.yml         # GitHub Actions: TA-Lib build + ruff + pytest
+├── AGENTS.md                        # This file. CLAUDE.md, GEMINI.md symlink here.
+├── TASKS.md                         # Current sprint + session log
 ├── requirements.txt                 # Production deps (pinned)
 ├── requirements-dev.txt             # + linter, pytest, jupyter, matplotlib
 └── pyproject.toml                   # ruff + pytest config
@@ -116,17 +135,23 @@ crypto-trading-lab/
 
 ## Current Status & Roadmap
 
-**Last milestone:** Walk-forward harness and GitHub Actions CI complete.
+**Last milestone:** Regime-filter experiments complete. `RSITrendBullOnly` is the
+only variant that survived the same-window screen *and* a single walk-forward
+fold, but the evidence is too thin (one OOS fold, +0.02% profit, 0.25 Sharpe)
+to act on. See `docs/14-strategy-comparison-report.md` and
+`docs/15-regime-filter-experiments.md` for the rejection rationale.
 
-**See `TASKS.md` for current sprint and detailed progress.**
+**Current sprint:** Multi-window walk-forward validation of `RSITrendBullOnly`.
+**See `TASKS.md` for active tasks and per-agent assignments.**
 
 Roadmap priority (from `docs/11-roadmap.md`):
-1. More baseline strategies (Donchian, Bollinger, RSI+trend, MACD)
-2. Regime classifier utility (`user_data/regime/classifier.py`)
-3. Switch live data to Binance.vision as default
-4. Live monitoring stack (logs, Telegram, heartbeat)
-5. Paper-trade validation (4+ weeks)
-6. Live micro-size deployment
+1. **Multi-window walk-forward of `RSITrendBullOnly`** — 3+ folds before any
+   claim of "weak research candidate" survives.
+2. If validated: design a second pass (different timerange / pairs / window).
+3. Switch live data to Binance.vision as default.
+4. Live monitoring stack (logs, Telegram, heartbeat).
+5. Paper-trade validation (4+ weeks).
+6. Live micro-size deployment.
 
 ---
 
@@ -160,6 +185,9 @@ Full docs in `docs/` (read in order):
 | 10 | `docs/10-troubleshooting.md` | Indexed by error message |
 | 11 | `docs/11-roadmap.md` | What to build next |
 | 12 | `docs/12-glossary.md` | Trading/Freqtrade terms |
+| 13 | `docs/13-walk-forward-validation-results.md` | First baseline walk-forward sweep + rejections |
+| 14 | `docs/14-strategy-comparison-report.md` | Aggregate baseline + WF ranking |
+| 15 | `docs/15-regime-filter-experiments.md` | Regime-filter variants vs unfiltered controls |
 
 ---
 
