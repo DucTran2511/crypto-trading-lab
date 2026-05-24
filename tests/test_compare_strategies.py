@@ -10,6 +10,7 @@ from scripts.compare_strategies import (
     WalkForwardResult,
     build_comparisons,
     build_markdown_report,
+    main,
     read_baseline_results,
     read_walk_forward_results,
 )
@@ -184,3 +185,77 @@ def test_build_markdown_report_documents_final_research_direction():
     assert "Avg IS-OOS Gap %" in markdown
     assert "No baseline is ready for paper trading" in markdown
     assert "Use `BollingerMeanReversion` as the next research control" in markdown
+
+
+def test_main_includes_regime_walk_forward_root(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
+    baseline_csv = tmp_path / "baseline_validation_summary.csv"
+    baseline_csv.write_text(
+        "\n".join(
+            [
+                "strategy,trades,win_rate_pct,total_profit_pct,sharpe,max_drawdown_pct,profit_factor",
+                "RSITrend,76,21.05,-1.73,-3.58,1.89,0.50",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    regime_root = tmp_path / "regime_walk_forward"
+    write_walk_forward_summary(
+        regime_root / "RSITrendBullOnly" / "walk_forward_summary.csv",
+        [
+            {
+                "fold": "1",
+                "in_sample_total_profit_pct": "0.30",
+                "out_sample_sharpe": "0.25",
+                "out_sample_max_drawdown_pct": "0.40",
+                "out_sample_total_profit_pct": "0.02",
+            },
+            {
+                "fold": "2",
+                "in_sample_total_profit_pct": "0.20",
+                "out_sample_sharpe": "0.15",
+                "out_sample_max_drawdown_pct": "0.20",
+                "out_sample_total_profit_pct": "0.01",
+            },
+        ],
+    )
+    output = tmp_path / "report.md"
+
+    exit_code = main(
+        [
+            "--baseline-csv",
+            str(baseline_csv),
+            "--walk-forward-root",
+            str(tmp_path / "missing_baseline_walk_forward"),
+            "--regime-walk-forward-root",
+            str(regime_root),
+            "--output",
+            str(output),
+        ]
+    )
+
+    assert exit_code == 0
+    report = output.read_text(encoding="utf-8")
+    assert "`RSITrendBullOnly`" in report
+    assert "Research candidate" in report
+    assert "N/A | N/A | N/A | 2 | 0.01 | 0.20 | 0.40 | 100.00 | 0.23" in report
+    assert "`RSITrendBullOnly` ranks first as a research candidate" in report
+    captured = capsys.readouterr()
+    assert "Wrote strategy comparison report" in captured.err
+
+
+def write_walk_forward_summary(path: Path, rows: list[dict[str, str]]) -> None:
+    path.parent.mkdir(parents=True)
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=[
+                "fold",
+                "in_sample_total_profit_pct",
+                "out_sample_sharpe",
+                "out_sample_max_drawdown_pct",
+                "out_sample_total_profit_pct",
+            ],
+        )
+        writer.writeheader()
+        writer.writerows(rows)

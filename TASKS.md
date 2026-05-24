@@ -38,7 +38,7 @@
     per-fold params/logs/backtest exports. Push the branch but do not commit
     those generated artefacts — they remain gitignored.
 
-- [ ] **B. Extend `scripts/compare_strategies.py`** — _suggested agent: Codex 5.4 medium_
+- [x] **B. Extend `scripts/compare_strategies.py`** — _suggested agent: Codex 5.4 medium_
   - Add an optional `--regime-walk-forward-root` argument (default
     `user_data/regime_filter_results/walk_forward`) that picks up
     `*/walk_forward_summary.csv` files and includes them in the comparison
@@ -138,6 +138,7 @@
 | 2026-05-23 | Antigravity | Automated and ran same-window baseline backtests, generated report, selected RSITrend/BollingerMeanReversion for walk-forward sweeps |
 | 2026-05-23 | Codex | Fixed baseline validation CLI help behavior and added parser/report tests |
 | 2026-05-23 | Antigravity | Ran walk-forward validation sweeps for RSITrend and BollingerMeanReversion, analyzed results and rejected both due to overfitting |
+| 2026-05-24 | Codex | Extended strategy comparison report to include regime walk-forward result roots |
 | 2026-05-23 | Codex | Reviewed walk-forward sweep branch and added committed results report |
 | 2026-05-24 | Codex | Added scripted strategy comparison report and ranked baselines for next research iteration |
 | 2026-05-24 | Codex | Implemented and ran regime-filter experiments; `RSITrendBullOnly` survived as weak research-only candidate |
