@@ -31,4 +31,6 @@ quality, and trade-frequency improvements instead of simply increasing hyperopt 
 - Run regime-filter experiments against `BollingerMeanReversion` first, always comparing
   against the unfiltered baseline result.
 
+[Regime filter experiment workflow](15-regime-filter-experiments.md)
+
 [Back to docs index](README.md)

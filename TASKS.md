@@ -11,16 +11,17 @@ _Nothing currently in progress._
 
 ## Up Next
 
-### Regime Filter Experiments (Priority 3)
-- [ ] Apply the regime classifier to the strongest baseline strategy candidates
-- [ ] Compare all-regime, bull-only, bear-excluded, and trending-only variants
-- [ ] Validate any promising regime-filtered variant with walk-forward validation
-- [ ] Keep the original baseline result as the control for every regime experiment
+_Nothing currently queued._
 
 ---
 
 ## Done
 
+- [x] Regime Filter Experiments
+  - [x] Apply the regime classifier to the strongest baseline strategy candidates
+  - [x] Compare all-regime, bull-only, bear-excluded, and trending-only variants
+  - [x] Validate any promising regime-filtered variant with walk-forward validation
+  - [x] Keep the original baseline result as the control for every regime experiment
 - [x] Strategy Comparison Report
   - [x] Create a strategy comparison report that aggregates baseline backtest and walk-forward results
   - [x] Rank strategies by out-of-sample performance, drawdown control, trade count, and fold stability
@@ -87,3 +88,4 @@ _Nothing currently in progress._
 | 2026-05-23 | Antigravity | Ran walk-forward validation sweeps for RSITrend and BollingerMeanReversion, analyzed results and rejected both due to overfitting |
 | 2026-05-23 | Codex | Reviewed walk-forward sweep branch and added committed results report |
 | 2026-05-24 | Codex | Added scripted strategy comparison report and ranked baselines for next research iteration |
+| 2026-05-24 | Codex | Implemented and ran regime-filter experiments; `RSITrendBullOnly` survived as weak research-only candidate |
