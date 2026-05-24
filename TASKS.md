@@ -47,7 +47,7 @@
     the new flag.
   - Acceptance: `ruff check .` clean, `pytest` green.
 
-- [ ] **C. Write `docs/16-rsitrend-bullonly-multiwindow.md`** — _suggested agent: Antigravity Gemini Flash high (after A finishes)_
+- [x] **C. Write `docs/16-rsitrend-bullonly-multiwindow.md`** — _suggested agent: Antigravity Gemini Flash high (after A finishes)_
   - Structure: 16.1 Scope · 16.2 Per-fold results table · 16.3 Acceptance criteria · 16.4 Decision · 16.5 Next step.
   - Explicit acceptance criteria (commit these to the doc up front, do not move the goalposts after the run):
     1. ≥3 out-of-sample folds completed.
@@ -62,6 +62,8 @@
     window, or a different pair subset). Do NOT advance to paper trading on a
     single-sprint result. Write a short proposal in `docs/16-...md` §16.5 with
     the proposed second-pass parameters and rejection criteria.
+  - Status: not applicable from the current run because `docs/16-...md` rejects
+    `RSITrendBullOnly` after failed average OOS Sharpe and profit criteria.
 
 - [ ] **E. Update `TASKS.md`** at sprint end — _any agent_
 
@@ -143,3 +145,4 @@
 | 2026-05-24 | Codex | Added scripted strategy comparison report and ranked baselines for next research iteration |
 | 2026-05-24 | Codex | Implemented and ran regime-filter experiments; `RSITrendBullOnly` survived as weak research-only candidate |
 | 2026-05-24 | Antigravity | Prepended OKX data starting from 2024-10-01, ran 3-fold walk-forward validation sweep for RSITrendBullOnly, and rejected it |
+| 2026-05-24 | Codex | Documented RSITrendBullOnly multi-window validation in docs/16 and linked it from docs indexes |

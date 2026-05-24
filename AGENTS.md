@@ -108,7 +108,7 @@ crypto-trading-lab/
 │   ├── test_compare_strategies.py
 │   ├── test_regime_classifier.py
 │   └── test_regime_filter_experiments.py
-├── docs/                            # Numbered 01-15, long-form documentation
+├── docs/                            # Numbered 01-16, long-form documentation
 ├── .github/workflows/ci.yml         # GitHub Actions: TA-Lib build + ruff + pytest
 ├── AGENTS.md                        # This file. CLAUDE.md, GEMINI.md symlink here.
 ├── TASKS.md                         # Current sprint + session log
@@ -135,19 +135,17 @@ crypto-trading-lab/
 
 ## Current Status & Roadmap
 
-**Last milestone:** Regime-filter experiments complete. `RSITrendBullOnly` is the
-only variant that survived the same-window screen *and* a single walk-forward
-fold, but the evidence is too thin (one OOS fold, +0.02% profit, 0.25 Sharpe)
-to act on. See `docs/14-strategy-comparison-report.md` and
-`docs/15-regime-filter-experiments.md` for the rejection rationale.
+**Last milestone:** Multi-window validation of `RSITrendBullOnly` complete. The
+variant failed the 3-fold acceptance criteria with negative average OOS Sharpe
+and profit, so it is rejected. See `docs/16-rsitrend-bullonly-multiwindow.md`.
 
-**Current sprint:** Multi-window walk-forward validation of `RSITrendBullOnly`.
+**Current sprint:** Close out the `RSITrendBullOnly` validation sprint and return
+to new research hypotheses.
 **See `TASKS.md` for active tasks and per-agent assignments.**
 
 Roadmap priority (from `docs/11-roadmap.md`):
-1. **Multi-window walk-forward of `RSITrendBullOnly`** — 3+ folds before any
-   claim of "weak research candidate" survives.
-2. If validated: design a second pass (different timerange / pairs / window).
+1. Form a new strategy or filter hypothesis; `RSITrendBullOnly` is rejected.
+2. Validate any new candidate with same-window screening and walk-forward tests.
 3. Switch live data to Binance.vision as default.
 4. Live monitoring stack (logs, Telegram, heartbeat).
 5. Paper-trade validation (4+ weeks).
@@ -188,6 +186,7 @@ Full docs in `docs/` (read in order):
 | 13 | `docs/13-walk-forward-validation-results.md` | First baseline walk-forward sweep + rejections |
 | 14 | `docs/14-strategy-comparison-report.md` | Aggregate baseline + WF ranking |
 | 15 | `docs/15-regime-filter-experiments.md` | Regime-filter variants vs unfiltered controls |
+| 16 | `docs/16-rsitrend-bullonly-multiwindow.md` | RSITrendBullOnly 3-fold validation + rejection |
 
 ---
 
