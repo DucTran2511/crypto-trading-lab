@@ -98,4 +98,7 @@ Promoted walk-forward validation, `2025-01-01` to `2025-05-01`, 90d in-sample an
 `RSITrendBullOnly` is not tradable from this evidence; the result is small and only one
 fold. It is the only regime-filtered variant worth a further multi-window research pass.
 
+The follow-up 3-fold validation rejected `RSITrendBullOnly`; see
+[16. RSITrendBullOnly Multi-Window Walk-Forward](16-rsitrend-bullonly-multiwindow.md).
+
 [Back to docs index](README.md)
