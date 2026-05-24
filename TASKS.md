@@ -57,13 +57,14 @@
   - All four must hold to mark the variant as "keep researching." Anything weaker → reject.
   - Add the new doc to the `docs/README.md` index and to the AGENTS.md docs table.
 
-- [ ] **D. If A passes acceptance** — _suggested agent: Sonnet 4.6 Thinking or Codex 5.5 high_
+- [x] **D. If A passes acceptance** — _suggested agent: Sonnet 4.6 Thinking or Codex 5.5 high_
   - Design a second validation pass (different timerange, longer in-sample
     window, or a different pair subset). Do NOT advance to paper trading on a
     single-sprint result. Write a short proposal in `docs/16-...md` §16.5 with
     the proposed second-pass parameters and rejection criteria.
-  - Status: not applicable from the current run because `docs/16-...md` rejects
-    `RSITrendBullOnly` after failed average OOS Sharpe and profit criteria.
+  - Status: closed as not applicable from the current run because
+    `docs/16-...md` rejects `RSITrendBullOnly` after failed average OOS Sharpe
+    and profit criteria.
 
 - [ ] **E. Update `TASKS.md`** at sprint end — _any agent_
 
@@ -146,3 +147,4 @@
 | 2026-05-24 | Codex | Implemented and ran regime-filter experiments; `RSITrendBullOnly` survived as weak research-only candidate |
 | 2026-05-24 | Antigravity | Prepended OKX data starting from 2024-10-01, ran 3-fold walk-forward validation sweep for RSITrendBullOnly, and rejected it |
 | 2026-05-24 | Codex | Documented RSITrendBullOnly multi-window validation in docs/16 and linked it from docs indexes |
+| 2026-05-24 | Codex | Closed task D as not applicable because RSITrendBullOnly failed acceptance |
