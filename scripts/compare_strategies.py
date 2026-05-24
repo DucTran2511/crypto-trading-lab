@@ -35,7 +35,8 @@ class WalkForwardResult:
 
 @dataclass(frozen=True)
 class StrategyComparison:
-    baseline: BaselineResult
+    strategy: str
+    baseline: BaselineResult | None
     walk_forward: WalkForwardResult | None
     rank: int
     status: str
@@ -57,6 +58,15 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=Path("user_data/walk_forward_results"),
         help="Directory containing per-strategy walk_forward_summary.csv files.",
+    )
+    parser.add_argument(
+        "--regime-walk-forward-root",
+        type=Path,
+        default=Path("user_data/regime_filter_results/walk_forward"),
+        help=(
+            "Optional directory containing regime-filter variant walk_forward_summary.csv files. "
+            "Results found here are merged into the comparison ranking."
+        ),
     )
     parser.add_argument(
         "--output",
@@ -134,17 +144,24 @@ def build_comparisons(
     baseline_results: Sequence[BaselineResult],
     walk_forward_results: dict[str, WalkForwardResult],
 ) -> list[StrategyComparison]:
-    sorted_baselines = sorted(
-        baseline_results,
-        key=lambda result: comparison_sort_key(result, walk_forward_results.get(result.strategy)),
+    baseline_by_strategy = {result.strategy: result for result in baseline_results}
+    strategy_names = sorted(set(baseline_by_strategy) | set(walk_forward_results))
+    sorted_strategies = sorted(
+        strategy_names,
+        key=lambda strategy: comparison_sort_key(
+            baseline_by_strategy.get(strategy),
+            walk_forward_results.get(strategy),
+        ),
     )
 
     comparisons = []
-    for rank, baseline in enumerate(sorted_baselines, start=1):
-        walk_forward = walk_forward_results.get(baseline.strategy)
+    for rank, strategy in enumerate(sorted_strategies, start=1):
+        baseline = baseline_by_strategy.get(strategy)
+        walk_forward = walk_forward_results.get(strategy)
         status, rationale = classify_strategy(baseline, walk_forward)
         comparisons.append(
             StrategyComparison(
+                strategy=strategy,
                 baseline=baseline,
                 walk_forward=walk_forward,
                 rank=rank,
@@ -156,7 +173,7 @@ def build_comparisons(
 
 
 def comparison_sort_key(
-    baseline: BaselineResult,
+    baseline: BaselineResult | None,
     walk_forward: WalkForwardResult | None,
 ) -> tuple[int, float, float, float, float, float, int]:
     if walk_forward is not None:
@@ -169,9 +186,12 @@ def comparison_sort_key(
             abs(walk_forward.avg_is_oos_profit_gap_pct)
             if walk_forward.avg_is_oos_profit_gap_pct is not None
             else 999.0,
-            baseline.max_drawdown_pct,
-            -baseline.trades,
+            baseline.max_drawdown_pct if baseline else 999.0,
+            -baseline.trades if baseline else 0,
         )
+
+    if baseline is None:
+        return (2, 0.0, 999.0, 999.0, 999.0, 999.0, 0)
 
     return (
         1,
@@ -186,7 +206,7 @@ def comparison_sort_key(
 
 
 def classify_strategy(
-    baseline: BaselineResult,
+    baseline: BaselineResult | None,
     walk_forward: WalkForwardResult | None,
 ) -> tuple[str, str]:
     if walk_forward is None:
@@ -194,6 +214,11 @@ def classify_strategy(
             "Control only",
             "Rejected before walk-forward validation; keep as a baseline/control, not a candidate.",
         )
+
+    if baseline is None:
+        basis = "Regime variant has no same-window baseline row; ranking is based on walk-forward only."
+    else:
+        basis = "Hyperopt improved the in-sample fold, but the out-of-sample fold did not preserve the edge."
 
     if (
         walk_forward.avg_oos_profit_pct is not None
@@ -204,12 +229,12 @@ def classify_strategy(
     ):
         return (
             "Research candidate",
-            "Out-of-sample fold stayed positive after hyperopt; continue with stricter validation.",
+            "Out-of-sample folds stayed positive after hyperopt; continue with stricter validation.",
         )
 
     return (
         "Reject",
-        "Hyperopt improved the in-sample fold, but the out-of-sample fold did not preserve the edge.",
+        basis,
     )
 
 
@@ -232,9 +257,11 @@ def build_markdown_report(comparisons: Sequence[StrategyComparison]) -> str:
         baseline = comparison.baseline
         walk_forward = comparison.walk_forward
         lines.append(
-            f"| {comparison.rank} | `{baseline.strategy}` | {comparison.status} | "
-            f"{baseline.trades} | {baseline.total_profit_pct:.2f} | "
-            f"{format_optional(baseline.sharpe)} | {baseline.max_drawdown_pct:.2f} | "
+            f"| {comparison.rank} | `{comparison.strategy}` | {comparison.status} | "
+            f"{baseline.trades if baseline else 'N/A'} | "
+            f"{format_optional(baseline.total_profit_pct if baseline else None)} | "
+            f"{format_optional(baseline.sharpe if baseline else None)} | "
+            f"{format_optional(baseline.max_drawdown_pct if baseline else None)} | "
             f"{walk_forward.folds if walk_forward else 0} | "
             f"{format_optional(walk_forward.avg_oos_profit_pct if walk_forward else None)} | "
             f"{format_optional(walk_forward.avg_oos_sharpe if walk_forward else None)} | "
@@ -245,7 +272,10 @@ def build_markdown_report(comparisons: Sequence[StrategyComparison]) -> str:
         )
 
     if not comparisons:
-        lines.append("| N/A | N/A | No data | 0 | N/A | N/A | N/A | 0 | N/A | N/A | N/A | N/A | N/A | No baseline rows were available. |")
+        lines.append(
+            "| N/A | N/A | No data | 0 | N/A | N/A | N/A | 0 | N/A | N/A | N/A | "
+            "N/A | N/A | No baseline rows were available. |"
+        )
         lines.extend(
             [
                 "",
@@ -258,13 +288,27 @@ def build_markdown_report(comparisons: Sequence[StrategyComparison]) -> str:
         )
         return "\n".join(lines) + "\n"
 
-    top_strategy = comparisons[0].baseline.strategy
-
-    lines.extend(
-        [
+    top_comparison = comparisons[0]
+    top_strategy = top_comparison.strategy
+    if top_comparison.status == "Research candidate":
+        decision = [
+            f"`{top_strategy}` ranks first as a research candidate because its walk-forward "
+            "holdout metrics stayed positive. It is not ready for paper trading until it passes "
+            "a broader multi-window or second-pass validation.",
             "",
-            "## 14.2 Decision",
-            "",
+            "Use the highest-ranked research candidate as the next experiment target, while keeping",
+            "`BollingerMeanReversion` and `RSITrend` as controls for comparison against the original",
+            "baseline and unfiltered strategy behavior.",
+        ]
+        next_work = [
+            f"- Run multi-window walk-forward validation for `{top_strategy}` before treating it as",
+            "  more than a weak research candidate.",
+            "- Keep `BollingerMeanReversion` and unfiltered `RSITrend` as controls.",
+            "- Reject the regime variant if the broader validation loses positive OOS Sharpe,",
+            "  positive OOS profit, or acceptable drawdown control.",
+        ]
+    else:
+        decision = [
             f"`{top_strategy}` ranks first because it had the least-bad validated holdout result, "
             "but it is still rejected as a tradable strategy. No baseline is ready for paper trading.",
             "",
@@ -272,13 +316,24 @@ def build_markdown_report(comparisons: Sequence[StrategyComparison]) -> str:
             "baseline drawdown and the best out-of-sample result among the strategies that reached",
             "walk-forward validation. The next iteration should focus on regime filters, entry",
             "quality, and trade-frequency improvements instead of simply increasing hyperopt epochs.",
-            "",
-            "## 14.3 Next Work",
-            "",
+        ]
+        next_work = [
             "- Keep `EMACrossover`, `DonchianBreakout`, and `MACDVolume` as losing controls.",
             "- Treat `RSITrend` as a secondary control: it had enough trades, but failed the holdout badly.",
             "- Run regime-filter experiments against `BollingerMeanReversion` first, always comparing",
             "  against the unfiltered baseline result.",
+        ]
+
+    lines.extend(
+        [
+            "",
+            "## 14.2 Decision",
+            "",
+            *decision,
+            "",
+            "## 14.3 Next Work",
+            "",
+            *next_work,
             "",
             "[Back to docs index](README.md)",
         ]
@@ -326,10 +381,22 @@ def optional_asc_sort_value(value: float | None) -> float:
     return value
 
 
+def merge_walk_forward_results(
+    primary_results: dict[str, WalkForwardResult],
+    extra_results: dict[str, WalkForwardResult],
+) -> dict[str, WalkForwardResult]:
+    merged = dict(primary_results)
+    merged.update(extra_results)
+    return merged
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     baseline_results = read_baseline_results(args.baseline_csv)
-    walk_forward_results = read_walk_forward_results(args.walk_forward_root)
+    walk_forward_results = merge_walk_forward_results(
+        read_walk_forward_results(args.walk_forward_root),
+        read_walk_forward_results(args.regime_walk_forward_root),
+    )
     comparisons = build_comparisons(baseline_results, walk_forward_results)
     output = write_report(comparisons, args.output)
     print(f"Wrote strategy comparison report: {output}", file=sys.stderr)
