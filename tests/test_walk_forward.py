@@ -100,6 +100,50 @@ def test_extract_backtest_metrics_from_stdout_when_no_export(tmp_path: Path):
     )
 
 
+def test_extract_backtest_metrics_from_stdout_new_drawdown_label(tmp_path: Path):
+    metrics = extract_backtest_metrics(
+        tmp_path / "missing.json",
+        "Sharpe: 0.88\nAbsolute Drawdown (Account): 3.14%\nTotal profit %: 5.5",
+        "",
+        "EMACrossover",
+    )
+
+    assert metrics == BacktestMetrics(
+        sharpe=0.88,
+        max_drawdown_pct=3.14,
+        total_profit_pct=5.5,
+    )
+
+
+def test_extract_backtest_metrics_from_zip(tmp_path: Path):
+    import zipfile
+    zip_file = tmp_path / "backtest-2026-05-24_17-20-47.zip"
+    export_file = tmp_path / "backtest.json"
+
+    with zipfile.ZipFile(zip_file, "w") as z:
+        z.writestr(
+            "backtest_results.json",
+            json.dumps(
+                {
+                    "strategy": {
+                        "EMACrossover": {
+                            "sharpe": 1.5,
+                            "max_drawdown_account": 0.05,
+                            "profit_total": 0.1,
+                        }
+                    }
+                }
+            )
+        )
+
+    metrics = extract_backtest_metrics(export_file, "", "", "EMACrossover")
+    assert metrics == BacktestMetrics(
+        sharpe=1.5,
+        max_drawdown_pct=5.0,
+        total_profit_pct=10.0,
+    )
+
+
 def test_run_walk_forward_orchestrates_hyperopt_and_backtests(tmp_path: Path):
     strategy_path = tmp_path / "strategies"
     strategy_path.mkdir()

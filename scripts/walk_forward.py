@@ -286,7 +286,31 @@ def extract_backtest_metrics(
     stderr: str,
     strategy: str,
 ) -> BacktestMetrics:
-    payload = load_json_if_present(export_file)
+    payload = None
+    if export_file.exists():
+        payload = load_json_if_present(export_file)
+    else:
+        # Check if Freqtrade exported as a ZIP file (standard in newer versions)
+        prefix = export_file.name
+        # If prefix ends with .json, remove it to match prefix*
+        if prefix.endswith(".json"):
+            prefix = prefix[:-5]
+        zips = sorted(export_file.parent.glob(f"{prefix}*.zip"))
+        if zips:
+            zip_path = zips[-1]
+            try:
+                import zipfile
+                with zipfile.ZipFile(zip_path) as z:
+                    json_file = None
+                    for name in z.namelist():
+                        if name.endswith(".json") and not name.endswith("_config.json"):
+                            json_file = name
+                            break
+                    if json_file:
+                        payload = json.loads(z.read(json_file).decode("utf-8"))
+            except Exception as exc:
+                print(f"Error parsing zip {zip_path}: {exc}", file=sys.stderr)
+
     metrics_source = find_strategy_metrics(payload, strategy) if payload is not None else None
     if metrics_source is not None:
         return BacktestMetrics(
@@ -309,10 +333,16 @@ def extract_backtest_metrics(
         )
 
     text = "\n".join(part for part in (stdout, stderr) if part)
+    sharpe = find_metric_in_text(text, ("Sharpe", "Sharpe Ratio"))
+    max_drawdown_pct = find_metric_in_text(
+        text,
+        ("Max drawdown %", "Max Drawdown", "Absolute Drawdown (Account)", "Max % of account underwater")
+    )
+    total_profit_pct = find_metric_in_text(text, ("Total profit %", "Total Profit %"))
     return BacktestMetrics(
-        sharpe=find_metric_in_text(text, ("Sharpe", "Sharpe Ratio")),
-        max_drawdown_pct=find_metric_in_text(text, ("Max drawdown %", "Max Drawdown")),
-        total_profit_pct=find_metric_in_text(text, ("Total profit %", "Total Profit %")),
+        sharpe=sharpe,
+        max_drawdown_pct=max_drawdown_pct,
+        total_profit_pct=total_profit_pct,
     )
 
 
