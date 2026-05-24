@@ -80,8 +80,13 @@ Do not paper-trade this variant and do not tune it further on the same window se
 
 ## 16.5 Next Step
 
-Task D does not apply because the validation did not pass acceptance. Do not design a
-second validation pass for `RSITrendBullOnly` from this result.
+Task D is closed as not applicable because the validation did not pass acceptance. Do not
+design a second validation pass for `RSITrendBullOnly` from this result.
+
+A second validation pass would only be justified if all four criteria in §16.3 had passed.
+They did not: average OOS Sharpe and average OOS profit were both negative. Advancing this
+variant to a new timerange, pair subset, or longer in-sample window would be post-hoc
+goalpost moving rather than validation.
 
 Keep `RSITrendBullOnly` as a rejected regime-filter experiment and return to research
 ideation. The next candidate should start from a new hypothesis, then pass the same
