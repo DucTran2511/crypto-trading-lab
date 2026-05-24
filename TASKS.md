@@ -7,7 +7,7 @@
 
 ## In Progress
 
-- [ ] **Sprint: Multi-window walk-forward validation of `RSITrendBullOnly`**
+- [/] **Sprint: Multi-window walk-forward validation of `RSITrendBullOnly`**
   Single-fold evidence in `docs/15-regime-filter-experiments.md` is too weak to
   act on (+0.02% OOS profit, 0.25 OOS Sharpe). Need at least 3 OOS folds before
   the variant survives as even a "weak research candidate." See per-agent task
@@ -17,7 +17,7 @@
 
 ### Sprint tasks (per-agent assignments)
 
-- [ ] **A. Run the multi-window walk-forward sweep** — _suggested agent: Antigravity Gemini Flash medium_
+- [x] **A. Run the multi-window walk-forward sweep** — _suggested agent: Antigravity Gemini Flash medium_
   - Pre-req: `RSITrendBullOnly` strategy file exists at
     `user_data/regime_filter_results/generated_strategies/RSITrendBullOnly.py`
     (regenerate via `scripts/regime_filter_experiments.py` if needed).
@@ -141,3 +141,4 @@
 | 2026-05-23 | Codex | Reviewed walk-forward sweep branch and added committed results report |
 | 2026-05-24 | Codex | Added scripted strategy comparison report and ranked baselines for next research iteration |
 | 2026-05-24 | Codex | Implemented and ran regime-filter experiments; `RSITrendBullOnly` survived as weak research-only candidate |
+| 2026-05-24 | Antigravity | Prepended OKX data starting from 2024-10-01, ran 3-fold walk-forward validation sweep for RSITrendBullOnly, and rejected it |
