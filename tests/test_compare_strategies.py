@@ -180,5 +180,7 @@ def test_build_markdown_report_documents_final_research_direction():
     markdown = build_markdown_report(comparisons)
 
     assert "# 14. Strategy Comparison Report" in markdown
+    assert "Worst OOS DD %" in markdown
+    assert "Avg IS-OOS Gap %" in markdown
     assert "No baseline is ready for paper trading" in markdown
     assert "Use `BollingerMeanReversion` as the next research control" in markdown

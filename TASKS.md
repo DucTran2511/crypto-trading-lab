@@ -86,4 +86,4 @@ _Nothing currently in progress._
 | 2026-05-23 | Codex | Fixed baseline validation CLI help behavior and added parser/report tests |
 | 2026-05-23 | Antigravity | Ran walk-forward validation sweeps for RSITrend and BollingerMeanReversion, analyzed results and rejected both due to overfitting |
 | 2026-05-23 | Codex | Reviewed walk-forward sweep branch and added committed results report |
-| 2026-05-23 | Codex | Added scripted strategy comparison report and ranked baselines for next research iteration |
+| 2026-05-24 | Codex | Added scripted strategy comparison report and ranked baselines for next research iteration |

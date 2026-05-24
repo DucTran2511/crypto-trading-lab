@@ -158,20 +158,28 @@ def build_comparisons(
 def comparison_sort_key(
     baseline: BaselineResult,
     walk_forward: WalkForwardResult | None,
-) -> tuple[int, float, float, float, int]:
+) -> tuple[int, float, float, float, float, float, int]:
     if walk_forward is not None:
         return (
             0,
-            -(walk_forward.avg_oos_profit_pct or -999.0),
-            -(walk_forward.avg_oos_sharpe or -999.0),
+            optional_desc_sort_value(walk_forward.positive_oos_fold_rate_pct),
+            optional_desc_sort_value(walk_forward.avg_oos_profit_pct),
+            optional_desc_sort_value(walk_forward.avg_oos_sharpe),
+            optional_asc_sort_value(walk_forward.worst_oos_drawdown_pct),
+            abs(walk_forward.avg_is_oos_profit_gap_pct)
+            if walk_forward.avg_is_oos_profit_gap_pct is not None
+            else 999.0,
             baseline.max_drawdown_pct,
             -baseline.trades,
         )
 
     return (
         1,
+        0.0,
         -baseline.total_profit_pct,
-        -(baseline.sharpe or -999.0),
+        optional_desc_sort_value(baseline.sharpe),
+        999.0,
+        999.0,
         baseline.max_drawdown_pct,
         -baseline.trades,
     )
@@ -206,7 +214,6 @@ def classify_strategy(
 
 
 def build_markdown_report(comparisons: Sequence[StrategyComparison]) -> str:
-    top_strategy = comparisons[0].baseline.strategy
     lines = [
         "# 14. Strategy Comparison Report",
         "",
@@ -217,8 +224,8 @@ def build_markdown_report(comparisons: Sequence[StrategyComparison]) -> str:
         "",
         "## 14.1 Final Ranking",
         "",
-        "| Rank | Strategy | Status | Baseline Trades | Baseline Profit % | Baseline Sharpe | Baseline Max DD % | OOS Folds | Avg OOS Profit % | Avg OOS Sharpe | OOS Positive Fold % | Rationale |",
-        "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+        "| Rank | Strategy | Status | Baseline Trades | Baseline Profit % | Baseline Sharpe | Baseline Max DD % | OOS Folds | Avg OOS Profit % | Avg OOS Sharpe | Worst OOS DD % | OOS Positive Fold % | Avg IS-OOS Gap % | Rationale |",
+        "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
 
     for comparison in comparisons:
@@ -231,9 +238,27 @@ def build_markdown_report(comparisons: Sequence[StrategyComparison]) -> str:
             f"{walk_forward.folds if walk_forward else 0} | "
             f"{format_optional(walk_forward.avg_oos_profit_pct if walk_forward else None)} | "
             f"{format_optional(walk_forward.avg_oos_sharpe if walk_forward else None)} | "
+            f"{format_optional(walk_forward.worst_oos_drawdown_pct if walk_forward else None)} | "
             f"{format_optional(walk_forward.positive_oos_fold_rate_pct if walk_forward else None)} | "
+            f"{format_optional(walk_forward.avg_is_oos_profit_gap_pct if walk_forward else None)} | "
             f"{comparison.rationale} |"
         )
+
+    if not comparisons:
+        lines.append("| N/A | N/A | No data | 0 | N/A | N/A | N/A | 0 | N/A | N/A | N/A | N/A | N/A | No baseline rows were available. |")
+        lines.extend(
+            [
+                "",
+                "## 14.2 Decision",
+                "",
+                "No baseline results were available, so no strategy can be ranked.",
+                "",
+                "[Back to docs index](README.md)",
+            ]
+        )
+        return "\n".join(lines) + "\n"
+
+    top_strategy = comparisons[0].baseline.strategy
 
     lines.extend(
         [
@@ -287,6 +312,18 @@ def format_optional(value: float | None) -> str:
     if value is None:
         return "N/A"
     return f"{value:.2f}"
+
+
+def optional_desc_sort_value(value: float | None) -> float:
+    if value is None:
+        return 999.0
+    return -value
+
+
+def optional_asc_sort_value(value: float | None) -> float:
+    if value is None:
+        return 999.0
+    return value
 
 
 def main(argv: Sequence[str] | None = None) -> int:
