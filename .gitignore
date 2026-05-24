@@ -20,6 +20,7 @@ user_data/logs/
 user_data/backtest_results/
 user_data/hyperopt_results/
 user_data/walk_forward_results/
+user_data/regime_filter_results/
 user_data/plot/
 user_data/*.sqlite
 user_data/*.sqlite-shm
