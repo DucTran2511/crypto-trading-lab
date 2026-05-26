@@ -86,9 +86,11 @@
     walk-forward per-fold table, and explicit pass/fail against acceptance criteria.
   - Update `docs/README.md` and AGENTS.md docs table with the new entry.
 
-- [ ] **I. Regime-filter experiments on Step 3 survivors** — _Antigravity Gemini Flash medium (after G, only for passing strategies)_
+- [x] **I. Regime-filter experiments on Step 3 survivors** — _Antigravity Gemini Flash medium (after G, only for passing strategies)_
   - Run `scripts/regime_filter_experiments.py` on each survivor.
   - This is the **only** legitimate place to evaluate regime gating.
+  - Closed as not applicable: Task G produced no passing Step 3 survivors, so
+    there are no legitimate strategies to run through regime-filter experiments.
 
 - [ ] **J. Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after H, only if any strategy passes)_
   - `freqtrade trade -c user_data/config.json --strategy <StrategyName>`.
@@ -195,3 +197,4 @@
 | 2026-05-26 | Codex | Added smoke tests for both 1h strategy classes and verified `ruff check .` plus `pytest` |
 | 2026-05-26 | Codex | Ran same-window 1h baseline backtests for Task F; both strategies passed the trade-count/drawdown screen, and Strategy B needed no ATR relaxation |
 | 2026-05-26 | Codex | Ran 7-fold walk-forward validation for `MultiTimeframeTrend` and `ATRAdaptiveMeanReversion`; both failed acceptance due to negative average OOS profit |
+| 2026-05-26 | Codex | Closed Task I as not applicable because Task G produced no passing Step 3 survivors for regime-filter experiments |
