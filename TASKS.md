@@ -21,7 +21,7 @@
 > ambiguity. Do **not** route any of these to Opus Thinking, Codex 5.5 high+,
 > or Devin without explicit escalation.
 
-- [ ] **A. Create feature branch + decide `max_open_trades` posture** — _Codex 5.4 low_
+- [x] **A. Create feature branch + decide `max_open_trades` posture** — _Codex 5.4 low_
   - Branch: `git checkout -b <agent>/sprint-1h-strategies` in the agent's worktree.
   - Per `docs/17-next-sprint-plan.md` §17.2.2, decide **Option A** (`max_open_trades = 2`, recommended)
     or **Option B** (keep `3`, document the 60% concentration here).
@@ -179,3 +179,4 @@
 | 2026-05-24 | Codex | Documented RSITrendBullOnly multi-window validation in docs/16 and linked it from docs indexes |
 | 2026-05-24 | Codex | Closed task D as not applicable because RSITrendBullOnly failed acceptance |
 | 2026-05-26 | Antigravity | Closed RSITrendBullOnly sprint, wrote next sprint plan (docs/17), opened new sprint for 1h strategies |
+| 2026-05-26 | Codex | Started `codex/sprint-1h-strategies`; chose Option A and set `max_open_trades = 2` for 40% peak concentration on 1h candidates |
