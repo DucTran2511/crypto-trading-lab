@@ -94,10 +94,13 @@
   - Closed as not applicable: Task G produced no passing Step 3 survivors, so
     there are no legitimate strategies to run through regime-filter experiments.
 
-- [ ] **J. Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after H, only if any strategy passes)_
+- [x] **J. Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after H, only if any strategy passes)_
   - `freqtrade trade -c user_data/config.json --strategy <StrategyName>`.
   - Track per-week trade count and win rate vs backtest expectation.
   - **No live-money deployment in this sprint.** Live go/no-go is a separate sprint decision.
+  - Closed as not applicable: Task G and docs/18 rejected both 1h candidates, so
+    no strategy met the prerequisite for a 4-week dry-run. No paper-trade process
+    was started.
 
 - [ ] **K. Update `TASKS.md`** at sprint end — _Codex 5.4 low_
 
@@ -201,3 +204,4 @@
 | 2026-05-26 | Codex | Ran 7-fold walk-forward validation for `MultiTimeframeTrend` and `ATRAdaptiveMeanReversion`; both failed acceptance due to negative average OOS profit |
 | 2026-05-26 | Codex | Documented the 1h strategy walk-forward rejection in docs/18 and linked it from docs/README.md and AGENTS.md |
 | 2026-05-26 | Codex | Closed Task I as not applicable because Task G produced no passing Step 3 survivors for regime-filter experiments |
+| 2026-05-26 | Codex | Closed Task J as not applicable because no strategy passed walk-forward acceptance for paper trading |
