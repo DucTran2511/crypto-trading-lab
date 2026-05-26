@@ -108,7 +108,7 @@ crypto-trading-lab/
 │   ├── test_compare_strategies.py
 │   ├── test_regime_classifier.py
 │   └── test_regime_filter_experiments.py
-├── docs/                            # Numbered 01-17, long-form documentation
+├── docs/                            # Numbered 01-18, long-form documentation
 ├── .github/workflows/ci.yml         # GitHub Actions: TA-Lib build + ruff + pytest
 ├── AGENTS.md                        # This file. CLAUDE.md, GEMINI.md symlink here.
 ├── TASKS.md                         # Current sprint + session log
@@ -135,13 +135,14 @@ crypto-trading-lab/
 
 ## Current Status & Roadmap
 
-**Last milestone:** Multi-window validation of `RSITrendBullOnly` complete. The
-variant failed the 3-fold acceptance criteria with negative average OOS Sharpe
-and profit, so it is rejected. See `docs/16-rsitrend-bullonly-multiwindow.md`.
+**Last milestone:** Seven-fold walk-forward validation of the 1h sprint
+candidates is complete. `MultiTimeframeTrend` and `ATRAdaptiveMeanReversion`
+both failed acceptance because average OOS profit was negative. See
+`docs/18-1h-strategy-walk-forward.md`.
 
-**Current sprint:** New hypotheses on higher timeframes. Two 1h strategies
-(`MultiTimeframeTrend` and `ATRAdaptiveMeanReversion`) proposed to replace the
-rejected 5m approaches. See `docs/17-next-sprint-plan.md` for full plan.
+**Current sprint:** New hypotheses on higher timeframes were tested and rejected.
+See `docs/17-next-sprint-plan.md` for the plan and `docs/18-1h-strategy-walk-forward.md`
+for the validation result.
 **See `TASKS.md` for active tasks and per-agent assignments.**
 
 Roadmap priority (from `docs/11-roadmap.md`):
@@ -189,6 +190,7 @@ Full docs in `docs/` (read in order):
 | 15 | `docs/15-regime-filter-experiments.md` | Regime-filter variants vs unfiltered controls |
 | 16 | `docs/16-rsitrend-bullonly-multiwindow.md` | RSITrendBullOnly 3-fold validation + rejection |
 | 17 | `docs/17-next-sprint-plan.md` | New hypotheses: MultiTimeframeTrend + ATRAdaptiveMeanReversion on 1h |
+| 18 | `docs/18-1h-strategy-walk-forward.md` | 1h strategy 7-fold validation + rejection |
 
 ---
 
