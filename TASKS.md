@@ -27,7 +27,7 @@
     or **Option B** (keep `3`, document the 60% concentration here).
   - Edit `user_data/config.json` accordingly. Document the chosen option in this file's session log.
 
-- [ ] **B. Download 1h candle data** — _Antigravity Gemini Flash medium_
+- [x] **B. Download 1h candle data** — _Antigravity Gemini Flash medium_
   ```bash
   freqtrade download-data -c user_data/config.json \
       --pairs BTC/USDT ETH/USDT SOL/USDT BNB/USDT \
@@ -180,3 +180,4 @@
 | 2026-05-24 | Codex | Closed task D as not applicable because RSITrendBullOnly failed acceptance |
 | 2026-05-26 | Antigravity | Closed RSITrendBullOnly sprint, wrote next sprint plan (docs/17), opened new sprint for 1h strategies |
 | 2026-05-26 | Codex | Started `codex/sprint-1h-strategies`; chose Option A and set `max_open_trades = 2` for 40% peak concentration on 1h candidates |
+| 2026-05-26 | Antigravity | Downloaded 1h candle data for BTC/USDT, ETH/USDT, SOL/USDT, BNB/USDT (2024-07-01 to 2025-05-01) |
