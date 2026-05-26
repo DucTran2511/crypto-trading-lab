@@ -7,71 +7,66 @@
 
 ## In Progress
 
-- [/] **Sprint: Multi-window walk-forward validation of `RSITrendBullOnly`**
-  Single-fold evidence in `docs/15-regime-filter-experiments.md` is too weak to
-  act on (+0.02% OOS profit, 0.25 OOS Sharpe). Need at least 3 OOS folds before
-  the variant survives as even a "weak research candidate." See per-agent task
-  assignments below.
+- [/] **Sprint: New hypotheses on higher timeframes**
+  All 5m single-timeframe strategies rejected. Shifting to 1h primary timeframe
+  with two structurally different approaches. Full plan in
+  `docs/17-next-sprint-plan.md`.
 
 ## Up Next
 
 ### Sprint tasks (per-agent assignments)
 
-- [x] **A. Run the multi-window walk-forward sweep** — _suggested agent: Antigravity Gemini Flash medium_
-  - Pre-req: `RSITrendBullOnly` strategy file exists at
-    `user_data/regime_filter_results/generated_strategies/RSITrendBullOnly.py`
-    (regenerate via `scripts/regime_filter_experiments.py` if needed).
-  - Run:
-    ```bash
-    python scripts/walk_forward.py \
-        --strategy RSITrendBullOnly \
-        --strategy-path user_data/regime_filter_results/generated_strategies \
-        --start 2025-01-01 --end 2025-05-01 \
-        --in-sample 90d --out-sample 30d --step 30d \
-        --loss SharpeHyperOptLoss --epochs 100 \
-        --spaces buy sell \
-        --output-dir user_data/walk_forward_results/RSITrendBullOnly \
-        --freqtrade-bin .venv/bin/freqtrade
-    ```
-  - Deliverable: `user_data/walk_forward_results/RSITrendBullOnly/`
-    contains `walk_forward_summary.csv`, `walk_forward_stability.png`, and the
-    per-fold params/logs/backtest exports. Push the branch but do not commit
-    those generated artefacts — they remain gitignored.
+- [ ] **A. Download 1h candle data** — _any agent_
+  ```bash
+  freqtrade download-data -c user_data/config.json \
+      --pairs BTC/USDT ETH/USDT SOL/USDT BNB/USDT \
+      --timeframes 1h \
+      --timerange=20240701-20250501
+  ```
 
-- [x] **B. Extend `scripts/compare_strategies.py`** — _suggested agent: Codex 5.4 medium_
-  - Add an optional `--regime-walk-forward-root` argument (default
-    `user_data/regime_filter_results/walk_forward`) that picks up
-    `*/walk_forward_summary.csv` files and includes them in the comparison
-    ranking alongside the baseline strategies.
-  - Add at least one test in `tests/test_compare_strategies.py` that exercises
-    the new flag.
+- [ ] **B. Implement `MultiTimeframeTrend.py`** — _suggested agent: Antigravity_
+  - 1h primary timeframe with 4h informative pairs for trend confirmation.
+  - RSI pullback-into-trend entry with volume filter.
+  - Hyperopt-safe indicator caching (`for val in self.<param>.range`).
+  - See `docs/17-next-sprint-plan.md` §17.3 Strategy A for full spec.
+  - New file: `user_data/strategies/MultiTimeframeTrend.py`
+
+- [ ] **C. Implement `ATRAdaptiveMeanReversion.py`** — _suggested agent: Antigravity_
+  - 1h timeframe, ATR-adaptive entry distance instead of static Bollinger Bands.
+  - Volatility contraction filter (ATR < median) + regime classifier integration.
+  - See `docs/17-next-sprint-plan.md` §17.3 Strategy B for full spec.
+  - New file: `user_data/strategies/ATRAdaptiveMeanReversion.py`
+
+- [ ] **D. Add tests for both new strategies** — _any agent_
+  - Import smoke tests (strategy class loads).
+  - Verify `populate_indicators`, `populate_entry_trend`, `populate_exit_trend`
+    return DataFrames with expected columns.
   - Acceptance: `ruff check .` clean, `pytest` green.
 
-- [x] **C. Write `docs/16-rsitrend-bullonly-multiwindow.md`** — _suggested agent: Antigravity Gemini Flash high (after A finishes)_
-  - Structure: 16.1 Scope · 16.2 Per-fold results table · 16.3 Acceptance criteria · 16.4 Decision · 16.5 Next step.
-  - Explicit acceptance criteria (commit these to the doc up front, do not move the goalposts after the run):
-    1. ≥3 out-of-sample folds completed.
-    2. Average OOS Sharpe > 0.
-    3. Average OOS total profit > 0.
-    4. No single OOS fold drawdown > 5%.
-  - All four must hold to mark the variant as "keep researching." Anything weaker → reject.
-  - Add the new doc to the `docs/README.md` index and to the AGENTS.md docs table.
+- [ ] **E. Same-window baseline backtests** — _any agent (after B, C, D)_
+  - Run `scripts/run_baselines.py` for both new strategies.
+  - Screen: ≥ 20 trades, max drawdown < 30%.
 
-- [x] **D. If A passes acceptance** — _suggested agent: Sonnet 4.6 Thinking or Codex 5.5 high_
-  - Design a second validation pass (different timerange, longer in-sample
-    window, or a different pair subset). Do NOT advance to paper trading on a
-    single-sprint result. Write a short proposal in `docs/16-...md` §16.5 with
-    the proposed second-pass parameters and rejection criteria.
-  - Status: closed as not applicable from the current run because
-    `docs/16-...md` rejects `RSITrendBullOnly` after failed average OOS Sharpe
-    and profit criteria.
+- [ ] **F. Walk-forward validation for survivors** — _any agent (after E)_
+  - 3+ OOS folds, 90d in-sample / 30d out-of-sample / 30d step.
+  - Acceptance criteria: avg OOS Sharpe > 0, avg OOS profit > 0, max fold DD ≤ 5%.
 
-- [ ] **E. Update `TASKS.md`** at sprint end — _any agent_
+- [ ] **G. Write results doc** — _any agent (after F)_
+  - `docs/18-*.md` following structure of `docs/16`.
+
+- [ ] **H. Regime-filter experiments on survivors** — _any agent (after F, if applicable)_
+
+- [ ] **I. Update `TASKS.md`** at sprint end — _any agent_
 
 ---
 
 ## Done
 
+- [x] RSITrendBullOnly multi-window walk-forward validation
+  - [x] Run 3-fold walk-forward sweep with prepended data back to 2024-10-01
+  - [x] Document results in `docs/16-rsitrend-bullonly-multiwindow.md`
+  - [x] Reject variant (avg OOS Sharpe -0.48, avg OOS profit -0.06%)
+  - [x] Close second-pass task as not applicable
 - [x] Regime Filter Experiments
   - [x] Apply the regime classifier to the strongest baseline strategy candidates
   - [x] Compare all-regime, bull-only, bear-excluded, and trending-only variants
@@ -148,3 +143,4 @@
 | 2026-05-24 | Antigravity | Prepended OKX data starting from 2024-10-01, ran 3-fold walk-forward validation sweep for RSITrendBullOnly, and rejected it |
 | 2026-05-24 | Codex | Documented RSITrendBullOnly multi-window validation in docs/16 and linked it from docs indexes |
 | 2026-05-24 | Codex | Closed task D as not applicable because RSITrendBullOnly failed acceptance |
+| 2026-05-26 | Antigravity | Closed RSITrendBullOnly sprint, wrote next sprint plan (docs/17), opened new sprint for 1h strategies |
