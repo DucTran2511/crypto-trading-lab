@@ -77,6 +77,8 @@ class ATRAdaptiveMeanReversion(IStrategy):
         return dataframe
 
     def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        dataframe["enter_long"] = 0
+
         sma = dataframe[f"sma_{self.sma_period.value}"]
         atr = dataframe[f"atr_{self.atr_period.value}"]
         atr_median = dataframe[
@@ -95,6 +97,8 @@ class ATRAdaptiveMeanReversion(IStrategy):
         return dataframe
 
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+        dataframe["exit_long"] = 0
+
         sma = dataframe[f"sma_{self.sma_period.value}"]
         atr = dataframe[f"atr_{self.atr_period.value}"]
         atr_median = dataframe[
