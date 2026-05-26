@@ -44,7 +44,7 @@
   - See `docs/17-next-sprint-plan.md` §17.3 Strategy A for full spec.
   - New file: `user_data/strategies/MultiTimeframeTrend.py`.
 
-- [ ] **D. Implement `ATRAdaptiveMeanReversion.py`** — _Codex 5.4 medium_
+- [x] **D. Implement `ATRAdaptiveMeanReversion.py`** — _Codex 5.4 medium_
   - 1h timeframe, ATR-adaptive entry distance instead of static Bollinger Bands.
   - Volatility contraction filter (ATR < median(ATR, 50)) + RSI < 35.
   - **No regime filter built into the strategy. No `use_regime_filter` hyperopt
@@ -181,3 +181,4 @@
 | 2026-05-26 | Antigravity | Closed RSITrendBullOnly sprint, wrote next sprint plan (docs/17), opened new sprint for 1h strategies |
 | 2026-05-26 | Codex | Started `codex/sprint-1h-strategies`; chose Option A and set `max_open_trades = 2` for 40% peak concentration on 1h candidates |
 | 2026-05-26 | Antigravity | Downloaded 1h candle data for BTC/USDT, ETH/USDT, SOL/USDT, BNB/USDT (2024-07-01 to 2025-05-01) |
+| 2026-05-26 | Codex | Implemented `ATRAdaptiveMeanReversion` 1h ATR-gated mean-reversion baseline with no built-in regime filter |
