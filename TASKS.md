@@ -59,9 +59,12 @@
     DataFrames with expected columns.
   - Acceptance: `ruff check .` clean, `pytest` green.
 
-- [ ] **F. Same-window baseline backtests** — _Antigravity Gemini Flash medium (after C, D, E)_
+- [x] **F. Same-window baseline backtests** — _Antigravity Gemini Flash medium (after C, D, E)_
   - Run `scripts/run_baselines.py --strategies MultiTimeframeTrend ATRAdaptiveMeanReversion --timerange=20250101-20250501`.
   - Screen: ≥ 20 trades **and** max drawdown < 30%.
+  - Result: both strategies cleared the screen. `MultiTimeframeTrend`: 301 trades,
+    -6.14% total profit, -8.08 Sharpe, 6.75% max drawdown. `ATRAdaptiveMeanReversion`:
+    797 trades, -26.85% total profit, -48.24 Sharpe, 26.92% max drawdown.
   - If Strategy B fails **only** the trade-count screen, perform the **one**
     relaxation pass per `docs/17-next-sprint-plan.md` §17.4 Step 1 note
     (ATR < median → ATR < 75th percentile). Document the change in the results doc.
@@ -184,3 +187,4 @@
 | 2026-05-26 | Codex | Implemented `ATRAdaptiveMeanReversion` 1h ATR-gated mean-reversion baseline with no built-in regime filter |
 | 2026-05-26 | Codex | Implemented `MultiTimeframeTrend` with 1h entries, 4h informative EMA-slope confirmation, RSI recovery logic, and volume filtering |
 | 2026-05-26 | Codex | Added smoke tests for both 1h strategy classes and verified `ruff check .` plus `pytest` |
+| 2026-05-26 | Codex | Ran same-window 1h baseline backtests for Task F; both strategies passed the trade-count/drawdown screen, and Strategy B needed no ATR relaxation |
