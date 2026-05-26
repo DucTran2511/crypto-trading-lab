@@ -69,10 +69,16 @@
     relaxation pass per `docs/17-next-sprint-plan.md` §17.4 Step 1 note
     (ATR < median → ATR < 75th percentile). Document the change in the results doc.
 
-- [ ] **G. Walk-forward validation for survivors** — _Antigravity Gemini Flash medium (after F)_
+- [x] **G. Walk-forward validation for survivors** — _Antigravity Gemini Flash medium (after F)_
   - 3+ OOS folds, 90d in-sample / 30d out-of-sample / 30d step.
   - Range: `2024-07-01` → `2025-05-01`.
   - Acceptance: avg OOS Sharpe > 0, avg OOS profit > 0, max fold DD ≤ 5% (all four criteria from `docs/16` §16.3).
+  - Result: both same-window survivors failed full acceptance. `MultiTimeframeTrend`
+    completed 7 folds with avg OOS Sharpe 0.20, avg OOS profit -0.03%, and worst
+    OOS drawdown 1.06%; it failed only average OOS profit. `ATRAdaptiveMeanReversion`
+    completed 7 folds with avg OOS Sharpe -16.09, avg OOS profit -0.76%, and worst
+    OOS drawdown 3.46%; it failed average OOS Sharpe and profit. No strategy advances
+    to regime-filter experiments or paper trading from Task G.
 
 - [ ] **H. Write results doc `docs/18-*.md`** — _Antigravity Gemini Flash high (after G)_
   - Follow the structure of `docs/16-rsitrend-bullonly-multiwindow.md` exactly.
@@ -188,3 +194,4 @@
 | 2026-05-26 | Codex | Implemented `MultiTimeframeTrend` with 1h entries, 4h informative EMA-slope confirmation, RSI recovery logic, and volume filtering |
 | 2026-05-26 | Codex | Added smoke tests for both 1h strategy classes and verified `ruff check .` plus `pytest` |
 | 2026-05-26 | Codex | Ran same-window 1h baseline backtests for Task F; both strategies passed the trade-count/drawdown screen, and Strategy B needed no ATR relaxation |
+| 2026-05-26 | Codex | Ran 7-fold walk-forward validation for `MultiTimeframeTrend` and `ATRAdaptiveMeanReversion`; both failed acceptance due to negative average OOS profit |
