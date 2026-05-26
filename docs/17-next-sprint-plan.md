@@ -44,12 +44,35 @@ freqtrade download-data -c user_data/config.json \
 This gives 10 months of 1h data — enough for 3+ walk-forward folds with 90-day
 in-sample and 30-day out-of-sample windows.
 
-### 17.2.2 Binance.vision as default (stretch)
+> **Note.** Binance.vision as the default ingestion source (roadmap item 11.3) is
+> intentionally **out of scope** for this sprint. It is unrelated to the 1h
+> hypothesis and changing the data source mid-sprint would conflate the
+> evaluation. Leave it for a dedicated infra sprint after the 1h strategies are
+> resolved either way.
 
-Per roadmap item 11.3: switch historical data ingestion to
-`scripts/download_binance_vision.py` so that backtest results are reproducible
-against immutable archives. **This is a stretch goal for this sprint** — only
-pursue if the new strategies are complete and validated first.
+### 17.2.2 Position-sizing posture (review before any backtest)
+
+The stoploss change in §17.6 (from -3% on 5m to -5% on 1h) interacts with
+`max_open_trades`:
+
+- Risk-per-trade rule: 1% of equity per trade.
+- 1% equity risk ÷ 5% stop distance = **20% of equity** per position max.
+- `user_data/config.json` currently has `max_open_trades = 3` (carry-over from the
+  5m era). 3 × 20% = **60% of equity deployed at peak**, which is materially
+  more concentrated than the previous 5m posture (3 × 12% ≈ 36% at peak).
+
+**Decision before running any 1h backtest:**
+
+- **Option A (recommended):** Tighten `max_open_trades` to `2` in
+  `user_data/config.json` for this sprint. 2 × 20% = 40% peak concentration,
+  which is closer to the conservative posture so far.
+- **Option B:** Keep `max_open_trades = 3` and document that this sprint runs at
+  60% peak concentration. Acceptable only if the sprint owner explicitly signs
+  off in `TASKS.md`.
+
+Do not introduce per-strategy stoploss changes by editing `config.json` globally
+— set `stoploss = -0.05` as a class attribute on each new 1h strategy so the
+5m baselines are unaffected. See `EMACrossover.py` for the pattern.
 
 ## 17.3 Strategy Hypotheses
 
@@ -115,23 +138,29 @@ academic literature.
 static Bollinger Band (like `BollingerMeanReversion`), use ATR(14) to dynamically
 size entry distance and only take trades when volatility is contracted.
 
+This strategy is the **unfiltered baseline**. Regime gating is **not** built into
+the strategy itself and is **not** a hyperopt parameter — it would let hyperopt
+pick whichever branch happened to win in-sample, defeating the validation. Regime
+filters are evaluated separately by `scripts/regime_filter_experiments.py` after
+the baseline survives walk-forward, exactly as was done for `RSITrend` →
+`RSITrendBullOnly` (see `docs/15-regime-filter-experiments.md`).
+
 **Entry conditions (all must be true):**
 
-1. **Adaptive dip.** Close is more than `N × ATR(14)` below the 20-period SMA
-   (N is tunable; default 1.5). This replaces a fixed Bollinger width with a
+1. **Adaptive dip.** Close is more than `N × ATR(14)` below the `sma_period`-bar
+   SMA (N is tunable; default 1.5). This replaces a fixed Bollinger width with a
    volatility-adaptive distance.
-2. **Volatility contraction.** ATR(14) is below its 50-period rolling median.
-   Mean reversion is only structurally valid when volatility is low and price is
-   ranging.
-3. **Oversold confirmation.** RSI(14) < 35.
-4. **Regime filter.** `classify_regime()` returns `range` or `bull` (no
-   mean-reversion in bear trends — learned from `RSITrendBullOnly`'s failure).
+2. **Volatility contraction.** ATR(14) is below its `atr_median_lookback`-period
+   rolling median. Mean reversion is structurally only valid when volatility is
+   low and price is ranging.
+3. **Oversold confirmation.** RSI(14) < `rsi_oversold` (default 35).
 
 **Exit conditions (any one triggers):**
 
-1. Close returns to the 20-period SMA (mean reverted).
-2. ATR(14) expands above `1.5 × median(ATR, 50)` (regime changed — exit early).
-3. ROI ladder or stoploss (default -4%).
+1. Close returns to the `sma_period`-bar SMA (mean reverted).
+2. ATR(14) expands above `atr_exit_multiplier × median(ATR, atr_median_lookback)`
+   (regime changed — exit early).
+3. ROI ladder or stoploss (default -5%; see §17.6).
 
 **Hyperopt-tunable parameters:**
 
@@ -142,15 +171,20 @@ size entry distance and only take trades when volatility is contracted.
 | `atr_period` | 10–20 | buy |
 | `atr_median_lookback` | 30–100 | buy |
 | `rsi_oversold` | 25–40 | buy |
-| `use_regime_filter` | True/False | buy |
 | `atr_exit_multiplier` | 1.0–2.5 | sell |
+
+> **Warning.** Do **not** add `use_regime_filter: True/False` to the hyperopt
+> space. Run regime gating as a separate generated subclass via
+> `scripts/regime_filter_experiments.py` (the established pattern). Tuning a
+> filter on/off in hyperopt amounts to letting the optimizer pick the version
+> with more degrees of freedom and produces results that do not generalise.
 
 **Why this might work:** The original `BollingerMeanReversion` failed because it
 traded in all volatility regimes. Mean reversion is structurally only valid in
 low-volatility, range-bound markets. ATR-gating is the most common fix in
-quantitative literature. Combining it with the existing regime classifier
-(`user_data/regime/classifier.py`) gives two orthogonal filters against trading
-in the wrong conditions.
+quantitative literature. If the unfiltered baseline survives walk-forward,
+`regime_filter_experiments.py` then tests whether layering a `range`-only or
+`bull-or-range` regime filter on top further improves OOS metrics.
 
 ---
 
@@ -167,8 +201,21 @@ python scripts/run_baselines.py \
   --timerange=20250101-20250501
 ```
 
-**Screen criteria:** ≥ 20 trades, max drawdown < 30%. Strategies that fail the
-screen do not advance.
+**Screen criteria:** ≥ 20 trades **and** max drawdown < 30%. Strategies that fail
+the screen do not advance.
+
+> **Note — trade-count fallback for Strategy B.** The ATR-contraction + RSI <
+> 35 filter on Strategy B is intentionally tight and may produce < 20 trades
+> over 4 months on 1h × 4 pairs. If Strategy B fails **only** the trade-count
+> screen (not the drawdown screen), perform **one** relaxation pass before
+> abandoning the hypothesis: change the ATR-contraction filter from
+> `ATR < median(ATR, 50)` to `ATR < 75th-percentile(ATR, 50)`. Document the
+> change in the results doc and re-run Step 1 once. Do **not** keep relaxing
+> filters in pursuit of trade count — that is post-hoc tuning. If the relaxed
+> version still fails, reject the hypothesis.
+>
+> This fallback applies **only** to the trade-count screen, not to walk-forward
+> acceptance criteria in Step 3.
 
 ### Step 2: Walk-forward validation (3+ OOS folds)
 
@@ -194,28 +241,63 @@ All four must pass (identical to `docs/16` §16.3):
 ### Step 4: Regime-filter experiments (if Step 3 passes)
 
 Run `scripts/regime_filter_experiments.py` for any passing strategy to check
-whether regime filtering improves or degrades OOS metrics.
+whether regime filtering improves or degrades OOS metrics. This is the **only**
+legitimate place to evaluate regime gating — not inside the strategy class and
+not inside the hyperopt space.
 
 ### Step 5: Document
 
 Write results in `docs/18-*.md` (or appropriate number) following the structure
-of `docs/16`.
+of `docs/16`. Include the trade-count screen result, walk-forward per-fold table,
+and explicit pass/fail against §17.4 step 3 acceptance criteria.
+
+### Step 6: Paper-trade gate (only if Step 3 passes)
+
+Any strategy that passes acceptance must run as a Freqtrade dry-run for **at
+least 4 weeks of live wall-clock time** before any further escalation:
+
+```bash
+freqtrade trade -c user_data/config.json --strategy <StrategyName>
+```
+
+> **Warning.** Do not skip the paper-trade gate. Walk-forward acceptance is
+> necessary but not sufficient — it doesn't catch exchange-side execution issues
+> (partial fills, fee changes, API stalls), regime shifts between historical
+> windows and live, or operational bugs (timezone, candle alignment, restart
+> handling). Until 4 weeks of dry-run logs match the backtest's expected
+> per-week trade count and win rate within tolerance, no live deployment.
+
+This sprint does **not** include any live-money deployment. That decision is
+deferred to a future sprint and requires a separate go/no-go in `TASKS.md`.
 
 ## 17.5 Task Breakdown
 
-| # | Task | Agent | Depends On |
+Agent assignments follow the cost/capability rubric established in PR #10:
+cheap models for transcription, mid-tier for code from spec, high-tier for
+design-under-ambiguity, Devin only for end-to-end PRs. Do **not** route any task
+here to Opus Thinking, Codex 5.5 high+, or Devin unless explicitly escalated.
+
+| # | Task | Suggested agent | Depends On |
 |---|---|---|---|
-| 1 | Create feature branch | Any | — |
-| 2 | Download 1h candle data (all 4 pairs, 2024-07-01 to 2025-05-01) | Any | 1 |
-| 3 | Implement `MultiTimeframeTrend.py` with hyperopt-safe indicators | Antigravity | 2 |
-| 4 | Implement `ATRAdaptiveMeanReversion.py` with regime filter | Antigravity | 2 |
-| 5 | Add import + smoke tests for both strategies | Any | 3, 4 |
-| 6 | `ruff check .` + `pytest` green | Any | 5 |
-| 7 | Run same-window baseline backtests | Any | 6 |
-| 8 | Run walk-forward validation for survivors | Any | 7 |
-| 9 | Write results doc (`docs/18-*.md`) | Any | 8 |
-| 10 | Run regime-filter experiments on survivors | Any | 8 |
-| 11 | Update `TASKS.md`, `AGENTS.md`, `docs/README.md` | Any | 9, 10 |
+| 1 | Create feature branch | Codex 5.4 low (or any) | — |
+| 2 | Adjust `max_open_trades` per §17.2.2 decision; document choice in `TASKS.md` | Codex 5.4 low | 1 |
+| 3 | Download 1h candle data (4 pairs, 2024-07-01 → 2025-05-01) | Antigravity Gemini Flash medium | 1 |
+| 4 | Implement `MultiTimeframeTrend.py` per §17.3 Strategy A | Codex 5.4 medium | 3 |
+| 5 | Implement `ATRAdaptiveMeanReversion.py` per §17.3 Strategy B (no regime filter, no `use_regime_filter` param) | Codex 5.4 medium | 3 |
+| 6 | Add import + smoke tests for both strategies in `tests/` | Codex 5.4 low | 4, 5 |
+| 7 | `ruff check .` + `pytest` green | Codex 5.4 low | 6 |
+| 8 | Run same-window baseline backtests (`scripts/run_baselines.py`) | Antigravity Gemini Flash medium | 7 |
+| 9 | If Strategy B fails only the trade-count screen, apply the **one** relaxation per §17.4 Step 1 note | Antigravity Gemini Flash medium | 8 |
+| 10 | Run walk-forward validation for survivors (`scripts/walk_forward.py`) | Antigravity Gemini Flash medium | 8 (or 9) |
+| 11 | Write results doc `docs/18-*.md` following `docs/16` structure | Antigravity Gemini Flash high | 10 |
+| 12 | Run regime-filter experiments on Step 3 survivors only (`scripts/regime_filter_experiments.py`) | Antigravity Gemini Flash medium | 10 |
+| 13 | If any strategy passes acceptance, start 4-week paper-trade dry-run per §17.4 Step 6 | Antigravity Gemini Flash medium | 11 |
+| 14 | Update `TASKS.md`, `AGENTS.md`, `docs/README.md` to reflect sprint outcome | Codex 5.4 low | 11, 12 |
+| ESC | Anything ambiguous or design-level that arises (e.g., should we change the acceptance criteria? extend the sprint? swap pair universe?) | Sonnet 4.6 Thinking — escalate, do **not** decide locally | any |
+
+**Cost ceiling:** ~1 Antigravity Gemini Flash medium-day + ~1 Codex 5.4
+medium-half-day. Do not pre-emptively escalate to higher tiers; if a task
+actually requires escalation, the assigned agent should stop and surface it.
 
 ## 17.6 Design Decisions and Rationale
 
@@ -236,6 +318,22 @@ of `docs/16`.
 - -5% accommodates the larger candle range while still capping single-trade
   risk (with position sizing: 1% equity risk ÷ 5% stop distance = 20% of
   equity per position max).
+- Implementation: set `stoploss = -0.05` as a class attribute on each 1h
+  strategy. Do **not** edit `user_data/config.json` — the 5m baselines still
+  use -3% and the config is the wrong place to put strategy-specific risk.
+- See §17.2.2 for the `max_open_trades` interaction this introduces.
+
+### Why split regime filtering out of the strategy class?
+
+- Tuning a regime filter as a hyperopt Boolean lets the optimiser pick the
+  branch that happened to fit the in-sample window — there is no out-of-sample
+  test of whether the filter itself adds signal.
+- The existing pipeline (`scripts/regime_filter_experiments.py`) generates a
+  family of regime-filtered subclasses from a baseline strategy and backtests
+  each as a separate strategy. This is how `RSITrendBullOnly` was identified
+  as the strongest variant of `RSITrend` (see `docs/15`).
+- Replicating that pattern here means: build Strategy B unfiltered, validate
+  it via walk-forward, **then** evaluate regime gating as separate experiments.
 
 ### Why keep the same 4 pairs?
 
