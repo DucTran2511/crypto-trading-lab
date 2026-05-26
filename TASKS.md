@@ -36,7 +36,7 @@
   ```
   - Data is gitignored. Push the branch with config changes only; do not commit candles.
 
-- [ ] **C. Implement `MultiTimeframeTrend.py`** — _Codex 5.4 medium_
+- [x] **C. Implement `MultiTimeframeTrend.py`** — _Codex 5.4 medium_
   - 1h primary timeframe with 4h informative pairs for trend confirmation.
   - RSI pullback-into-trend entry with volume filter.
   - Hyperopt-safe indicator caching (`for val in self.<param>.range`).
@@ -53,7 +53,7 @@
   - See `docs/17-next-sprint-plan.md` §17.3 Strategy B for full spec.
   - New file: `user_data/strategies/ATRAdaptiveMeanReversion.py`.
 
-- [ ] **E. Add smoke tests for both new strategies** — _Codex 5.4 low_
+- [x] **E. Add smoke tests for both new strategies** — _Codex 5.4 low_
   - Import test (strategy class loads).
   - `populate_indicators`, `populate_entry_trend`, `populate_exit_trend` return
     DataFrames with expected columns.
@@ -182,3 +182,5 @@
 | 2026-05-26 | Codex | Started `codex/sprint-1h-strategies`; chose Option A and set `max_open_trades = 2` for 40% peak concentration on 1h candidates |
 | 2026-05-26 | Antigravity | Downloaded 1h candle data for BTC/USDT, ETH/USDT, SOL/USDT, BNB/USDT (2024-07-01 to 2025-05-01) |
 | 2026-05-26 | Codex | Implemented `ATRAdaptiveMeanReversion` 1h ATR-gated mean-reversion baseline with no built-in regime filter |
+| 2026-05-26 | Codex | Implemented `MultiTimeframeTrend` with 1h entries, 4h informative EMA-slope confirmation, RSI recovery logic, and volume filtering |
+| 2026-05-26 | Codex | Added smoke tests for both 1h strategy classes and verified `ruff check .` plus `pytest` |
