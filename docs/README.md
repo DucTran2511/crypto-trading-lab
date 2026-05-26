@@ -20,6 +20,7 @@ This folder is the long-form docs for `crypto-trading-lab`. Start here, then dri
 14. [Strategy comparison report](14-strategy-comparison-report.md) — aggregate baseline and walk-forward ranking.
 15. [Regime filter experiments](15-regime-filter-experiments.md) — compare bull-only, bear-excluded, and trending-only filters against controls.
 16. [RSITrendBullOnly multi-window](16-rsitrend-bullonly-multiwindow.md) — 3-fold validation result and rejection decision.
+17. [Next sprint plan](17-next-sprint-plan.md) — new hypotheses on higher timeframes (MultiTimeframeTrend + ATRAdaptiveMeanReversion).
 
 ## Reference
 
