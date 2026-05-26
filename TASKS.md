@@ -21,13 +21,13 @@
 > ambiguity. Do **not** route any of these to Opus Thinking, Codex 5.5 high+,
 > or Devin without explicit escalation.
 
-- [ ] **A. Create feature branch + decide `max_open_trades` posture** — _Codex 5.4 low_
+- [x] **A. Create feature branch + decide `max_open_trades` posture** — _Codex 5.4 low_
   - Branch: `git checkout -b <agent>/sprint-1h-strategies` in the agent's worktree.
   - Per `docs/17-next-sprint-plan.md` §17.2.2, decide **Option A** (`max_open_trades = 2`, recommended)
     or **Option B** (keep `3`, document the 60% concentration here).
   - Edit `user_data/config.json` accordingly. Document the chosen option in this file's session log.
 
-- [ ] **B. Download 1h candle data** — _Antigravity Gemini Flash medium_
+- [x] **B. Download 1h candle data** — _Antigravity Gemini Flash medium_
   ```bash
   freqtrade download-data -c user_data/config.json \
       --pairs BTC/USDT ETH/USDT SOL/USDT BNB/USDT \
@@ -44,7 +44,7 @@
   - See `docs/17-next-sprint-plan.md` §17.3 Strategy A for full spec.
   - New file: `user_data/strategies/MultiTimeframeTrend.py`.
 
-- [ ] **D. Implement `ATRAdaptiveMeanReversion.py`** — _Codex 5.4 medium_
+- [x] **D. Implement `ATRAdaptiveMeanReversion.py`** — _Codex 5.4 medium_
   - 1h timeframe, ATR-adaptive entry distance instead of static Bollinger Bands.
   - Volatility contraction filter (ATR < median(ATR, 50)) + RSI < 35.
   - **No regime filter built into the strategy. No `use_regime_filter` hyperopt
@@ -179,3 +179,6 @@
 | 2026-05-24 | Codex | Documented RSITrendBullOnly multi-window validation in docs/16 and linked it from docs indexes |
 | 2026-05-24 | Codex | Closed task D as not applicable because RSITrendBullOnly failed acceptance |
 | 2026-05-26 | Antigravity | Closed RSITrendBullOnly sprint, wrote next sprint plan (docs/17), opened new sprint for 1h strategies |
+| 2026-05-26 | Codex | Started `codex/sprint-1h-strategies`; chose Option A and set `max_open_trades = 2` for 40% peak concentration on 1h candidates |
+| 2026-05-26 | Antigravity | Downloaded 1h candle data for BTC/USDT, ETH/USDT, SOL/USDT, BNB/USDT (2024-07-01 to 2025-05-01) |
+| 2026-05-26 | Codex | Implemented `ATRAdaptiveMeanReversion` 1h ATR-gated mean-reversion baseline with no built-in regime filter |
