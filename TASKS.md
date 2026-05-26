@@ -5,12 +5,16 @@
 
 ---
 
-## In Progress
+## Sprint Status
 
-- [/] **Sprint: New hypotheses on higher timeframes**
+- [x] **Sprint: New hypotheses on higher timeframes**
   All 5m single-timeframe strategies rejected. Shifting to 1h primary timeframe
   with two structurally different approaches. Full plan in
   `docs/17-next-sprint-plan.md`.
+  Sprint result: both 1h candidates passed the same-window screen but failed
+  walk-forward acceptance due to negative average out-of-sample profit. No
+  strategy advances to regime-filter experiments or paper trading. See
+  `docs/18-1h-strategy-walk-forward.md`.
 
 ## Up Next
 
@@ -102,12 +106,16 @@
     no strategy met the prerequisite for a 4-week dry-run. No paper-trade process
     was started.
 
-- [ ] **K. Update `TASKS.md`** at sprint end — _Codex 5.4 low_
+- [x] **K. Update `TASKS.md`** at sprint end — _Codex 5.4 low_
+  - Result: closed the 1h sprint, recorded that no strategy advances, and left
+    the next research direction for a future hypothesis sprint.
 
-- [ ] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
+- [x] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
   - If any task surfaces a design-level question (e.g., should we change the
     acceptance criteria? extend the sprint? swap pair universe?), stop and
     escalate here. Do **not** decide locally inside the assigned agent.
+  - Closed unused: no design-level escalation surfaced during the sprint. The
+    pre-registered acceptance criteria were applied without modification.
 
 ---
 
@@ -205,3 +213,4 @@
 | 2026-05-26 | Codex | Documented the 1h strategy walk-forward rejection in docs/18 and linked it from docs/README.md and AGENTS.md |
 | 2026-05-26 | Codex | Closed Task I as not applicable because Task G produced no passing Step 3 survivors for regime-filter experiments |
 | 2026-05-26 | Codex | Closed Task J as not applicable because no strategy passed walk-forward acceptance for paper trading |
+| 2026-05-26 | Codex | Closed the 1h sprint bookkeeping: Task K complete, escalation lane unused, no candidate advances |
