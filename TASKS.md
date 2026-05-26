@@ -80,11 +80,13 @@
     OOS drawdown 3.46%; it failed average OOS Sharpe and profit. No strategy advances
     to regime-filter experiments or paper trading from Task G.
 
-- [ ] **H. Write results doc `docs/18-*.md`** — _Antigravity Gemini Flash high (after G)_
+- [x] **H. Write results doc `docs/18-*.md`** — _Antigravity Gemini Flash high (after G)_
   - Follow the structure of `docs/16-rsitrend-bullonly-multiwindow.md` exactly.
   - Include the trade-count screen result, any relaxation applied per Task F,
     walk-forward per-fold table, and explicit pass/fail against acceptance criteria.
   - Update `docs/README.md` and AGENTS.md docs table with the new entry.
+  - Result: added `docs/18-1h-strategy-walk-forward.md` and linked it from the
+    docs index and AGENTS.md. Both 1h sprint candidates are documented as rejected.
 
 - [x] **I. Regime-filter experiments on Step 3 survivors** — _Antigravity Gemini Flash medium (after G, only for passing strategies)_
   - Run `scripts/regime_filter_experiments.py` on each survivor.
@@ -197,4 +199,5 @@
 | 2026-05-26 | Codex | Added smoke tests for both 1h strategy classes and verified `ruff check .` plus `pytest` |
 | 2026-05-26 | Codex | Ran same-window 1h baseline backtests for Task F; both strategies passed the trade-count/drawdown screen, and Strategy B needed no ATR relaxation |
 | 2026-05-26 | Codex | Ran 7-fold walk-forward validation for `MultiTimeframeTrend` and `ATRAdaptiveMeanReversion`; both failed acceptance due to negative average OOS profit |
+| 2026-05-26 | Codex | Documented the 1h strategy walk-forward rejection in docs/18 and linked it from docs/README.md and AGENTS.md |
 | 2026-05-26 | Codex | Closed Task I as not applicable because Task G produced no passing Step 3 survivors for regime-filter experiments |
