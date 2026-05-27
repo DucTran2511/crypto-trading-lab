@@ -64,10 +64,13 @@ def test_ticker_to_pair_only_keeps_simple_usdt_spot_pairs():
 
 def test_exclusion_reason_covers_stable_wrapped_leveraged_and_synthetic_assets():
     assert exclusion_reason("USDC") == "stablecoin"
+    assert exclusion_reason("USD1") == "stablecoin"
     assert exclusion_reason("WBTC") == "wrapped"
+    assert exclusion_reason("JITOSOL") == "wrapped"
     assert exclusion_reason("ETH3L") == "leveraged"
     assert exclusion_reason("BTCDOWN") == "leveraged"
     assert exclusion_reason("BTCST") == "synthetic"
+    assert exclusion_reason("XAUT") == "synthetic"
     assert exclusion_reason("BTC") is None
 
 
@@ -88,6 +91,21 @@ def test_build_universe_ranks_by_historical_30d_quote_volume(tmp_path: Path):
     assert [candidate.pair for candidate in universe] == ["BBB/USDT", "CCC/USDT"]
     assert universe[0].quote_volume_30d == pytest.approx(3000.0)
     assert universe[1].quote_volume_30d == pytest.approx(1500.0)
+
+
+def test_build_universe_accepts_exact_six_calendar_months_of_history(tmp_path: Path):
+    tickers = [_ticker("BTC-USDT")]
+    _write_candles(tmp_path, "BTC/USDT", start="2024-01-01", close=10.0, volume=10.0)
+
+    universe = build_universe(
+        tickers=tickers,
+        data_dir=tmp_path,
+        timeframe="5m",
+        snapshot_date=date(2024, 7, 1),
+        top=1,
+    )
+
+    assert [candidate.pair for candidate in universe] == ["BTC/USDT"]
 
 
 def test_build_universe_applies_all_exclusion_rules(tmp_path: Path):

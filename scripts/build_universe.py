@@ -20,7 +20,7 @@ DEFAULT_TIMEFRAME = "5m"
 DEFAULT_SNAPSHOT_DATE = "2024-07-01"
 DEFAULT_TOP_N = 20
 VOLUME_WINDOW_DAYS = 30
-MIN_HISTORY_DAYS = 183
+MIN_HISTORY_MONTHS = 6
 STABLECOIN_BASES = {
     "USDC",
     "DAI",
@@ -39,6 +39,14 @@ STABLECOIN_BASES = {
     "USDL",
     "USDS",
     "USDT",
+    "USD1",
+    "RLUSD",
+    "USAT",
+    "AUDF",
+    "AUDM",
+    "BRL1",
+    "EURS",
+    "EURT",
 }
 WRAPPED_BASES = {
     "WBTC",
@@ -51,10 +59,15 @@ WRAPPED_BASES = {
     "STETH",
     "RETH",
     "CBETH",
+    "BETH",
+    "JITOSOL",
+    "OKSOL",
 }
 LEVERAGED_SUFFIXES = ("3L", "3S", "5L", "5S", "UP", "DOWN", "BULL", "BEAR")
 SYNTHETIC_BASES = {
     "BTCST",
+    "XAUT",
+    "PAXG",
 }
 
 
@@ -193,7 +206,7 @@ def historical_volume_candidate(
         return None
 
     snapshot_ts = pd.Timestamp(snapshot_date)
-    min_start = snapshot_ts - pd.Timedelta(days=MIN_HISTORY_DAYS)
+    min_start = snapshot_ts - pd.DateOffset(months=MIN_HISTORY_MONTHS)
     history_start = candles["date"].min()
     history_end = candles["date"].max()
     if history_start > min_start:
@@ -281,7 +294,7 @@ def write_universe(
         "selection": f"top {top} by historical 30d quote volume ending {snapshot_date.isoformat()}",
         "timeframe": timeframe,
         "volume_window_days": VOLUME_WINDOW_DAYS,
-        "min_history_days": MIN_HISTORY_DAYS,
+        "min_history_months": MIN_HISTORY_MONTHS,
         "pairs": [candidate.pair for candidate in candidates],
         "candidates": [candidate.as_row() for candidate in candidates],
     }
