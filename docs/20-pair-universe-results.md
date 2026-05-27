@@ -498,10 +498,11 @@ Task I is not applicable because no strategy passed the paper-trade gate
 prerequisite. Starting a four-week dry run from these results would skip the
 validation rules that rejected the candidate.
 
-The kill criterion from [19. Pair Universe Expansion](19-pair-universe-expansion.md)
-now applies: if the sprint produces no survivor, the next design decision is whether
-to escalate to FreqAI or perps plus funding-rate arbitrage. That is a design-level
-choice and should be handled through the escalation lane rather than decided inside
-this results report.
+The branching rule from [19. Pair Universe Expansion](19-pair-universe-expansion.md)
+now applies. This was not the "zero of five strategies pass the same-window screen"
+case, because `RSITrend` did pass Step 1. It was the "at least one strategy passes
+the screen but none pass walk-forward" case, so the registered follow-up is the
+daily-momentum-ranking sprint described in §19.8 before declaring the research
+thread dead or escalating to FreqAI/perps.
 
 [Back to docs index](README.md)

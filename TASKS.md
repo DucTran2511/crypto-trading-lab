@@ -148,14 +148,23 @@
     acceptance. Starting a dry-run from the rejected `RSITrend` result would
     bypass the pre-registered paper-trade gate.
 
-- [ ] **J. Update `TASKS.md`** at sprint end — _Codex 5.4 low_
+- [x] **J. Update `TASKS.md`** at sprint end — _Codex 5.4 low_
+  - Result: closed Sprint 19 with no strategy advancing to regime-filter
+    experiments or paper trading. `RSITrend` was the only Step 1 survivor and
+    failed Step 3 walk-forward acceptance. The registered next research path is
+    the daily-momentum-ranking follow-up from `docs/19-pair-universe-expansion.md`
+    §19.8, not another same-universe retune.
 
-- [ ] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
+- [x] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
   - Surface any design-level question rather than deciding locally. Examples:
     "the universe-selection script is missing obvious pairs", "should we
     expand to top-50 because top-20 is too sparse?", "zero of five strategies
     passed Step 1 — the kill criterion from §19.8 triggers; should we go to
     FreqAI or perps next?".
+  - Closed unused for Sprint 19: no unplanned design-level decision was made.
+    Because one strategy passed the same-window screen but none passed
+    walk-forward validation, the pre-registered §19.8 branch points to a
+    daily-momentum-ranking follow-up sprint before FreqAI/perps escalation.
 
 ---
 
@@ -364,3 +373,4 @@
 | 2026-05-27 | Codex | Completed Sprint 19 Task G: documented top-20 universe rejection in docs/20 and updated docs indexes |
 | 2026-05-27 | Codex | Closed Sprint 19 Task H as not applicable because there are no Step 3 survivors for regime-filter experiments |
 | 2026-05-27 | Codex | Closed Sprint 19 Task I as not applicable because no strategy passed the paper-trade acceptance gate |
+| 2026-05-27 | Codex | Closed Sprint 19 Task J and ESC lane: no candidate advances; next registered follow-up is daily momentum ranking |
