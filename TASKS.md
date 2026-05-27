@@ -106,7 +106,7 @@
       DOGE 137, ORDI 162, TURBO 174, XRP 144, FIL 146, SUI 149, SHIB 135,
       FLOKI 120, WLD 119, NEAR 122, LTC 164, ENS 125, BNB 133, UNI 129.
 
-- [ ] **F. Walk-forward validation for screen survivors** — _Antigravity Gemini Flash medium (after E)_
+- [x] **F. Walk-forward validation for screen survivors** — _Antigravity Gemini Flash medium (after E)_
   - For each strategy that passed Task E: run
     `scripts/walk_forward.py` with 90d/30d/30d windows over 2024-07-01 →
     2025-05-01.
@@ -115,6 +115,12 @@
   - This is the largest single block of compute in the sprint. Budget
     accordingly; if any strategy passes Task E it can be walk-forwarded in
     parallel with the others.
+  - Result: ran 7-fold walk-forward validation for the only Task E survivor,
+    `RSITrend`, with 90d/30d/30d windows over 2024-07-01 → 2025-05-01.
+    Acceptance failed: avg OOS Sharpe -30.77, avg OOS profit -0.17%, worst
+    fold drawdown 0.84%. It passed fold count and drawdown criteria, but failed
+    average OOS Sharpe and average OOS profit. No strategy advances from
+    Task F to regime-filter experiments or paper trading.
 
 - [ ] **G. Write results doc `docs/20-pair-universe-results.md`** — _Antigravity Gemini Flash high (after F)_
   - Follow the structure of `docs/18-1h-strategy-walk-forward.md` exactly.
@@ -344,3 +350,4 @@
 | 2026-05-27 | Codex | Completed Sprint 19 Task C: generated top-20 OKX universe JSON from local historical OHLCV and updated `pair_whitelist` |
 | 2026-05-27 | Codex | Completed Sprint 19 Task D: downloaded and verified top-20 OKX 5m candles for 2024-07-01 through 2025-05-01 |
 | 2026-05-27 | Codex | Completed Sprint 19 Task E same-window top-20 baseline sweep; only `RSITrend` passed the trade-count/drawdown screen |
+| 2026-05-27 | Codex | Completed Sprint 19 Task F: `RSITrend` failed 7-fold top-20 walk-forward acceptance on avg OOS Sharpe and profit |
