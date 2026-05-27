@@ -96,13 +96,19 @@
     `.venv/bin/ruff check .`, imports for all five ranked strategy classes,
     and `.venv/bin/pytest`.
 
-- [ ] **D. Smoke tests for ranked strategies and selection helper** — _Codex 5.4 low_
+- [x] **D. Smoke tests for ranked strategies and selection helper** — _Codex 5.4 low_
   - `tests/test_daily_momentum_selection.py`: helper handles missing dates,
     out-of-universe pairs, and the date-boundary case (entry candle's date
     looks up the *previous* completed UTC day's ranking).
   - For each ranked strategy: import test + populate_indicators /
     populate_entry_trend / populate_exit_trend smoke test.
   - Acceptance: `ruff check .` clean, `pytest` green.
+  - Result: added `tests/test_daily_momentum_selection.py` covering missing
+    dates, out-of-universe pairs, UTC date-boundary behavior, imports for all
+    five daily-ranked strategies, and populate_indicators /
+    populate_entry_trend / populate_exit_trend smoke runs against a temporary
+    ranking JSON. Verified `.venv/bin/ruff check .` and `.venv/bin/pytest`
+    with 75 passing tests.
 
 - [ ] **E. Generate daily-rank JSON for the backtest window** — _Codex 5.4 low_
   - Run the script for `2024-07-01` → `2025-05-01` and commit the resulting
@@ -512,3 +518,4 @@
 | 2026-05-27 | Codex | Completed Sprint 21 Task A: created `codex/sprint-21-daily-momentum` and kept the default 1-day closed-UTC daily momentum lookback |
 | 2026-05-27 | Codex | Completed Sprint 21 Task B: added daily momentum ranking CLI plus tests; verified ruff, pytest, and a real-data smoke run |
 | 2026-05-27 | Codex | Completed Sprint 21 Task C: wired daily momentum ranking into five thin ranked strategy subclasses with the shared selection helper |
+| 2026-05-27 | Codex | Completed Sprint 21 Task D: added selection-helper and ranked-strategy smoke coverage; verified ruff and pytest |
