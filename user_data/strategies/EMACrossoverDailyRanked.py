@@ -2,10 +2,22 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
 from pandas import DataFrame
 
-from user_data.selection.daily_momentum import DailyMomentumRankedMixin
-from user_data.strategies.EMACrossover import EMACrossover
+try:
+    from user_data.selection.daily_momentum import DailyMomentumRankedMixin
+    from user_data.strategies.EMACrossover import EMACrossover
+except ModuleNotFoundError as exc:
+    if exc.name != "user_data":
+        raise
+    user_data_dir = Path(__file__).resolve().parents[1]
+    strategies_dir = Path(__file__).resolve().parent
+    sys.path.extend(str(path) for path in (user_data_dir, strategies_dir) if str(path) not in sys.path)
+    from EMACrossover import EMACrossover
+    from selection.daily_momentum import DailyMomentumRankedMixin
 
 
 class EMACrossoverDailyRanked(DailyMomentumRankedMixin, EMACrossover):

@@ -125,13 +125,47 @@
     `2025-04-15` top-3 `TON/USDT`, `ENS/USDT`, `ETH/USDT`. Verified
     `.venv/bin/ruff check .` and `.venv/bin/pytest`.
 
-- [ ] **F. Same-window baseline backtests for ranked variants** — _Antigravity Gemini Flash medium (after C, D, E)_
+- [x] **F. Same-window baseline backtests for ranked variants** — _Antigravity Gemini Flash medium (after C, D, E)_
   - Run `scripts/run_baselines.py` against the five `*DailyRanked` strategies
     on `--timerange=20250101-20250501`.
   - Screen: ≥ 50 trades **and** max drawdown < 30% (identical to docs/19
     §19.6 Step 1).
   - Capture per-pair trade counts in the results doc; this is informative
     even if the screen fails.
+  - Result: fixed ranked-strategy imports so Freqtrade's strategy resolver can
+    load them, then ran the same-window sweep over `20250101-20250501`.
+    Step 1 survivors for Task G: `EMACrossoverDailyRanked`,
+    `DonchianBreakoutDailyRanked`, and `RSITrendDailyRanked`.
+    `BollingerMeanReversionDailyRanked` failed trade count; `MACDVolumeDailyRanked`
+    failed drawdown.
+  - Summary:
+    - `EMACrossoverDailyRanked`: 627 trades, -18.93% profit, Sharpe -22.65,
+      19.33% max drawdown — pass Step 1.
+    - `DonchianBreakoutDailyRanked`: 751 trades, -27.01% profit, Sharpe
+      -21.26, 29.53% max drawdown — pass Step 1.
+    - `BollingerMeanReversionDailyRanked`: 4 trades, +0.15% profit, Sharpe
+      +0.26, 0.10% max drawdown — fail trade count.
+    - `RSITrendDailyRanked`: 67 trades, -1.96% profit, Sharpe -2.98,
+      2.90% max drawdown — pass Step 1.
+    - `MACDVolumeDailyRanked`: 1131 trades, -31.58% profit, Sharpe -43.21,
+      31.97% max drawdown — fail drawdown.
+  - Per-pair trade counts:
+    - `EMACrossoverDailyRanked`: BTC 38, ETH 12, SOL 36, PEPE 42, TON 44,
+      PEOPLE 43, DOGE 13, ORDI 42, TURBO 43, XRP 37, FIL 14, SUI 68,
+      SHIB 9, FLOKI 15, WLD 31, NEAR 40, LTC 36, ENS 8, BNB 37, UNI 19.
+    - `DonchianBreakoutDailyRanked`: BTC 49, ETH 18, SOL 45, PEPE 41,
+      TON 43, PEOPLE 45, DOGE 20, ORDI 62, TURBO 62, XRP 38, FIL 16,
+      SUI 74, SHIB 12, FLOKI 12, WLD 41, NEAR 43, LTC 51, ENS 10,
+      BNB 47, UNI 22.
+    - `BollingerMeanReversionDailyRanked`: BTC 0, ETH 0, SOL 0, PEPE 1,
+      TON 0, PEOPLE 0, DOGE 0, ORDI 0, TURBO 0, XRP 0, FIL 0, SUI 0,
+      SHIB 0, FLOKI 0, WLD 2, NEAR 0, LTC 0, ENS 0, BNB 1, UNI 0.
+    - `RSITrendDailyRanked`: BTC 3, ETH 0, SOL 5, PEPE 6, TON 4, PEOPLE 3,
+      DOGE 4, ORDI 2, TURBO 3, XRP 5, FIL 1, SUI 5, SHIB 2, FLOKI 2,
+      WLD 4, NEAR 1, LTC 5, ENS 3, BNB 7, UNI 2.
+    - `MACDVolumeDailyRanked`: BTC 80, ETH 27, SOL 52, PEPE 68, TON 68,
+      PEOPLE 57, DOGE 27, ORDI 69, TURBO 90, XRP 68, FIL 31, SUI 113,
+      SHIB 22, FLOKI 28, WLD 54, NEAR 54, LTC 78, ENS 37, BNB 71, UNI 37.
 
 - [ ] **G. Walk-forward validation for screen survivors** — _Antigravity Gemini Flash medium (after F)_
   - For each strategy that passed Task F: run `scripts/walk_forward.py`
@@ -528,3 +562,4 @@
 | 2026-05-27 | Codex | Completed Sprint 21 Task C: wired daily momentum ranking into five thin ranked strategy subclasses with the shared selection helper |
 | 2026-05-27 | Codex | Completed Sprint 21 Task D: added selection-helper and ranked-strategy smoke coverage; verified ruff and pytest |
 | 2026-05-27 | Codex | Completed Sprint 21 Task E: generated and sanity-checked the full-window daily momentum ranking JSON with 20 pairs on all 304 days |
+| 2026-05-27 | Codex | Completed Sprint 21 Task F: ran same-window ranked baseline sweep; EMACrossoverDailyRanked, DonchianBreakoutDailyRanked, and RSITrendDailyRanked passed the Step 1 screen |
