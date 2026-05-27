@@ -140,10 +140,13 @@
     walk-forward acceptance on average OOS Sharpe and average OOS profit, so
     there is no legitimate candidate for regime-filter experiments.
 
-- [ ] **I. Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after G, only if any strategy passes acceptance)_
+- [x] **I. Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after G, only if any strategy passes acceptance)_
   - `freqtrade trade -c user_data/config.json --strategy <StrategyName>`.
   - Track per-week trade count and win rate vs backtest expectation.
   - **No live-money deployment in this sprint.**
+  - Closed as not applicable: no Sprint 19 strategy passed walk-forward
+    acceptance. Starting a dry-run from the rejected `RSITrend` result would
+    bypass the pre-registered paper-trade gate.
 
 - [ ] **J. Update `TASKS.md`** at sprint end — _Codex 5.4 low_
 
@@ -360,3 +363,4 @@
 | 2026-05-27 | Codex | Completed Sprint 19 Task F: `RSITrend` failed 7-fold top-20 walk-forward acceptance on avg OOS Sharpe and profit |
 | 2026-05-27 | Codex | Completed Sprint 19 Task G: documented top-20 universe rejection in docs/20 and updated docs indexes |
 | 2026-05-27 | Codex | Closed Sprint 19 Task H as not applicable because there are no Step 3 survivors for regime-filter experiments |
+| 2026-05-27 | Codex | Closed Sprint 19 Task I as not applicable because no strategy passed the paper-trade acceptance gate |
