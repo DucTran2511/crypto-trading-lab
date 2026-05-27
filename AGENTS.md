@@ -108,7 +108,7 @@ crypto-trading-lab/
 │   ├── test_compare_strategies.py
 │   ├── test_regime_classifier.py
 │   └── test_regime_filter_experiments.py
-├── docs/                            # Numbered 01-19, long-form documentation
+├── docs/                            # Numbered 01-20, long-form documentation
 ├── .github/workflows/ci.yml         # GitHub Actions: TA-Lib build + ruff + pytest
 ├── AGENTS.md                        # This file. CLAUDE.md, GEMINI.md symlink here.
 ├── TASKS.md                         # Current sprint + session log
@@ -200,6 +200,7 @@ Full docs in `docs/` (read in order):
 | 17 | `docs/17-next-sprint-plan.md` | New hypotheses: MultiTimeframeTrend + ATRAdaptiveMeanReversion on 1h |
 | 18 | `docs/18-1h-strategy-walk-forward.md` | 1h strategy 7-fold validation + rejection |
 | 19 | `docs/19-pair-universe-expansion.md` | Top-20 USDT spot universe expansion sprint plan |
+| 20 | `docs/20-pair-universe-results.md` | Top-20 universe same-window + walk-forward rejection |
 
 ---
 

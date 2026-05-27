@@ -23,6 +23,7 @@ This folder is the long-form docs for `crypto-trading-lab`. Start here, then dri
 17. [Next sprint plan](17-next-sprint-plan.md) — new hypotheses on higher timeframes (MultiTimeframeTrend + ATRAdaptiveMeanReversion).
 18. [1h strategy walk-forward results](18-1h-strategy-walk-forward.md) — 7-fold validation result and rejection decision for the 1h sprint candidates.
 19. [Pair universe expansion sprint plan](19-pair-universe-expansion.md) — top-20 USDT spot universe on OKX; reuse 5m baselines to test whether the universe was the bottleneck.
+20. [Pair universe expansion results](20-pair-universe-results.md) — top-20 OKX universe screen, RSITrend walk-forward result, and rejection decision.
 
 ## Reference
 
