@@ -65,7 +65,7 @@
     from local 1d OKX OHLCV, confirmed BTC/ETH/SOL/BNB are present and
     obvious stablecoins are absent, and updated `pair_whitelist` to match.
 
-- [ ] **D. Download 5m candle data for the 16 new pairs** — _Antigravity Gemini Flash medium_
+- [x] **D. Download 5m candle data for the 16 new pairs** — _Antigravity Gemini Flash medium_
   ```bash
   freqtrade download-data -c user_data/config.json \
       --timeframes 5m \
@@ -73,6 +73,9 @@
   ```
   - With the updated `pair_whitelist`, this only fetches what's missing.
   - Data remains gitignored. Push the branch with the JSON + config changes only.
+  - Result: ran the download for the top-20 whitelist over
+    `20240701-20250501`; verified all 20 5m files cover from 2024-07-01
+    through at least 2025-05-01. Candle data remains gitignored.
 
 - [ ] **E. Same-window baseline backtests** — _Antigravity Gemini Flash medium (after D)_
   - Run `scripts/run_baselines.py --strategies EMACrossover DonchianBreakout BollingerMeanReversion RSITrend MACDVolume --pairs <top20 from JSON> --timerange=20250101-20250501`.
@@ -317,3 +320,4 @@
 | 2026-05-27 | Codex | Started `codex/sprint-19-top20`; chose Sprint 19 Option A and kept `max_open_trades = 2` for ~66% peak concentration |
 | 2026-05-27 | Codex | Implemented Task B for Sprint 19: top-N OKX USDT universe builder with exclusion/ranking tests; verified ruff and pytest |
 | 2026-05-27 | Codex | Completed Sprint 19 Task C: generated top-20 OKX universe JSON from local historical OHLCV and updated `pair_whitelist` |
+| 2026-05-27 | Codex | Completed Sprint 19 Task D: downloaded and verified top-20 OKX 5m candles for 2024-07-01 through 2025-05-01 |
