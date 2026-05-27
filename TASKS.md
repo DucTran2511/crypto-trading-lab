@@ -73,7 +73,7 @@
     Verified `.venv/bin/ruff check .`, `.venv/bin/pytest`, and a real-data
     CLI smoke run for `2024-07-01` through `2024-07-04`.
 
-- [ ] **C. Wire the rank into entry gating** — _Codex 5.4 medium_
+- [x] **C. Wire the rank into entry gating** — _Codex 5.4 medium_
   - Per `docs/21-daily-momentum-ranking.md` §21.3, add a strategy-level
     helper (new module `user_data/selection/daily_momentum.py`) that loads
     the ranking JSON and exposes `is_pair_in_today_top_n(pair, date, n)`.
@@ -88,6 +88,13 @@
     `user_data/strategies/*DailyRanked.py`.
   - Acceptance: `ruff check .` clean, `pytest` green (smoke tests in
     Task D).
+  - Result: added the lazy-loading daily momentum selection helper and thin
+    daily-ranked subclasses for `EMACrossover`, `DonchianBreakout`,
+    `BollingerMeanReversion`, `RSITrend`, and `MACDVolume`. Each subclass
+    calls the baseline `populate_entry_trend` unchanged, then clears
+    `enter_long` outside the configured top-3 daily ranking gate. Verified
+    `.venv/bin/ruff check .`, imports for all five ranked strategy classes,
+    and `.venv/bin/pytest`.
 
 - [ ] **D. Smoke tests for ranked strategies and selection helper** — _Codex 5.4 low_
   - `tests/test_daily_momentum_selection.py`: helper handles missing dates,
@@ -504,3 +511,4 @@
 | 2026-05-27 | Devin | Queued Sprint 21: wrote `docs/21-daily-momentum-ranking.md` and populated `TASKS.md` A–K + ESC with per-agent tier assignments |
 | 2026-05-27 | Codex | Completed Sprint 21 Task A: created `codex/sprint-21-daily-momentum` and kept the default 1-day closed-UTC daily momentum lookback |
 | 2026-05-27 | Codex | Completed Sprint 21 Task B: added daily momentum ranking CLI plus tests; verified ruff, pytest, and a real-data smoke run |
+| 2026-05-27 | Codex | Completed Sprint 21 Task C: wired daily momentum ranking into five thin ranked strategy subclasses with the shared selection helper |
