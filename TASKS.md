@@ -122,12 +122,15 @@
     average OOS Sharpe and average OOS profit. No strategy advances from
     Task F to regime-filter experiments or paper trading.
 
-- [ ] **G. Write results doc `docs/20-pair-universe-results.md`** — _Antigravity Gemini Flash high (after F)_
+- [x] **G. Write results doc `docs/20-pair-universe-results.md`** — _Antigravity Gemini Flash high (after F)_
   - Follow the structure of `docs/18-1h-strategy-walk-forward.md` exactly.
   - Include: the universe selection (paste the JSON), per-strategy +
     per-pair Step 1 results, walk-forward per-fold tables for survivors,
     explicit pass/fail against §19.6 Step 3 acceptance criteria.
   - Update `docs/README.md` and AGENTS.md docs table.
+  - Result: added `docs/20-pair-universe-results.md`, linked it from
+    `docs/README.md`, and added it to the AGENTS.md documentation table.
+    The doc rejects Sprint 19 because `RSITrend` failed walk-forward acceptance.
 
 - [ ] **H. Regime-filter experiments on Step 3 survivors** — _Antigravity Gemini Flash medium (after F, only for passing strategies)_
   - Run `scripts/regime_filter_experiments.py` for each survivor.
@@ -351,3 +354,4 @@
 | 2026-05-27 | Codex | Completed Sprint 19 Task D: downloaded and verified top-20 OKX 5m candles for 2024-07-01 through 2025-05-01 |
 | 2026-05-27 | Codex | Completed Sprint 19 Task E same-window top-20 baseline sweep; only `RSITrend` passed the trade-count/drawdown screen |
 | 2026-05-27 | Codex | Completed Sprint 19 Task F: `RSITrend` failed 7-fold top-20 walk-forward acceptance on avg OOS Sharpe and profit |
+| 2026-05-27 | Codex | Completed Sprint 19 Task G: documented top-20 universe rejection in docs/20 and updated docs indexes |
