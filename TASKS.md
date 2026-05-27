@@ -55,12 +55,15 @@
     historical-volume ranking, and JSON output. Verified `ruff check .` and
     `pytest` green.
 
-- [ ] **C. Run `build_universe.py`, commit the JSON, update `pair_whitelist`** — _Codex 5.4 low_
+- [x] **C. Run `build_universe.py`, commit the JSON, update `pair_whitelist`** — _Codex 5.4 low_
   - Run the script and inspect the output. Sanity check: BTC, ETH, SOL,
     BNB should appear; obvious stablecoins should not.
   - Commit `user_data/universes/top20_okx_2024-07-01.json` (this is
     metadata, not candle data — add to git, not gitignore).
   - Update `user_data/config.json` `pair_whitelist` to match.
+  - Result: generated `user_data/universes/top20_okx_2024-07-01.json`
+    from local 1d OKX OHLCV, confirmed BTC/ETH/SOL/BNB are present and
+    obvious stablecoins are absent, and updated `pair_whitelist` to match.
 
 - [ ] **D. Download 5m candle data for the 16 new pairs** — _Antigravity Gemini Flash medium_
   ```bash
@@ -313,3 +316,4 @@
 | 2026-05-26 | Codex | Closed the 1h sprint bookkeeping: Task K complete, escalation lane unused, no candidate advances |
 | 2026-05-27 | Codex | Started `codex/sprint-19-top20`; chose Sprint 19 Option A and kept `max_open_trades = 2` for ~66% peak concentration |
 | 2026-05-27 | Codex | Implemented Task B for Sprint 19: top-N OKX USDT universe builder with exclusion/ranking tests; verified ruff and pytest |
+| 2026-05-27 | Codex | Completed Sprint 19 Task C: generated top-20 OKX universe JSON from local historical OHLCV and updated `pair_whitelist` |

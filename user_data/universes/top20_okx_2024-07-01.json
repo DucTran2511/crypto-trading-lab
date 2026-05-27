@@ -1,0 +1,214 @@
+{
+  "exchange": "okx",
+  "market": "spot",
+  "quote": "USDT",
+  "snapshot_date": "2024-07-01",
+  "selection": "top 20 by historical 30d quote volume ending 2024-07-01",
+  "timeframe": "1d",
+  "volume_window_days": 30,
+  "min_history_months": 6,
+  "pairs": [
+    "BTC/USDT",
+    "ETH/USDT",
+    "SOL/USDT",
+    "PEPE/USDT",
+    "TON/USDT",
+    "PEOPLE/USDT",
+    "DOGE/USDT",
+    "ORDI/USDT",
+    "TURBO/USDT",
+    "XRP/USDT",
+    "FIL/USDT",
+    "SUI/USDT",
+    "SHIB/USDT",
+    "FLOKI/USDT",
+    "WLD/USDT",
+    "NEAR/USDT",
+    "LTC/USDT",
+    "ENS/USDT",
+    "BNB/USDT",
+    "UNI/USDT"
+  ],
+  "candidates": [
+    {
+      "pair": "BTC/USDT",
+      "inst_id": "BTC-USDT",
+      "base": "BTC",
+      "quote_volume_30d": 12132207300.981245,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "ETH/USDT",
+      "inst_id": "ETH-USDT",
+      "base": "ETH",
+      "quote_volume_30d": 8071585384.796876,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "SOL/USDT",
+      "inst_id": "SOL-USDT",
+      "base": "SOL",
+      "quote_volume_30d": 2789013874.3170524,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "PEPE/USDT",
+      "inst_id": "PEPE-USDT",
+      "base": "PEPE",
+      "quote_volume_30d": 2310964153.7510357,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "TON/USDT",
+      "inst_id": "TON-USDT",
+      "base": "TON",
+      "quote_volume_30d": 2009058652.626474,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "PEOPLE/USDT",
+      "inst_id": "PEOPLE-USDT",
+      "base": "PEOPLE",
+      "quote_volume_30d": 1285681006.1526613,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "DOGE/USDT",
+      "inst_id": "DOGE-USDT",
+      "base": "DOGE",
+      "quote_volume_30d": 1272149900.835706,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "ORDI/USDT",
+      "inst_id": "ORDI-USDT",
+      "base": "ORDI",
+      "quote_volume_30d": 1074648780.232776,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "TURBO/USDT",
+      "inst_id": "TURBO-USDT",
+      "base": "TURBO",
+      "quote_volume_30d": 946007206.081316,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "XRP/USDT",
+      "inst_id": "XRP-USDT",
+      "base": "XRP",
+      "quote_volume_30d": 630430195.2273045,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "FIL/USDT",
+      "inst_id": "FIL-USDT",
+      "base": "FIL",
+      "quote_volume_30d": 599681415.7725252,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "SUI/USDT",
+      "inst_id": "SUI-USDT",
+      "base": "SUI",
+      "quote_volume_30d": 443833656.1431297,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "SHIB/USDT",
+      "inst_id": "SHIB-USDT",
+      "base": "SHIB",
+      "quote_volume_30d": 413730958.80241686,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "FLOKI/USDT",
+      "inst_id": "FLOKI-USDT",
+      "base": "FLOKI",
+      "quote_volume_30d": 382575738.7558658,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "WLD/USDT",
+      "inst_id": "WLD-USDT",
+      "base": "WLD",
+      "quote_volume_30d": 377624074.471086,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "NEAR/USDT",
+      "inst_id": "NEAR-USDT",
+      "base": "NEAR",
+      "quote_volume_30d": 348782317.4711227,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "LTC/USDT",
+      "inst_id": "LTC-USDT",
+      "base": "LTC",
+      "quote_volume_30d": 342145221.06602734,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "ENS/USDT",
+      "inst_id": "ENS-USDT",
+      "base": "ENS",
+      "quote_volume_30d": 340435256.8526412,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "BNB/USDT",
+      "inst_id": "BNB-USDT",
+      "base": "BNB",
+      "quote_volume_30d": 337166800.1620253,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    },
+    {
+      "pair": "UNI/USDT",
+      "inst_id": "UNI-USDT",
+      "base": "UNI",
+      "quote_volume_30d": 318444298.74658954,
+      "candles": 30,
+      "history_start": "2023-12-31",
+      "history_end": "2024-07-15"
+    }
+  ]
+}
