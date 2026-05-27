@@ -132,9 +132,13 @@
     `docs/README.md`, and added it to the AGENTS.md documentation table.
     The doc rejects Sprint 19 because `RSITrend` failed walk-forward acceptance.
 
-- [ ] **H. Regime-filter experiments on Step 3 survivors** — _Antigravity Gemini Flash medium (after F, only for passing strategies)_
+- [x] **H. Regime-filter experiments on Step 3 survivors** — _Antigravity Gemini Flash medium (after F, only for passing strategies)_
   - Run `scripts/regime_filter_experiments.py` for each survivor.
   - This is the **only** legitimate place to evaluate regime gating.
+  - Closed as not applicable: Task F/G produced no passing Step 3 survivors.
+    `RSITrend` was the only same-window screen survivor, and it failed
+    walk-forward acceptance on average OOS Sharpe and average OOS profit, so
+    there is no legitimate candidate for regime-filter experiments.
 
 - [ ] **I. Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after G, only if any strategy passes acceptance)_
   - `freqtrade trade -c user_data/config.json --strategy <StrategyName>`.
@@ -355,3 +359,4 @@
 | 2026-05-27 | Codex | Completed Sprint 19 Task E same-window top-20 baseline sweep; only `RSITrend` passed the trade-count/drawdown screen |
 | 2026-05-27 | Codex | Completed Sprint 19 Task F: `RSITrend` failed 7-fold top-20 walk-forward acceptance on avg OOS Sharpe and profit |
 | 2026-05-27 | Codex | Completed Sprint 19 Task G: documented top-20 universe rejection in docs/20 and updated docs indexes |
+| 2026-05-27 | Codex | Closed Sprint 19 Task H as not applicable because there are no Step 3 survivors for regime-filter experiments |
