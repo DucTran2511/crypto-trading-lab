@@ -30,12 +30,14 @@
 > under ambiguity. Do **not** route any of these to Opus Thinking, Codex 5.5
 > high+, or Devin without explicit escalation.
 
-- [ ] **A. Create feature branch + decide `max_open_trades` posture** — _Codex 5.4 low_
+- [x] **A. Create feature branch + decide `max_open_trades` posture** — _Codex 5.4 low_
   - Branch: `git checkout -b <agent>/sprint-19-top20` in the agent's worktree.
   - Per `docs/19-pair-universe-expansion.md` §19.4, default to Option A
     (`max_open_trades = 2`, peak ~66% concentration). Only override if there
     is an explicit reason — document the choice in this file's session log.
   - No code edits in this task beyond the config check.
+  - Result: created `codex/sprint-19-top20`; kept Option A because
+    `user_data/config.json` already has `max_open_trades = 2`.
 
 - [ ] **B. Build `scripts/build_universe.py`** — _Codex 5.4 medium_
   - Enumerate OKX USDT spot pairs (`GET /api/v5/market/tickers?instType=SPOT`).
@@ -305,3 +307,4 @@
 | 2026-05-26 | Codex | Closed Task I as not applicable because Task G produced no passing Step 3 survivors for regime-filter experiments |
 | 2026-05-26 | Codex | Closed Task J as not applicable because no strategy passed walk-forward acceptance for paper trading |
 | 2026-05-26 | Codex | Closed the 1h sprint bookkeeping: Task K complete, escalation lane unused, no candidate advances |
+| 2026-05-27 | Codex | Started `codex/sprint-19-top20`; chose Sprint 19 Option A and kept `max_open_trades = 2` for ~66% peak concentration |
