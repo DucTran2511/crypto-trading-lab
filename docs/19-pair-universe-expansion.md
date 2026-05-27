@@ -57,7 +57,7 @@ The following are filtered out before ranking:
 ### 19.2.3 How to discover the universe
 
 OKX exposes 30d quote volume via `GET /api/v5/market/tickers?instType=SPOT`.
-A small helper script (Task A) queries it, applies the exclusion rules above,
+A small helper script (Task B in `TASKS.md`) queries it, applies the exclusion rules above,
 and writes the resulting whitelist to `user_data/universes/top20_okx_2024-07-01.json`.
 Commit the JSON. The committed snapshot is the source of truth for the rest
 of the sprint — no agent re-derives it.
@@ -161,7 +161,7 @@ python scripts/walk_forward.py \
 
 > **Note.** `walk_forward.py` uses the `pair_whitelist` from `config.json`
 > at hyperopt/backtest time, so the top-20 universe applies automatically once
-> Task B is complete.
+> Task C (commit JSON + update `pair_whitelist`) is complete.
 
 ### Step 3: Acceptance criteria
 
@@ -201,23 +201,25 @@ Agent assignments follow the cost/capability rubric established in PR #10.
 Do **not** route any task here to Opus Thinking, Codex 5.5 high+, or Devin
 without explicit escalation.
 
+Task IDs in the table below are the canonical letter IDs used in `TASKS.md`.
+Use them everywhere; do **not** invent a parallel numbering scheme.
+
 | # | Task | Suggested agent | Depends On |
 |---|---|---|---|
-| 1 | Create feature branch + decide `max_open_trades` posture per §19.4 | Codex 5.4 low | — |
-| 2 | Write `scripts/build_universe.py`: enumerate OKX USDT spot, exclude per §19.2.2, rank by historical 30d quote volume ending 2024-07-01, output `user_data/universes/top20_okx_2024-07-01.json` | Codex 5.4 medium | 1 |
-| 3 | Add a test for `build_universe.py` (mock OKX tickers + synthetic OHLCV, verify ranking + exclusion logic) | Codex 5.4 low | 2 |
-| 4 | Run `build_universe.py`, commit the JSON, update `pair_whitelist` in `user_data/config.json` | Codex 5.4 low | 2, 3 |
-| 5 | Download 5m candle data for the new 16 pairs (BTC/ETH/SOL/BNB already present) | Antigravity Gemini Flash medium | 4 |
-| 6 | Run same-window baseline backtests per §19.6 Step 1 | Antigravity Gemini Flash medium | 5 |
-| 7 | For each strategy that passes Step 1, run walk-forward sweep per §19.6 Step 2 | Antigravity Gemini Flash medium | 6 |
-| 8 | Write `docs/20-pair-universe-results.md` following docs/18 structure | Antigravity Gemini Flash high | 7 |
-| 9 | Regime-filter experiments on Step 3 survivors only | Antigravity Gemini Flash medium | 7 |
-| 10 | If any strategy passes acceptance, start 4-week paper-trade dry-run per §19.6 Step 6 | Antigravity Gemini Flash medium | 8 |
-| 11 | Update `TASKS.md`, `AGENTS.md`, `docs/README.md` to reflect sprint outcome | Codex 5.4 low | 8, 9 |
+| A | Create feature branch + decide `max_open_trades` posture per §19.4 | Codex 5.4 low | — |
+| B | Write `scripts/build_universe.py` (enumerate OKX USDT spot, exclude per §19.2.2, rank by historical 30d quote volume ending 2024-07-01, output `user_data/universes/top20_okx_2024-07-01.json`) **plus** a test in `tests/test_build_universe.py` covering ranking + every exclusion rule | Codex 5.4 medium | A |
+| C | Run `build_universe.py`, commit the JSON, update `pair_whitelist` in `user_data/config.json` | Codex 5.4 low | B |
+| D | Download 5m candle data for the new 16 pairs (BTC/ETH/SOL/BNB already present) | Antigravity Gemini Flash medium | C |
+| E | Run same-window baseline backtests per §19.6 Step 1 | Antigravity Gemini Flash medium | D |
+| F | For each strategy that passes Step 1, run walk-forward sweep per §19.6 Step 2 | Antigravity Gemini Flash medium | E |
+| G | Write `docs/20-pair-universe-results.md` following docs/18 structure | Antigravity Gemini Flash high | F |
+| H | Regime-filter experiments on Step 3 survivors only | Antigravity Gemini Flash medium | F |
+| I | If any strategy passes acceptance, start 4-week paper-trade dry-run per §19.6 Step 6 | Antigravity Gemini Flash medium | G |
+| J | Update `TASKS.md`, `AGENTS.md`, `docs/README.md` to reflect sprint outcome | Codex 5.4 low | G, H |
 | ESC | Anything ambiguous or design-level (e.g., did the universe-selection script miss obvious pairs? should we expand to top-50? should we re-introduce 1h strategies?) | Sonnet 4.6 Thinking — escalate, do **not** decide locally | any |
 
 **Cost ceiling:** ~1 Codex 5.4 medium-day + ~2 Antigravity Gemini Flash
-medium-days. The walk-forward step (Task 7) is the largest single block —
+medium-days. The walk-forward step (Task F) is the largest single block —
 each strategy × top-20 sweep is ~5× the compute of sprint 17's
 single-strategy walk-forward. Plan accordingly.
 
