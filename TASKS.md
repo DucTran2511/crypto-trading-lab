@@ -40,7 +40,7 @@
 > under ambiguity. Do **not** route any of these to Opus Thinking, Codex 5.5
 > high+, or Devin without explicit escalation.
 
-- [ ] **A. Create feature branch + decide ranking lookback** — _Codex 5.4 low_
+- [x] **A. Create feature branch + decide ranking lookback** — _Codex 5.4 low_
   - Branch: `git checkout -b <agent>/sprint-21-daily-momentum` in the
     agent's worktree.
   - Per `docs/21-daily-momentum-ranking.md` §21.2, default to **1-day**
@@ -48,6 +48,9 @@
     candles. Only override if there is an explicit reason — document the
     choice in this file's session log.
   - No code edits in this task beyond the branch creation.
+  - Result: created `codex/sprint-21-daily-momentum`; kept the pre-registered
+    1-day trailing return computed on closed UTC daily candles because no
+    explicit override reason surfaced.
 
 - [ ] **B. Build `scripts/rank_pairs_by_momentum.py`** — _Codex 5.4 medium_
   - Read the top-20 universe JSON
@@ -494,3 +497,4 @@
 | 2026-05-27 | Codex | Closed Sprint 19 Task J and ESC lane: no candidate advances; next registered follow-up is daily momentum ranking |
 | 2026-05-27 | Devin | Bookkeeping closeout: marked Sprint 19 done, archived its task list, updated AGENTS.md milestone/tally (9 strategies, 9 rejected) |
 | 2026-05-27 | Devin | Queued Sprint 21: wrote `docs/21-daily-momentum-ranking.md` and populated `TASKS.md` A–K + ESC with per-agent tier assignments |
+| 2026-05-27 | Codex | Completed Sprint 21 Task A: created `codex/sprint-21-daily-momentum` and kept the default 1-day closed-UTC daily momentum lookback |
