@@ -7,20 +7,111 @@
 
 ## Sprint Status
 
-- [x] **Sprint: New hypotheses on higher timeframes**
-  All 5m single-timeframe strategies rejected. Shifting to 1h primary timeframe
-  with two structurally different approaches. Full plan in
-  `docs/17-next-sprint-plan.md`.
-  Sprint result: both 1h candidates passed the same-window screen but failed
-  walk-forward acceptance due to negative average out-of-sample profit. No
-  strategy advances to regime-filter experiments or paper trading. See
+- [/] **Sprint 19: Pair universe expansion (top-20 USDT spot)**
+  Eight strategies rejected so far on 4 majors. This sprint changes the pair
+  universe (not the strategies, not the timeframe) to test whether the
+  bottleneck is the over-served BTC/ETH/SOL/BNB market. Full plan in
+  `docs/19-pair-universe-expansion.md`.
+
+## Previous Sprint (done)
+
+- [x] **Sprint 17: New hypotheses on higher timeframes** — see
+  `docs/17-next-sprint-plan.md`. Both 1h candidates passed the same-window
+  screen but failed walk-forward acceptance due to negative average
+  out-of-sample profit. No strategy advanced. See
   `docs/18-1h-strategy-walk-forward.md`.
 
 ## Up Next
 
-### Sprint tasks (per-agent assignments)
+### Sprint 19 tasks (per-agent assignments)
 
-> Full spec: `docs/17-next-sprint-plan.md`. Tier rubric: cheap models for
+> Full spec: `docs/19-pair-universe-expansion.md`. Tier rubric: cheap models
+> for transcription, mid-tier for code-from-spec, high-tier only for design
+> under ambiguity. Do **not** route any of these to Opus Thinking, Codex 5.5
+> high+, or Devin without explicit escalation.
+
+- [ ] **A. Create feature branch + decide `max_open_trades` posture** — _Codex 5.4 low_
+  - Branch: `git checkout -b <agent>/sprint-19-top20` in the agent's worktree.
+  - Per `docs/19-pair-universe-expansion.md` §19.4, default to Option A
+    (`max_open_trades = 2`, peak ~66% concentration). Only override if there
+    is an explicit reason — document the choice in this file's session log.
+  - No code edits in this task beyond the config check.
+
+- [ ] **B. Build `scripts/build_universe.py`** — _Codex 5.4 medium_
+  - Enumerate OKX USDT spot pairs (`GET /api/v5/market/tickers?instType=SPOT`).
+  - Apply exclusions per `docs/19-pair-universe-expansion.md` §19.2.2
+    (stablecoins, wrapped tokens, leveraged tokens, < 6 months OKX history).
+  - Rank by **historical 30d quote volume ending 2024-07-01** (from local
+    OHLCV in `user_data/data/okx/`, not from the live ticker volume field).
+  - Write top-20 result to `user_data/universes/top20_okx_2024-07-01.json`.
+  - CLI: `argparse`, `--help`, `--snapshot-date YYYY-MM-DD`, `--top N`.
+  - Tests in `tests/test_build_universe.py`: mock OKX tickers + synthetic
+    OHLCV, verify ranking + every exclusion rule.
+  - Acceptance: `ruff check .` clean, `pytest` green.
+
+- [ ] **C. Run `build_universe.py`, commit the JSON, update `pair_whitelist`** — _Codex 5.4 low_
+  - Run the script and inspect the output. Sanity check: BTC, ETH, SOL,
+    BNB should appear; obvious stablecoins should not.
+  - Commit `user_data/universes/top20_okx_2024-07-01.json` (this is
+    metadata, not candle data — add to git, not gitignore).
+  - Update `user_data/config.json` `pair_whitelist` to match.
+
+- [ ] **D. Download 5m candle data for the 16 new pairs** — _Antigravity Gemini Flash medium_
+  ```bash
+  freqtrade download-data -c user_data/config.json \
+      --timeframes 5m \
+      --timerange=20240701-20250501
+  ```
+  - With the updated `pair_whitelist`, this only fetches what's missing.
+  - Data remains gitignored. Push the branch with the JSON + config changes only.
+
+- [ ] **E. Same-window baseline backtests** — _Antigravity Gemini Flash medium (after D)_
+  - Run `scripts/run_baselines.py --strategies EMACrossover DonchianBreakout BollingerMeanReversion RSITrend MACDVolume --pairs <top20 from JSON> --timerange=20250101-20250501`.
+  - **Screen: ≥ 50 trades and max drawdown < 30%** (raised from 20 per
+    §19.6 Step 1).
+  - Capture per-pair trade counts in the results doc; this informs follow-up
+    sprints.
+
+- [ ] **F. Walk-forward validation for screen survivors** — _Antigravity Gemini Flash medium (after E)_
+  - For each strategy that passed Task E: run
+    `scripts/walk_forward.py` with 90d/30d/30d windows over 2024-07-01 →
+    2025-05-01.
+  - Acceptance: ≥ 3 OOS folds, avg OOS Sharpe > 0, avg OOS profit > 0,
+    no single fold drawdown > 5% (identical to docs/16 §16.3).
+  - This is the largest single block of compute in the sprint. Budget
+    accordingly; if any strategy passes Task E it can be walk-forwarded in
+    parallel with the others.
+
+- [ ] **G. Write results doc `docs/20-pair-universe-results.md`** — _Antigravity Gemini Flash high (after F)_
+  - Follow the structure of `docs/18-1h-strategy-walk-forward.md` exactly.
+  - Include: the universe selection (paste the JSON), per-strategy +
+    per-pair Step 1 results, walk-forward per-fold tables for survivors,
+    explicit pass/fail against §19.6 Step 3 acceptance criteria.
+  - Update `docs/README.md` and AGENTS.md docs table.
+
+- [ ] **H. Regime-filter experiments on Step 3 survivors** — _Antigravity Gemini Flash medium (after F, only for passing strategies)_
+  - Run `scripts/regime_filter_experiments.py` for each survivor.
+  - This is the **only** legitimate place to evaluate regime gating.
+
+- [ ] **I. Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after G, only if any strategy passes acceptance)_
+  - `freqtrade trade -c user_data/config.json --strategy <StrategyName>`.
+  - Track per-week trade count and win rate vs backtest expectation.
+  - **No live-money deployment in this sprint.**
+
+- [ ] **J. Update `TASKS.md`** at sprint end — _Codex 5.4 low_
+
+- [ ] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
+  - Surface any design-level question rather than deciding locally. Examples:
+    "the universe-selection script is missing obvious pairs", "should we
+    expand to top-50 because top-20 is too sparse?", "zero of five strategies
+    passed Step 1 — the kill criterion from §19.8 triggers; should we go to
+    FreqAI or perps next?".
+
+---
+
+### Sprint 17 tasks (done — archived for reference)
+
+> Full spec was: `docs/17-next-sprint-plan.md`. Tier rubric: cheap models for
 > transcription, mid-tier for code-from-spec, high-tier only for design under
 > ambiguity. Do **not** route any of these to Opus Thinking, Codex 5.5 high+,
 > or Devin without explicit escalation.

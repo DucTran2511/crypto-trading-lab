@@ -22,6 +22,7 @@ This folder is the long-form docs for `crypto-trading-lab`. Start here, then dri
 16. [RSITrendBullOnly multi-window](16-rsitrend-bullonly-multiwindow.md) — 3-fold validation result and rejection decision.
 17. [Next sprint plan](17-next-sprint-plan.md) — new hypotheses on higher timeframes (MultiTimeframeTrend + ATRAdaptiveMeanReversion).
 18. [1h strategy walk-forward results](18-1h-strategy-walk-forward.md) — 7-fold validation result and rejection decision for the 1h sprint candidates.
+19. [Pair universe expansion sprint plan](19-pair-universe-expansion.md) — top-20 USDT spot universe on OKX; reuse 5m baselines to test whether the universe was the bottleneck.
 
 ## Reference
 

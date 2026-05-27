@@ -108,7 +108,7 @@ crypto-trading-lab/
 │   ├── test_compare_strategies.py
 │   ├── test_regime_classifier.py
 │   └── test_regime_filter_experiments.py
-├── docs/                            # Numbered 01-18, long-form documentation
+├── docs/                            # Numbered 01-19, long-form documentation
 ├── .github/workflows/ci.yml         # GitHub Actions: TA-Lib build + ruff + pytest
 ├── AGENTS.md                        # This file. CLAUDE.md, GEMINI.md symlink here.
 ├── TASKS.md                         # Current sprint + session log
@@ -135,23 +135,31 @@ crypto-trading-lab/
 
 ## Current Status & Roadmap
 
-**Last milestone:** Seven-fold walk-forward validation of the 1h sprint
-candidates is complete. `MultiTimeframeTrend` and `ATRAdaptiveMeanReversion`
-both failed acceptance because average OOS profit was negative. See
-`docs/18-1h-strategy-walk-forward.md`.
+**Last milestone:** Sprint 17 — seven-fold walk-forward validation of the 1h
+sprint candidates is complete. `MultiTimeframeTrend` and
+`ATRAdaptiveMeanReversion` both failed acceptance because average OOS profit
+was negative. See `docs/18-1h-strategy-walk-forward.md`.
 
-**Current sprint:** New hypotheses on higher timeframes were tested and rejected.
-See `docs/17-next-sprint-plan.md` for the plan and `docs/18-1h-strategy-walk-forward.md`
-for the validation result.
+**Eight strategies tested, eight rejected** — all on the BTC/ETH/SOL/BNB
+universe. The strategy and timeframe spaces have both been searched; the
+universe has not.
+
+**Current sprint:** Sprint 19 — pair universe expansion to top-20 USDT spot
+on OKX. Reuse the five 5m baseline strategies; only the data they see
+changes. Full plan in `docs/19-pair-universe-expansion.md`.
 **See `TASKS.md` for active tasks and per-agent assignments.**
 
-Roadmap priority (from `docs/11-roadmap.md`):
-1. Form a new strategy or filter hypothesis; `RSITrendBullOnly` is rejected.
-2. Validate any new candidate with same-window screening and walk-forward tests.
-3. Switch live data to Binance.vision as default.
-4. Live monitoring stack (logs, Telegram, heartbeat).
-5. Paper-trade validation (4+ weeks).
-6. Live micro-size deployment.
+Roadmap priority (from `docs/11-roadmap.md`, updated for current state):
+1. Resolve Sprint 19 (top-20 universe on existing 5m baselines).
+2. If Sprint 19 produces survivors: regime filter + 4-week paper trade.
+3. If Sprint 19 produces nothing: escalate to FreqAI (ML on engineered
+   features) or perps + funding-rate arbitrage. See branching memo in
+   `docs/19-pair-universe-expansion.md` §19.8 "kill criterion".
+4. Switch live data to Binance.vision as default (still deferred).
+5. Live monitoring stack (logs, Telegram, heartbeat).
+6. Paper-trade validation (4+ weeks) once a strategy clears acceptance.
+7. Live micro-size deployment — still gated on ≥ 6 months of paper-trade
+   logs matching backtest expectation.
 
 ---
 
@@ -191,6 +199,7 @@ Full docs in `docs/` (read in order):
 | 16 | `docs/16-rsitrend-bullonly-multiwindow.md` | RSITrendBullOnly 3-fold validation + rejection |
 | 17 | `docs/17-next-sprint-plan.md` | New hypotheses: MultiTimeframeTrend + ATRAdaptiveMeanReversion on 1h |
 | 18 | `docs/18-1h-strategy-walk-forward.md` | 1h strategy 7-fold validation + rejection |
+| 19 | `docs/19-pair-universe-expansion.md` | Top-20 USDT spot universe expansion sprint plan |
 
 ---
 
