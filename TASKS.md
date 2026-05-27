@@ -52,7 +52,7 @@
     1-day trailing return computed on closed UTC daily candles because no
     explicit override reason surfaced.
 
-- [ ] **B. Build `scripts/rank_pairs_by_momentum.py`** — _Codex 5.4 medium_
+- [x] **B. Build `scripts/rank_pairs_by_momentum.py`** — _Codex 5.4 medium_
   - Read the top-20 universe JSON
     (`user_data/universes/top20_okx_2024-07-01.json`) and local OKX 1d
     OHLCV from `user_data/data/okx/`.
@@ -67,6 +67,11 @@
     known returns, verify daily ordering, verify edge case where a pair has
     insufficient history.
   - Acceptance: `ruff check .` clean, `pytest` green.
+  - Result: added `scripts/rank_pairs_by_momentum.py` and focused tests for
+    parser help, universe loading, known-return ordering, insufficient
+    per-pair history, and the plain `{date: [pairs...]}` output schema.
+    Verified `.venv/bin/ruff check .`, `.venv/bin/pytest`, and a real-data
+    CLI smoke run for `2024-07-01` through `2024-07-04`.
 
 - [ ] **C. Wire the rank into entry gating** — _Codex 5.4 medium_
   - Per `docs/21-daily-momentum-ranking.md` §21.3, add a strategy-level
@@ -498,3 +503,4 @@
 | 2026-05-27 | Devin | Bookkeeping closeout: marked Sprint 19 done, archived its task list, updated AGENTS.md milestone/tally (9 strategies, 9 rejected) |
 | 2026-05-27 | Devin | Queued Sprint 21: wrote `docs/21-daily-momentum-ranking.md` and populated `TASKS.md` A–K + ESC with per-agent tier assignments |
 | 2026-05-27 | Codex | Completed Sprint 21 Task A: created `codex/sprint-21-daily-momentum` and kept the default 1-day closed-UTC daily momentum lookback |
+| 2026-05-27 | Codex | Completed Sprint 21 Task B: added daily momentum ranking CLI plus tests; verified ruff, pytest, and a real-data smoke run |
