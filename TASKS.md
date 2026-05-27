@@ -110,12 +110,20 @@
     ranking JSON. Verified `.venv/bin/ruff check .` and `.venv/bin/pytest`
     with 75 passing tests.
 
-- [ ] **E. Generate daily-rank JSON for the backtest window** — _Codex 5.4 low_
+- [x] **E. Generate daily-rank JSON for the backtest window** — _Codex 5.4 low_
   - Run the script for `2024-07-01` → `2025-05-01` and commit the resulting
     JSON (it's metadata, not candle data — add to git, not gitignore).
   - Sanity check: spot-check 3 random days; confirm the top-3 are large-cap
     or known-mover names; confirm no day has fewer than 20 ranked pairs
     (otherwise data gap).
+  - Result: downloaded missing local OKX `1d` candles for the top-20 universe
+    through `2025-05-01`, generated
+    `user_data/universes/daily_momentum_rank_20240701-20250501.json`, and
+    confirmed 304 ranked days with exactly 20 pairs per day. Spot checks:
+    `2024-07-15` top-3 `PEOPLE/USDT`, `TURBO/USDT`, `FLOKI/USDT`;
+    `2025-01-20` top-3 `ENS/USDT`, `SOL/USDT`, `ETH/USDT`;
+    `2025-04-15` top-3 `TON/USDT`, `ENS/USDT`, `ETH/USDT`. Verified
+    `.venv/bin/ruff check .` and `.venv/bin/pytest`.
 
 - [ ] **F. Same-window baseline backtests for ranked variants** — _Antigravity Gemini Flash medium (after C, D, E)_
   - Run `scripts/run_baselines.py` against the five `*DailyRanked` strategies
@@ -519,3 +527,4 @@
 | 2026-05-27 | Codex | Completed Sprint 21 Task B: added daily momentum ranking CLI plus tests; verified ruff, pytest, and a real-data smoke run |
 | 2026-05-27 | Codex | Completed Sprint 21 Task C: wired daily momentum ranking into five thin ranked strategy subclasses with the shared selection helper |
 | 2026-05-27 | Codex | Completed Sprint 21 Task D: added selection-helper and ranked-strategy smoke coverage; verified ruff and pytest |
+| 2026-05-27 | Codex | Completed Sprint 21 Task E: generated and sanity-checked the full-window daily momentum ranking JSON with 20 pairs on all 304 days |
