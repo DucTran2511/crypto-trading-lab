@@ -77,12 +77,34 @@
     `20240701-20250501`; verified all 20 5m files cover from 2024-07-01
     through at least 2025-05-01. Candle data remains gitignored.
 
-- [ ] **E. Same-window baseline backtests** — _Antigravity Gemini Flash medium (after D)_
+- [x] **E. Same-window baseline backtests** — _Antigravity Gemini Flash medium (after D)_
   - Run `scripts/run_baselines.py --strategies EMACrossover DonchianBreakout BollingerMeanReversion RSITrend MACDVolume --pairs <top20 from JSON> --timerange=20250101-20250501`.
   - **Screen: ≥ 50 trades and max drawdown < 30%** (raised from 20 per
     §19.6 Step 1).
   - Capture per-pair trade counts in the results doc; this informs follow-up
     sprints.
+  - Result: ran the top-20 same-window sweep for `20250101-20250501`.
+    `RSITrend` is the only Step 1 survivor (339 trades, 8.97% max drawdown).
+    `EMACrossover` failed drawdown (1897 trades, 48.91% DD), `DonchianBreakout`
+    failed drawdown (1250 trades, 40.23% DD), `BollingerMeanReversion` failed
+    trade count (14 trades, 0.85% DD), and `MACDVolume` failed drawdown
+    (3169 trades, 88.02% DD).
+  - Per-pair trade counts:
+    - `EMACrossover`: BTC 146, ETH 106, SOL 112, PEPE 121, TON 124, PEOPLE 107,
+      DOGE 91, ORDI 99, TURBO 88, XRP 113, FIL 78, SUI 88, SHIB 73, FLOKI 67,
+      WLD 87, NEAR 64, LTC 87, ENS 74, BNB 86, UNI 86.
+    - `DonchianBreakout`: BTC 114, ETH 86, SOL 88, PEPE 55, TON 98, PEOPLE 75,
+      DOGE 45, ORDI 73, TURBO 63, XRP 64, FIL 47, SUI 59, SHIB 37, FLOKI 34,
+      WLD 46, NEAR 45, LTC 79, ENS 33, BNB 80, UNI 29.
+    - `BollingerMeanReversion`: BTC 0, ETH 2, SOL 1, PEPE 1, TON 1, PEOPLE 1,
+      DOGE 0, ORDI 0, TURBO 0, XRP 0, FIL 1, SUI 1, SHIB 0, FLOKI 0, WLD 1,
+      NEAR 0, LTC 1, ENS 0, BNB 3, UNI 1.
+    - `RSITrend`: BTC 18, ETH 18, SOL 20, PEPE 42, TON 20, PEOPLE 11,
+      DOGE 23, ORDI 7, TURBO 13, XRP 20, FIL 17, SUI 14, SHIB 28, FLOKI 9,
+      WLD 14, NEAR 12, LTC 15, ENS 12, BNB 12, UNI 14.
+    - `MACDVolume`: BTC 237, ETH 207, SOL 206, PEPE 187, TON 193, PEOPLE 180,
+      DOGE 137, ORDI 162, TURBO 174, XRP 144, FIL 146, SUI 149, SHIB 135,
+      FLOKI 120, WLD 119, NEAR 122, LTC 164, ENS 125, BNB 133, UNI 129.
 
 - [ ] **F. Walk-forward validation for screen survivors** — _Antigravity Gemini Flash medium (after E)_
   - For each strategy that passed Task E: run
@@ -321,3 +343,4 @@
 | 2026-05-27 | Codex | Implemented Task B for Sprint 19: top-N OKX USDT universe builder with exclusion/ranking tests; verified ruff and pytest |
 | 2026-05-27 | Codex | Completed Sprint 19 Task C: generated top-20 OKX universe JSON from local historical OHLCV and updated `pair_whitelist` |
 | 2026-05-27 | Codex | Completed Sprint 19 Task D: downloaded and verified top-20 OKX 5m candles for 2024-07-01 through 2025-05-01 |
+| 2026-05-27 | Codex | Completed Sprint 19 Task E same-window top-20 baseline sweep; only `RSITrend` passed the trade-count/drawdown screen |
