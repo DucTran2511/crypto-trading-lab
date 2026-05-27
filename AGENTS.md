@@ -108,7 +108,7 @@ crypto-trading-lab/
 │   ├── test_compare_strategies.py
 │   ├── test_regime_classifier.py
 │   └── test_regime_filter_experiments.py
-├── docs/                            # Numbered 01-20, long-form documentation
+├── docs/                            # Numbered 01-21, long-form documentation
 ├── .github/workflows/ci.yml         # GitHub Actions: TA-Lib build + ruff + pytest
 ├── AGENTS.md                        # This file. CLAUDE.md, GEMINI.md symlink here.
 ├── TASKS.md                         # Current sprint + session log
@@ -135,26 +135,31 @@ crypto-trading-lab/
 
 ## Current Status & Roadmap
 
-**Last milestone:** Sprint 17 — seven-fold walk-forward validation of the 1h
-sprint candidates is complete. `MultiTimeframeTrend` and
-`ATRAdaptiveMeanReversion` both failed acceptance because average OOS profit
-was negative. See `docs/18-1h-strategy-walk-forward.md`.
+**Last milestone:** Sprint 19 — top-20 USDT spot universe expansion is
+complete. Only `RSITrend` passed the same-window screen; it then failed
+7-fold walk-forward (avg OOS Sharpe -30.77, avg OOS profit -0.17%). See
+`docs/20-pair-universe-results.md`.
 
-**Eight strategies tested, eight rejected** — all on the BTC/ETH/SOL/BNB
-universe. The strategy and timeframe spaces have both been searched; the
-universe has not.
+**Nine strategies tested, nine rejected** — five 5m baselines and one bull-only
+variant on BTC/ETH/SOL/BNB, two 1h candidates on the same majors, and the
+strongest 5m baseline (`RSITrend`) on the top-20 universe. Strategy,
+timeframe, and universe-by-volume spaces have all been searched. The remaining
+untested dimension is *pair selection by signal* (rank intraday and trade only
+the leaders).
 
-**Current sprint:** Sprint 19 — pair universe expansion to top-20 USDT spot
-on OKX. Reuse the five 5m baseline strategies; only the data they see
-changes. Full plan in `docs/19-pair-universe-expansion.md`.
+**Current sprint:** Sprint 21 — daily momentum ranking. Each UTC day, rank the
+top-20 universe by trailing 1d return and restrict entries to today's top-3.
+Reuse the existing 5m baseline strategies. Full plan in
+`docs/21-daily-momentum-ranking.md`. This is the registered §19.8 follow-up
+*before* declaring the indicator-on-spot research thread dead.
 **See `TASKS.md` for active tasks and per-agent assignments.**
 
 Roadmap priority (from `docs/11-roadmap.md`, updated for current state):
-1. Resolve Sprint 19 (top-20 universe on existing 5m baselines).
-2. If Sprint 19 produces survivors: regime filter + 4-week paper trade.
-3. If Sprint 19 produces nothing: escalate to FreqAI (ML on engineered
+1. Resolve Sprint 21 (daily momentum ranking on existing 5m baselines).
+2. If Sprint 21 produces survivors: regime filter + 4-week paper trade.
+3. If Sprint 21 produces nothing: escalate to FreqAI (ML on engineered
    features) or perps + funding-rate arbitrage. See branching memo in
-   `docs/19-pair-universe-expansion.md` §19.8 "kill criterion".
+   `docs/21-daily-momentum-ranking.md` §21.8 "kill criterion".
 4. Switch live data to Binance.vision as default (still deferred).
 5. Live monitoring stack (logs, Telegram, heartbeat).
 6. Paper-trade validation (4+ weeks) once a strategy clears acceptance.
@@ -201,6 +206,7 @@ Full docs in `docs/` (read in order):
 | 18 | `docs/18-1h-strategy-walk-forward.md` | 1h strategy 7-fold validation + rejection |
 | 19 | `docs/19-pair-universe-expansion.md` | Top-20 USDT spot universe expansion sprint plan |
 | 20 | `docs/20-pair-universe-results.md` | Top-20 universe same-window + walk-forward rejection |
+| 21 | `docs/21-daily-momentum-ranking.md` | Daily-momentum-ranked top-3 from top-20 universe sprint plan |
 
 ---
 

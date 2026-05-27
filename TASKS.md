@@ -7,13 +7,23 @@
 
 ## Sprint Status
 
-- [/] **Sprint 19: Pair universe expansion (top-20 USDT spot)**
-  Eight strategies rejected so far on 4 majors. This sprint changes the pair
-  universe (not the strategies, not the timeframe) to test whether the
-  bottleneck is the over-served BTC/ETH/SOL/BNB market. Full plan in
-  `docs/19-pair-universe-expansion.md`.
+- [/] **Sprint 21: Daily momentum ranking (top-3 of top-20 universe)**
+  Nine strategies rejected so far. The strategy, timeframe, and
+  universe-by-volume spaces have all been searched. This sprint adds the
+  remaining untested dimension: *pair selection by signal* — each UTC day,
+  rank the existing top-20 universe by trailing 1d return and restrict
+  entries to today's top-3. Reuse the existing 5m baseline strategies
+  unchanged. Full plan in `docs/21-daily-momentum-ranking.md`. This is the
+  registered `docs/19-pair-universe-expansion.md` §19.8 follow-up *before*
+  declaring the indicator-on-spot research thread dead.
 
-## Previous Sprint (done)
+## Previous Sprints (done)
+
+- [x] **Sprint 19: Pair universe expansion (top-20 USDT spot)** — see
+  `docs/19-pair-universe-expansion.md`. Only `RSITrend` passed the
+  same-window screen; it then failed 7-fold walk-forward acceptance with
+  avg OOS Sharpe -30.77 and avg OOS profit -0.17%. No strategy advanced.
+  See `docs/20-pair-universe-results.md`.
 
 - [x] **Sprint 17: New hypotheses on higher timeframes** — see
   `docs/17-next-sprint-plan.md`. Both 1h candidates passed the same-window
@@ -23,12 +33,120 @@
 
 ## Up Next
 
-### Sprint 19 tasks (per-agent assignments)
+### Sprint 21 tasks (per-agent assignments)
 
-> Full spec: `docs/19-pair-universe-expansion.md`. Tier rubric: cheap models
+> Full spec: `docs/21-daily-momentum-ranking.md`. Tier rubric: cheap models
 > for transcription, mid-tier for code-from-spec, high-tier only for design
 > under ambiguity. Do **not** route any of these to Opus Thinking, Codex 5.5
 > high+, or Devin without explicit escalation.
+
+- [ ] **A. Create feature branch + decide ranking lookback** — _Codex 5.4 low_
+  - Branch: `git checkout -b <agent>/sprint-21-daily-momentum` in the
+    agent's worktree.
+  - Per `docs/21-daily-momentum-ranking.md` §21.2, default to **1-day**
+    trailing return as the ranking signal computed on closed UTC daily
+    candles. Only override if there is an explicit reason — document the
+    choice in this file's session log.
+  - No code edits in this task beyond the branch creation.
+
+- [ ] **B. Build `scripts/rank_pairs_by_momentum.py`** — _Codex 5.4 medium_
+  - Read the top-20 universe JSON
+    (`user_data/universes/top20_okx_2024-07-01.json`) and local OKX 1d
+    OHLCV from `user_data/data/okx/`.
+  - Compute trailing 1d return per pair for every UTC day in a given range.
+  - Write a per-day ranking JSON to
+    `user_data/universes/daily_momentum_rank_YYYYMMDD-YYYYMMDD.json` with
+    schema `{date: [pairs sorted best→worst]}`.
+  - CLI: `argparse`, `--help`, `--start YYYY-MM-DD`, `--end YYYY-MM-DD`,
+    `--lookback-days 1` (default 1), `--top N` (default 3 in downstream
+    consumers, but stored ranking is the full top-20 ordering).
+  - Tests in `tests/test_rank_pairs_by_momentum.py`: synthetic OHLCV with
+    known returns, verify daily ordering, verify edge case where a pair has
+    insufficient history.
+  - Acceptance: `ruff check .` clean, `pytest` green.
+
+- [ ] **C. Wire the rank into entry gating** — _Codex 5.4 medium_
+  - Per `docs/21-daily-momentum-ranking.md` §21.3, add a strategy-level
+    helper (new module `user_data/selection/daily_momentum.py`) that loads
+    the ranking JSON and exposes `is_pair_in_today_top_n(pair, date, n)`.
+  - Add a thin subclass per baseline strategy:
+    `EMACrossoverDailyRanked`, `DonchianBreakoutDailyRanked`,
+    `BollingerMeanReversionDailyRanked`, `RSITrendDailyRanked`,
+    `MACDVolumeDailyRanked`. Each subclass overrides
+    `populate_entry_trend` to AND-gate the original entry signal with the
+    helper. **No other strategy logic changes.**
+  - Files: `user_data/selection/__init__.py`,
+    `user_data/selection/daily_momentum.py`,
+    `user_data/strategies/*DailyRanked.py`.
+  - Acceptance: `ruff check .` clean, `pytest` green (smoke tests in
+    Task D).
+
+- [ ] **D. Smoke tests for ranked strategies and selection helper** — _Codex 5.4 low_
+  - `tests/test_daily_momentum_selection.py`: helper handles missing dates,
+    out-of-universe pairs, and the date-boundary case (entry candle's date
+    looks up the *previous* completed UTC day's ranking).
+  - For each ranked strategy: import test + populate_indicators /
+    populate_entry_trend / populate_exit_trend smoke test.
+  - Acceptance: `ruff check .` clean, `pytest` green.
+
+- [ ] **E. Generate daily-rank JSON for the backtest window** — _Codex 5.4 low_
+  - Run the script for `2024-07-01` → `2025-05-01` and commit the resulting
+    JSON (it's metadata, not candle data — add to git, not gitignore).
+  - Sanity check: spot-check 3 random days; confirm the top-3 are large-cap
+    or known-mover names; confirm no day has fewer than 20 ranked pairs
+    (otherwise data gap).
+
+- [ ] **F. Same-window baseline backtests for ranked variants** — _Antigravity Gemini Flash medium (after C, D, E)_
+  - Run `scripts/run_baselines.py` against the five `*DailyRanked` strategies
+    on `--timerange=20250101-20250501`.
+  - Screen: ≥ 50 trades **and** max drawdown < 30% (identical to docs/19
+    §19.6 Step 1).
+  - Capture per-pair trade counts in the results doc; this is informative
+    even if the screen fails.
+
+- [ ] **G. Walk-forward validation for screen survivors** — _Antigravity Gemini Flash medium (after F)_
+  - For each strategy that passed Task F: run `scripts/walk_forward.py`
+    with 90d/30d/30d windows over 2024-07-01 → 2025-05-01.
+  - Acceptance: ≥ 3 OOS folds, avg OOS Sharpe > 0, avg OOS profit > 0, no
+    single fold drawdown > 5% (identical to docs/16 §16.3).
+  - This is the largest compute block of the sprint.
+
+- [ ] **H. Write results doc `docs/22-daily-momentum-results.md`** — _Antigravity Gemini Flash high (after G)_
+  - Follow the structure of `docs/20-pair-universe-results.md` exactly.
+  - Include: ranking methodology recap, per-strategy + per-pair Step 1
+    results, walk-forward per-fold tables for survivors, explicit pass/fail
+    against §21.6 acceptance criteria.
+  - Update `docs/README.md` and AGENTS.md docs table.
+
+- [ ] **I. Regime-filter experiments on Step 3 survivors** — _Antigravity Gemini Flash medium (after G, only for passing strategies)_
+  - Run `scripts/regime_filter_experiments.py` for each survivor.
+  - This is the **only** legitimate place to evaluate regime gating.
+
+- [ ] **J. Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after H, only if any strategy passes acceptance)_
+  - `freqtrade trade -c user_data/config.json --strategy <StrategyName>`.
+  - Track per-week trade count and win rate vs backtest expectation.
+  - **No live-money deployment in this sprint.**
+
+- [ ] **K. Update `TASKS.md`** at sprint end — _Codex 5.4 low_
+  - Mark Sprint 21 done. If no survivor: invoke the kill criterion in
+    `docs/21-daily-momentum-ranking.md` §21.8 and write a one-paragraph
+    follow-up memo in the session log proposing FreqAI or perps+funding
+    as the next sprint.
+
+- [ ] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
+  - Surface any design-level question rather than deciding locally.
+    Examples: "should ranking use 3d or 7d return instead of 1d?",
+    "should we trade top-5 instead of top-3?", "the ranking JSON has gaps
+    on holidays — should we forward-fill?".
+
+---
+
+### Sprint 19 tasks (done — archived for reference)
+
+> Full spec was: `docs/19-pair-universe-expansion.md`. Tier rubric: cheap
+> models for transcription, mid-tier for code-from-spec, high-tier only for
+> design under ambiguity. Do **not** route any of these to Opus Thinking,
+> Codex 5.5 high+, or Devin without explicit escalation.
 
 - [x] **A. Create feature branch + decide `max_open_trades` posture** — _Codex 5.4 low_
   - Branch: `git checkout -b <agent>/sprint-19-top20` in the agent's worktree.
@@ -374,3 +492,5 @@
 | 2026-05-27 | Codex | Closed Sprint 19 Task H as not applicable because there are no Step 3 survivors for regime-filter experiments |
 | 2026-05-27 | Codex | Closed Sprint 19 Task I as not applicable because no strategy passed the paper-trade acceptance gate |
 | 2026-05-27 | Codex | Closed Sprint 19 Task J and ESC lane: no candidate advances; next registered follow-up is daily momentum ranking |
+| 2026-05-27 | Devin | Bookkeeping closeout: marked Sprint 19 done, archived its task list, updated AGENTS.md milestone/tally (9 strategies, 9 rejected) |
+| 2026-05-27 | Devin | Queued Sprint 21: wrote `docs/21-daily-momentum-ranking.md` and populated `TASKS.md` A–K + ESC with per-agent tier assignments |
