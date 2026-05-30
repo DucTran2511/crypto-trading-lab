@@ -135,35 +135,29 @@ crypto-trading-lab/
 
 ## Current Status & Roadmap
 
-**Last milestone:** Sprint 19 — top-20 USDT spot universe expansion is
-complete. Only `RSITrend` passed the same-window screen; it then failed
-7-fold walk-forward (avg OOS Sharpe -30.77, avg OOS profit -0.17%). See
-`docs/20-pair-universe-results.md`.
+**Last milestone:** Sprint 21 — daily momentum ranking is complete. Three
+ranked variants passed the same-window screen, but all failed 7-fold
+walk-forward acceptance. See `docs/22-daily-momentum-results.md`.
 
-**Nine strategies tested, nine rejected** — five 5m baselines and one bull-only
-variant on BTC/ETH/SOL/BNB, two 1h candidates on the same majors, and the
-strongest 5m baseline (`RSITrend`) on the top-20 universe. Strategy,
-timeframe, and universe-by-volume spaces have all been searched. The remaining
-untested dimension is *pair selection by signal* (rank intraday and trade only
-the leaders).
+**Fourteen strategies tested, fourteen rejected** — five 5m baselines and one
+bull-only variant on BTC/ETH/SOL/BNB, two 1h candidates on the same majors, the
+strongest 5m baseline (`RSITrend`) on the top-20 universe, and five
+daily-momentum-ranked top-20 variants. Strategy, timeframe, universe-by-volume,
+and dynamic pair-selection spaces have all been searched.
 
-**Current sprint:** Sprint 21 — daily momentum ranking. Each UTC day, rank the
-top-20 universe by trailing 1d return and restrict entries to today's top-3.
-Reuse the existing 5m baseline strategies. Full plan in
-`docs/21-daily-momentum-ranking.md`. This is the registered §19.8 follow-up
-*before* declaring the indicator-on-spot research thread dead.
+**Current sprint:** no active research sprint is open. The kill criterion in
+`docs/21-daily-momentum-ranking.md` §21.8 applies: do not add another spot
+indicator, timeframe, or ranking lookback as the next step.
 **See `TASKS.md` for active tasks and per-agent assignments.**
 
 Roadmap priority (from `docs/11-roadmap.md`, updated for current state):
-1. Resolve Sprint 21 (daily momentum ranking on existing 5m baselines).
-2. If Sprint 21 produces survivors: regime filter + 4-week paper trade.
-3. If Sprint 21 produces nothing: escalate to FreqAI (ML on engineered
-   features) or perps + funding-rate arbitrage. See branching memo in
-   `docs/21-daily-momentum-ranking.md` §21.8 "kill criterion".
-4. Switch live data to Binance.vision as default (still deferred).
-5. Live monitoring stack (logs, Telegram, heartbeat).
-6. Paper-trade validation (4+ weeks) once a strategy clears acceptance.
-7. Live micro-size deployment — still gated on ≥ 6 months of paper-trade
+1. Escalate to FreqAI (ML on engineered features) or perps + funding-rate
+   arbitrage. See `docs/21-daily-momentum-ranking.md` §21.8 and
+   `docs/22-daily-momentum-results.md`.
+2. Switch live data to Binance.vision as default (still deferred).
+3. Live monitoring stack (logs, Telegram, heartbeat).
+4. Paper-trade validation (4+ weeks) once a strategy clears acceptance.
+5. Live micro-size deployment — still gated on ≥ 6 months of paper-trade
    logs matching backtest expectation.
 
 ---
@@ -207,6 +201,7 @@ Full docs in `docs/` (read in order):
 | 19 | `docs/19-pair-universe-expansion.md` | Top-20 USDT spot universe expansion sprint plan |
 | 20 | `docs/20-pair-universe-results.md` | Top-20 universe same-window + walk-forward rejection |
 | 21 | `docs/21-daily-momentum-ranking.md` | Daily-momentum-ranked top-3 from top-20 universe sprint plan |
+| 22 | `docs/22-daily-momentum-results.md` | Daily momentum ranking screen, walk-forward rejection, and kill-criterion decision |
 
 ---
 
