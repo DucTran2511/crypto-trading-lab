@@ -25,6 +25,7 @@ This folder is the long-form docs for `crypto-trading-lab`. Start here, then dri
 19. [Pair universe expansion sprint plan](19-pair-universe-expansion.md) — top-20 USDT spot universe on OKX; reuse 5m baselines to test whether the universe was the bottleneck.
 20. [Pair universe expansion results](20-pair-universe-results.md) — top-20 OKX universe screen, RSITrend walk-forward result, and rejection decision.
 21. [Daily momentum ranking sprint plan](21-daily-momentum-ranking.md) — rank top-20 by trailing 1d return each UTC day and restrict entries to today's top-3; final pre-FreqAI/perps test of the indicator-on-spot thread.
+22. [Daily momentum ranking results](22-daily-momentum-results.md) — same-window screen, three walk-forward rejections, and Sprint 21 kill-criterion decision.
 
 ## Reference
 

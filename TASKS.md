@@ -7,15 +7,15 @@
 
 ## Sprint Status
 
-- [/] **Sprint 21: Daily momentum ranking (top-3 of top-20 universe)**
-  Nine strategies rejected so far. The strategy, timeframe, and
-  universe-by-volume spaces have all been searched. This sprint adds the
-  remaining untested dimension: *pair selection by signal* — each UTC day,
-  rank the existing top-20 universe by trailing 1d return and restrict
-  entries to today's top-3. Reuse the existing 5m baseline strategies
-  unchanged. Full plan in `docs/21-daily-momentum-ranking.md`. This is the
-  registered `docs/19-pair-universe-expansion.md` §19.8 follow-up *before*
-  declaring the indicator-on-spot research thread dead.
+- [x] **Sprint 21: Daily momentum ranking (top-3 of top-20 universe)**
+  Fourteen strategy variants have now been rejected. The strategy, timeframe,
+  universe-by-volume, and dynamic pair-selection spaces have all been searched.
+  This sprint tested the remaining dimension: *pair selection by signal* —
+  each UTC day, rank the existing top-20 universe by trailing 1d return and
+  restrict entries to today's top-3. Results are documented in
+  `docs/22-daily-momentum-results.md`. The `docs/21-daily-momentum-ranking.md`
+  §21.8 kill criterion now applies: do not add another spot indicator,
+  timeframe, or ranking lookback as the next step.
 
 ## Previous Sprints (done)
 
@@ -32,6 +32,9 @@
   `docs/18-1h-strategy-walk-forward.md`.
 
 ## Up Next
+
+The next sprint should address a structurally different direction: FreqAI on
+engineered features, or perps plus funding-rate arbitrage.
 
 ### Sprint 21 tasks (per-agent assignments)
 
@@ -167,40 +170,61 @@
       PEOPLE 57, DOGE 27, ORDI 69, TURBO 90, XRP 68, FIL 31, SUI 113,
       SHIB 22, FLOKI 28, WLD 54, NEAR 54, LTC 78, ENS 37, BNB 71, UNI 37.
 
-- [ ] **G. Walk-forward validation for screen survivors** — _Antigravity Gemini Flash medium (after F)_
+- [x] **G. Walk-forward validation for screen survivors** — _Antigravity Gemini Flash medium (after F)_
   - For each strategy that passed Task F: run `scripts/walk_forward.py`
     with 90d/30d/30d windows over 2024-07-01 → 2025-05-01.
   - Acceptance: ≥ 3 OOS folds, avg OOS Sharpe > 0, avg OOS profit > 0, no
     single fold drawdown > 5% (identical to docs/16 §16.3).
   - This is the largest compute block of the sprint.
+  - Result: ran 7-fold walk-forward validation for all Task F survivors:
+    `EMACrossoverDailyRanked`, `DonchianBreakoutDailyRanked`, and
+    `RSITrendDailyRanked`. All three failed Step 3 acceptance.
+    `EMACrossoverDailyRanked`: avg OOS Sharpe -1.96, avg OOS profit -0.44%,
+    worst OOS drawdown 2.62%. `DonchianBreakoutDailyRanked`: avg OOS Sharpe
+    -8.90, avg OOS profit -2.91%, worst OOS drawdown 6.43%.
+    `RSITrendDailyRanked`: avg OOS Sharpe -18.57, avg OOS profit -0.43%,
+    worst OOS drawdown 1.08%.
 
-- [ ] **H. Write results doc `docs/22-daily-momentum-results.md`** — _Antigravity Gemini Flash high (after G)_
+- [x] **H. Write results doc `docs/22-daily-momentum-results.md`** — _Antigravity Gemini Flash high (after G)_
   - Follow the structure of `docs/20-pair-universe-results.md` exactly.
   - Include: ranking methodology recap, per-strategy + per-pair Step 1
     results, walk-forward per-fold tables for survivors, explicit pass/fail
     against §21.6 acceptance criteria.
   - Update `docs/README.md` and AGENTS.md docs table.
+  - Result: wrote `docs/22-daily-momentum-results.md` with ranking recap,
+    Step 1 screen results, per-pair trade-count table, per-fold
+    walk-forward tables for the three screen survivors, acceptance criteria,
+    rejection decision, and kill-criterion next step. Updated `docs/README.md`
+    and `AGENTS.md`.
 
-- [ ] **I. Regime-filter experiments on Step 3 survivors** — _Antigravity Gemini Flash medium (after G, only for passing strategies)_
+- [x] **I. Regime-filter experiments on Step 3 survivors** — _Antigravity Gemini Flash medium (after G, only for passing strategies)_
   - Run `scripts/regime_filter_experiments.py` for each survivor.
   - This is the **only** legitimate place to evaluate regime gating.
+  - Closed as not applicable: Task G produced no passing Step 3 survivors, so
+    there is no valid ranked strategy to send into regime-filter experiments.
 
-- [ ] **J. Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after H, only if any strategy passes acceptance)_
+- [x] **J. Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after H, only if any strategy passes acceptance)_
   - `freqtrade trade -c user_data/config.json --strategy <StrategyName>`.
   - Track per-week trade count and win rate vs backtest expectation.
   - **No live-money deployment in this sprint.**
+  - Closed as not applicable: no Sprint 21 strategy passed walk-forward
+    acceptance, so starting a 4-week dry-run would skip the paper-trade gate.
 
-- [ ] **K. Update `TASKS.md`** at sprint end — _Codex 5.4 low_
+- [x] **K. Update `TASKS.md`** at sprint end — _Codex 5.4 low_
   - Mark Sprint 21 done. If no survivor: invoke the kill criterion in
     `docs/21-daily-momentum-ranking.md` §21.8 and write a one-paragraph
     follow-up memo in the session log proposing FreqAI or perps+funding
     as the next sprint.
+  - Result: marked Sprint 21 done and invoked the §21.8 kill criterion. The
+    next sprint should move to a structurally different direction: FreqAI on
+    engineered features, or perps plus funding-rate arbitrage.
 
-- [ ] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
+- [x] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
   - Surface any design-level question rather than deciding locally.
     Examples: "should ranking use 3d or 7d return instead of 1d?",
     "should we trade top-5 instead of top-3?", "the ranking JSON has gaps
     on holidays — should we forward-fill?".
+  - Closed unused: no design-level ambiguity surfaced during Tasks G-H-J.
 
 ---
 
@@ -563,3 +587,8 @@
 | 2026-05-27 | Codex | Completed Sprint 21 Task D: added selection-helper and ranked-strategy smoke coverage; verified ruff and pytest |
 | 2026-05-27 | Codex | Completed Sprint 21 Task E: generated and sanity-checked the full-window daily momentum ranking JSON with 20 pairs on all 304 days |
 | 2026-05-27 | Codex | Completed Sprint 21 Task F: ran same-window ranked baseline sweep; EMACrossoverDailyRanked, DonchianBreakoutDailyRanked, and RSITrendDailyRanked passed the Step 1 screen |
+| 2026-05-30 | Codex | Completed Sprint 21 Task G: ran 7-fold walk-forward validation for EMACrossoverDailyRanked, DonchianBreakoutDailyRanked, and RSITrendDailyRanked; all failed Step 3 acceptance |
+| 2026-05-30 | Codex | Completed Sprint 21 Task H: documented daily momentum ranking rejection in docs/22 and updated docs indexes |
+| 2026-05-30 | Codex | Closed Sprint 21 Task I as not applicable because Task G produced no passing Step 3 survivors for regime-filter experiments |
+| 2026-05-30 | Codex | Closed Sprint 21 Task J as not applicable because no ranked strategy passed the paper-trade acceptance gate |
+| 2026-05-30 | Codex | Closed Sprint 21 Task K and invoked the kill criterion: next sprint should leave spot-indicator variants and evaluate either FreqAI engineered-feature models or a perps plus funding-rate arbitrage track |
