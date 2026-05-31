@@ -222,12 +222,15 @@ on engineered features, perps + funding-rate arbitrage, or stop).
   - Result: not applicable. Task F produced zero Step 3 survivors, so the
     Tier 2 `MultiTimeframeConfirmation` implementation gate did not open.
 
-- [ ] **I. (Conditional) Tier 2 same-window + walk-forward for MTF combo** — _Antigravity Gemini Flash medium (after H)_
+- [x] **I. (Conditional) Tier 2 same-window + walk-forward for MTF combo** — _Antigravity Gemini Flash medium (after H)_
   - Run `scripts/run_baselines.py` on `MultiTimeframeConfirmation` alone over
     `20220101-20250501`. Then run `scripts/walk_forward.py` if it passes the
     screen.
   - Same 4-criterion acceptance gate.
   - Append results to `docs/24-higher-timeframe-results.md` Tier 2 section.
+  - Result: not applicable. Task H did not implement
+    `MultiTimeframeConfirmation` because Task F produced zero Step 3
+    survivors, so there was no Tier 2 strategy to backtest or walk forward.
 
 - [ ] **J. (Conditional) Regime-filter experiments** — _Antigravity Gemini Flash medium (after F or I, only for Step 3 survivors)_
   - Run `scripts/regime_filter_experiments.py` for each survivor.
@@ -817,3 +820,4 @@ on engineered features, perps + funding-rate arbitrage, or stop).
 | 2026-05-31 | Codex | Completed Sprint 23 Task F as not applicable: no corrected 1d same-window screen survivors advanced to walk-forward; added pair/timeframe forwarding to the walk-forward harness |
 | 2026-05-31 | Codex | Completed Sprint 23 Task G: documented the corrected higher-timeframe rejection in docs/24, updated docs indexes, skipped Tier 2, and invoked §23.8 |
 | 2026-05-31 | Codex | Closed Sprint 23 Task H as not applicable because Task F produced zero Step 3 survivors |
+| 2026-05-31 | Codex | Closed Sprint 23 Task I as not applicable because Tier 2 never opened and no `MultiTimeframeConfirmation` strategy was implemented |
