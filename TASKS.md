@@ -97,7 +97,7 @@ on engineered features, perps + funding-rate arbitrage, or stop).
     `2022-12-21` on OKX, so it has fewer candles than the full-window
     BTC/ETH/SOL files; no download errors occurred.
 
-- [ ] **C. Implement five `*Daily` strategy subclasses + smoke tests** — _Codex 5.4 medium_
+- [x] **C. Implement five `*Daily` strategy subclasses + smoke tests** — _Codex 5.4 medium_
   - Per `docs/23-higher-timeframe-sweep.md` §23.3.1, add:
     - `user_data/strategies/EMACrossoverDaily.py`
     - `user_data/strategies/DonchianBreakoutDaily.py`
@@ -116,6 +116,10 @@ on engineered features, perps + funding-rate arbitrage, or stop).
     `populate_exit_trend` on a small synthetic 1d DataFrame.
   - Acceptance: `ruff check .` clean, `pytest` green (75 + at least 5 new
     tests pass).
+  - Result: added the five thin `*Daily` subclasses with only `timeframe`,
+    `stoploss`, and `minimal_roi` overrides, plus five smoke tests in
+    `tests/test_daily_strategies.py`. Verified `.venv/bin/ruff check .`
+    clean and `.venv/bin/pytest` green: 80 passed.
 
 - [ ] **D. Tier 1 same-window backtests** — _Codex 5.4 low_
   - Run:
@@ -775,3 +779,4 @@ on engineered features, perps + funding-rate arbitrage, or stop).
 | 2026-05-30 | Codex | Closed Sprint 21 Task K and invoked the kill criterion: next sprint should leave spot-indicator variants and evaluate either FreqAI engineered-feature models or a perps plus funding-rate arbitrage track |
 | 2026-05-31 | Codex | Completed Sprint 23 Task A: created `codex/sprint-23-higher-timeframes` and confirmed the 2022-01-01 to 2025-05-01 1d window plus pre-registered stoploss/ROI table with no deviations |
 | 2026-05-31 | Codex | Completed Sprint 23 Task B: downloaded/prepended OKX 1d, 1w, and 4h candles for BTC/ETH/SOL/BNB; all files landed, with BNB limited to OKX data starting 2022-12-21 |
+| 2026-05-31 | Codex | Completed Sprint 23 Task C: added five `*Daily` strategy subclasses plus smoke tests; verified ruff and pytest (80 passed) |
