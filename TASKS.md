@@ -150,13 +150,17 @@ on engineered features, perps + funding-rate arbitrage, or stop).
     `MACDVolumeDaily` BTC 794, ETH 748, SOL 703, BNB 641.
     Step 1 survivor for Task F: `RSITrendDaily`.
 
-- [ ] **E. (Conditional) `MultiTimeframeConfirmation` smoke test stub** — _Codex 5.4 low_
+- [x] **E. (Conditional) `MultiTimeframeConfirmation` smoke test stub** — _Codex 5.4 low_
   - **Only if Task D produces ≥ 1 survivor.** Otherwise mark this task as
     not applicable and proceed to G + L.
   - Add a no-op smoke test stub for `MultiTimeframeConfirmation` so Task H
     can drop the implementation into a slot that already has test
     scaffolding. Do **not** implement the strategy here — Task H owns the
     implementation.
+  - Result: added `tests/test_multi_timeframe_confirmation.py` with a
+    skipped import smoke stub. It remains inactive while Task H's strategy
+    module is absent, then instantiates `MultiTimeframeConfirmation` and
+    checks the expected class name and `1d` timeframe once implemented.
 
 - [ ] **F. Tier 1 walk-forward for screen survivors** — _Antigravity Gemini Flash medium (after D)_
   - For each strategy that passed Task D: run
@@ -796,3 +800,4 @@ on engineered features, perps + funding-rate arbitrage, or stop).
 | 2026-05-31 | Codex | Completed Sprint 23 Task B: downloaded/prepended OKX 1d, 1w, and 4h candles for BTC/ETH/SOL/BNB; all files landed, with BNB limited to OKX data starting 2022-12-21 |
 | 2026-05-31 | Codex | Completed Sprint 23 Task C: added five `*Daily` strategy subclasses plus smoke tests; verified ruff and pytest (80 passed) |
 | 2026-05-31 | Codex | Completed Sprint 23 Task D: fixed baseline runner pair forwarding, ran Tier 1 four-major same-window 1d sweep, and identified `RSITrendDaily` as the only Step 1 survivor |
+| 2026-05-31 | Codex | Completed Sprint 23 Task E: added the conditional `MultiTimeframeConfirmation` smoke test stub without implementing the strategy |
