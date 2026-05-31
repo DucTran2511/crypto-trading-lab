@@ -107,6 +107,7 @@ def run_backtest(
     timerange: str,
     results_dir: Path,
     freqtrade_bin: str,
+    pairs: Sequence[str],
     runner: Runner = subprocess.run,
 ) -> Path | None:
     print(f"Running backtest for {strategy}...", file=sys.stderr)
@@ -126,6 +127,8 @@ def run_backtest(
         str(export_filename),
         "--cache",
         "none",
+        "--pairs",
+        *pairs,
     ]
     res = runner(cmd, capture_output=True, text=True, check=False)
     if res.returncode != 0:
@@ -281,6 +284,7 @@ def run_baselines(
             timerange=timerange,
             results_dir=results_dir,
             freqtrade_bin=freqtrade_bin,
+            pairs=pairs,
             runner=runner,
         )
         if zip_path:
