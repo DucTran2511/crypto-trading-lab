@@ -7,21 +7,22 @@
 
 ## Sprint Status
 
-- [/] **Sprint 23: Higher-timeframe sweep (1d primary, MTF combo conditional)**
-  Fourteen strategy variants have been rejected across 5m and 1h timeframes.
-  Sprint 21 fired its kill criterion, but a single untested cell remains:
-  **1d as primary trading timeframe**. The fee-economics argument (§23.1) makes
-  this a defensible categorical exception to §21.8, not "another variant" — at
-  1d the round-trip fee burden is 10–20× lower than at 5m. This sprint is
-  two-tier with a hard gate between tiers: Tier 1 runs all five baselines on 1d
-  primary against the 4 majors over a 3-year window; Tier 2 (a single
-  `MultiTimeframeConfirmation` strategy combining 1w + 1d + 4h) **only runs if
-  Tier 1 produces ≥ 1 Step 3 survivor**. Full plan in
-  `docs/23-higher-timeframe-sweep.md`. If both tiers reject, §23.8 applies with
-  no further escape hatches — next sprint must be FreqAI, perps+funding, or
-  stop.
+- [x] **Sprint 23: Higher-timeframe sweep (1d primary, MTF combo conditional)**
+  Complete and rejected. The corrected 1d same-window screen produced zero
+  Step 1 survivors because all five daily baselines failed the 50-trade floor.
+  Tier 1 walk-forward, Tier 2 `MultiTimeframeConfirmation`, regime-filter
+  experiments, and paper trading were skipped by the hard gates. See
+  `docs/24-higher-timeframe-results.md`. Section 23.8 now applies with no
+  further escape hatches: next sprint must be FreqAI, perps + funding-rate
+  arbitrage, or stop.
 
 ## Previous Sprints (done)
+
+- [x] **Sprint 23: Higher-timeframe sweep (1d primary, 4 majors)** — see
+  `docs/23-higher-timeframe-sweep.md` and
+  `docs/24-higher-timeframe-results.md`. All five daily baselines failed the
+  corrected 1d same-window trade-count screen. Tier 2 was skipped. Nineteen
+  indicator-on-spot strategy variants have now been tested and rejected.
 
 - [x] **Sprint 21: Daily momentum ranking (top-3 of top-20 universe)** — see
   `docs/21-daily-momentum-ranking.md`. Three ranked variants passed the
@@ -43,9 +44,9 @@
 
 ## Up Next
 
-If Sprint 23 produces zero survivors, §23.8 applies with no further escape
-hatches: next sprint must address a structurally different direction (FreqAI
-on engineered features, perps + funding-rate arbitrage, or stop).
+Sprint 23 produced zero survivors, so §23.8 applies with no further escape
+hatches. The next sprint must address a structurally different direction:
+FreqAI on engineered features, perps + funding-rate arbitrage, or stop.
 
 ### Sprint 23 tasks (per-agent assignments)
 
@@ -222,36 +223,56 @@ on engineered features, perps + funding-rate arbitrage, or stop).
   - Result: not applicable. Task F produced zero Step 3 survivors, so the
     Tier 2 `MultiTimeframeConfirmation` implementation gate did not open.
 
-- [ ] **I. (Conditional) Tier 2 same-window + walk-forward for MTF combo** — _Antigravity Gemini Flash medium (after H)_
+- [x] **I. (Conditional) Tier 2 same-window + walk-forward for MTF combo** — _Antigravity Gemini Flash medium (after H)_
   - Run `scripts/run_baselines.py` on `MultiTimeframeConfirmation` alone over
     `20220101-20250501`. Then run `scripts/walk_forward.py` if it passes the
     screen.
   - Same 4-criterion acceptance gate.
   - Append results to `docs/24-higher-timeframe-results.md` Tier 2 section.
+  - Result: not applicable. Task H did not implement
+    `MultiTimeframeConfirmation` because Task F produced zero Step 3
+    survivors, so there was no Tier 2 strategy to backtest or walk forward.
 
-- [ ] **J. (Conditional) Regime-filter experiments** — _Antigravity Gemini Flash medium (after F or I, only for Step 3 survivors)_
+- [x] **J. (Conditional) Regime-filter experiments** — _Antigravity Gemini Flash medium (after F or I, only for Step 3 survivors)_
   - Run `scripts/regime_filter_experiments.py` for each survivor.
   - This is the **only** legitimate place to evaluate regime gating on top
     of a strategy that has already passed walk-forward acceptance.
+  - Result: not applicable. Sprint 23 produced no Step 3 survivors, so there
+    is no accepted strategy eligible for regime-filter experiments.
 
-- [ ] **K. (Conditional) Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after G + J, only if any strategy passes acceptance)_
+- [x] **K. (Conditional) Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after G + J, only if any strategy passes acceptance)_
   - `freqtrade trade -c user_data/config.json --strategy <StrategyName>`.
   - Track per-week trade count and win rate vs backtest expectation.
   - **No live-money deployment in this sprint.**
+  - Result: not applicable. No strategy passed the acceptance gate, so no
+    paper-trade dry-run was started.
 
-- [ ] **L. Update `TASKS.md` at sprint end** — _Codex 5.4 low_
+- [x] **L. Update `TASKS.md` at sprint end** — _Codex 5.4 low_
   - Mark Sprint 23 done. If no survivor: invoke §23.8 and write a
     one-paragraph follow-up memo in the session log proposing FreqAI, perps
     + funding, or "stop here" as the next sprint. Surface the decision to
     the ESC lane.
+  - Result: marked Sprint 23 done and invoked §23.8. Follow-up memo:
+    indicator-on-OKX-spot has now exhausted baseline strategy, regime filter,
+    1h candidates, top-20 universe expansion, daily momentum selection, and
+    corrected 1d primary trading. The next sprint should not add another spot
+    indicator variant. The viable directions are (1) FreqAI/ML on engineered
+    features if the goal remains directional spot prediction, (2) perps plus
+    funding-rate/arbitrage research if the goal is a structurally different
+    crypto edge, or (3) stop the lab here if neither direction is worth the
+    added complexity.
 
-- [ ] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
+- [x] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
   - Surface any design-level question rather than deciding locally.
     Examples: "the 1d walk-forward windows produce only 4 folds — should we
     extend the window?", "Task H's `MultiTimeframeConfirmation` should use
     Tier 1's best survivor as the entry signal — which one if 2 survive?",
     "the `merge_informative_pair` smoke test reveals a 1-candle look-ahead
     — should we accept it or rewrite?".
+  - Result: no unresolved design ambiguity remains inside Sprint 23 because
+    the corrected Tier 1 screen produced zero survivors. Surfaced the §23.8
+    decision to the escalation lane: choose FreqAI, perps + funding, or stop;
+    do not continue with spot-indicator variants.
 
 ### Sprint 21 tasks (per-agent assignments)
 
@@ -817,3 +838,7 @@ on engineered features, perps + funding-rate arbitrage, or stop).
 | 2026-05-31 | Codex | Completed Sprint 23 Task F as not applicable: no corrected 1d same-window screen survivors advanced to walk-forward; added pair/timeframe forwarding to the walk-forward harness |
 | 2026-05-31 | Codex | Completed Sprint 23 Task G: documented the corrected higher-timeframe rejection in docs/24, updated docs indexes, skipped Tier 2, and invoked §23.8 |
 | 2026-05-31 | Codex | Closed Sprint 23 Task H as not applicable because Task F produced zero Step 3 survivors |
+| 2026-05-31 | Codex | Closed Sprint 23 Task I as not applicable because Tier 2 never opened and no `MultiTimeframeConfirmation` strategy was implemented |
+| 2026-05-31 | Codex | Closed Sprint 23 Task J as not applicable because no strategy passed walk-forward acceptance for regime-filter experiments |
+| 2026-05-31 | Codex | Closed Sprint 23 Task K as not applicable because no strategy passed the paper-trade acceptance gate |
+| 2026-05-31 | Codex | Closed Sprint 23 Task L and ESC lane: marked Sprint 23 done, invoked §23.8, and surfaced the next-sprint decision as FreqAI, perps plus funding, or stop |
