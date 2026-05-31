@@ -84,6 +84,8 @@ class WalkForwardConfig:
     config_path: Path
     output_dir: Path
     spaces: tuple[str, ...]
+    pairs: tuple[str, ...] = ()
+    timeframe: str | None = None
     freqtrade_bin: str = "freqtrade"
     strategy_path: Path | None = None
     random_state: int | None = 42
@@ -205,6 +207,7 @@ def build_hyperopt_command(config: WalkForwardConfig, fold: FoldWindow) -> list[
         "--timerange",
         fold.in_sample_timerange,
     ]
+    append_market_scope_options(command, config)
     append_strategy_path_option(command, config)
     if config.random_state is not None:
         command.extend(["--random-state", str(config.random_state)])
@@ -234,8 +237,16 @@ def build_backtest_command(
         "--cache",
         "none",
     ]
+    append_market_scope_options(command, config)
     append_strategy_path_option(command, config)
     return command
+
+
+def append_market_scope_options(command: list[str], config: WalkForwardConfig) -> None:
+    if config.pairs:
+        command.extend(["--pairs", *config.pairs])
+    if config.timeframe:
+        command.extend(["--timeframe", config.timeframe])
 
 
 def append_strategy_path_option(command: list[str], config: WalkForwardConfig) -> None:
@@ -593,6 +604,8 @@ def parse_args(argv: list[str] | None = None) -> WalkForwardConfig:
     parser.add_argument("--loss", default="SharpeHyperOptLoss", help="Hyperopt loss function")
     parser.add_argument("--epochs", type=int, default=100, help="Hyperopt epochs per fold")
     parser.add_argument("--spaces", nargs="+", default=["buy"], help="Hyperopt spaces to tune")
+    parser.add_argument("--pairs", nargs="+", default=[], help="Optional pairs to pass to Freqtrade")
+    parser.add_argument("--timeframe", default=None, help="Optional timeframe override, e.g. 1d")
     parser.add_argument(
         "-c",
         "--config",
@@ -635,6 +648,8 @@ def parse_args(argv: list[str] | None = None) -> WalkForwardConfig:
         config_path=args.config,
         output_dir=args.output_dir,
         spaces=tuple(args.spaces),
+        pairs=tuple(args.pairs),
+        timeframe=args.timeframe,
         freqtrade_bin=args.freqtrade_bin,
         strategy_path=args.strategy_path,
         random_state=args.random_state,

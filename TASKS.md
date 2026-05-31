@@ -134,21 +134,23 @@ on engineered features, perps + funding-rate arbitrage, or stop).
   - Capture per-strategy + per-pair trade counts in the session log; the
     distribution across pairs is informative even when the screen fails.
   - List Step 1 survivors. Pass them as `--strategy` arguments into Task F.
-  - Result: fixed `scripts/run_baselines.py` to pass `--pairs` through to
-    `freqtrade backtesting`, then reran the Tier 1 sweep constrained to
-    BTC/ETH/SOL/BNB. Screen results:
-    `EMACrossoverDaily` 1844 trades / 48.23% DD — fail DD;
-    `DonchianBreakoutDaily` 1610 / 44.84% — fail DD;
-    `BollingerMeanReversionDaily` 13 / 0.09% — fail trades;
-    `RSITrendDaily` 207 / 5.80% — **pass**;
-    `MACDVolumeDaily` 2886 / 89.97% — fail DD.
+  - Corrected result: fixed `scripts/run_baselines.py` to pass both `--pairs`
+    and explicit `--timeframe` through to `freqtrade backtesting`, then reran
+    the Tier 1 sweep constrained to BTC/ETH/SOL/BNB on `1d`. This supersedes
+    an earlier invalid run where config-level `timeframe = "5m"` overrode the
+    daily strategy class. Screen results:
+    `EMACrossoverDaily` 27 trades / 2.81% DD — fail trades;
+    `DonchianBreakoutDaily` 32 / 4.27% — fail trades;
+    `BollingerMeanReversionDaily` 0 / 0.00% — fail trades;
+    `RSITrendDaily` 4 / 2.10% — fail trades;
+    `MACDVolumeDaily` 45 / 4.30% — fail trades.
     Per-pair trade counts:
-    `EMACrossoverDaily` BTC 541, ETH 481, SOL 433, BNB 389;
-    `DonchianBreakoutDaily` BTC 484, ETH 400, SOL 382, BNB 344;
-    `BollingerMeanReversionDaily` BTC 3, ETH 3, SOL 2, BNB 5;
-    `RSITrendDaily` BTC 54, ETH 52, SOL 45, BNB 56;
-    `MACDVolumeDaily` BTC 794, ETH 748, SOL 703, BNB 641.
-    Step 1 survivor for Task F: `RSITrendDaily`.
+    `EMACrossoverDaily` BTC 6, ETH 10, SOL 5, BNB 6;
+    `DonchianBreakoutDaily` BTC 11, ETH 11, SOL 8, BNB 2;
+    `BollingerMeanReversionDaily` BTC 0, ETH 0, SOL 0, BNB 0;
+    `RSITrendDaily` BTC 2, ETH 0, SOL 2, BNB 0;
+    `MACDVolumeDaily` BTC 15, ETH 12, SOL 10, BNB 8.
+    Step 1 survivors for Task F: none.
 
 - [x] **E. (Conditional) `MultiTimeframeConfirmation` smoke test stub** — _Codex 5.4 low_
   - **Only if Task D produces ≥ 1 survivor.** Otherwise mark this task as
@@ -162,7 +164,7 @@ on engineered features, perps + funding-rate arbitrage, or stop).
     module is absent, then instantiates `MultiTimeframeConfirmation` and
     checks the expected class name and `1d` timeframe once implemented.
 
-- [ ] **F. Tier 1 walk-forward for screen survivors** — _Antigravity Gemini Flash medium (after D)_
+- [x] **F. Tier 1 walk-forward for screen survivors** — _Antigravity Gemini Flash medium (after D)_
   - For each strategy that passed Task D: run
     ```bash
     python scripts/walk_forward.py \
@@ -180,6 +182,12 @@ on engineered features, perps + funding-rate arbitrage, or stop).
   - Acceptance (per §23.6 Step 3, unchanged): ≥ 3 OOS folds, avg OOS Sharpe
     > 0, avg OOS profit > 0, no single fold drawdown > 5%.
   - This is the largest compute block of Tier 1.
+  - Result: not run for any strategy because the corrected `1d` Task D screen
+    produced zero Step 1 survivors. An initial attempted `RSITrendDaily`
+    walk-forward exposed missing pair/timeframe forwarding in the harness;
+    `scripts/walk_forward.py` now supports explicit `--pairs` and
+    `--timeframe` for future runs, but Sprint 23's Tier 1 hard gate stops
+    here.
 
 - [ ] **G. Write results doc `docs/24-higher-timeframe-results.md`** — _Antigravity Gemini Flash high (after F)_
   - Follow the structure of `docs/22-daily-momentum-results.md` exactly:
@@ -799,5 +807,6 @@ on engineered features, perps + funding-rate arbitrage, or stop).
 | 2026-05-31 | Codex | Completed Sprint 23 Task A: created `codex/sprint-23-higher-timeframes` and confirmed the 2022-01-01 to 2025-05-01 1d window plus pre-registered stoploss/ROI table with no deviations |
 | 2026-05-31 | Codex | Completed Sprint 23 Task B: downloaded/prepended OKX 1d, 1w, and 4h candles for BTC/ETH/SOL/BNB; all files landed, with BNB limited to OKX data starting 2022-12-21 |
 | 2026-05-31 | Codex | Completed Sprint 23 Task C: added five `*Daily` strategy subclasses plus smoke tests; verified ruff and pytest (80 passed) |
-| 2026-05-31 | Codex | Completed Sprint 23 Task D: fixed baseline runner pair forwarding, ran Tier 1 four-major same-window 1d sweep, and identified `RSITrendDaily` as the only Step 1 survivor |
+| 2026-05-31 | Codex | Completed Sprint 23 Task D: fixed baseline runner pair/timeframe forwarding, reran the valid Tier 1 four-major 1d screen, and found zero Step 1 survivors |
 | 2026-05-31 | Codex | Completed Sprint 23 Task E: added the conditional `MultiTimeframeConfirmation` smoke test stub without implementing the strategy |
+| 2026-05-31 | Codex | Completed Sprint 23 Task F as not applicable: no corrected 1d same-window screen survivors advanced to walk-forward; added pair/timeframe forwarding to the walk-forward harness |

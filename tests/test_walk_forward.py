@@ -191,6 +191,8 @@ def test_run_walk_forward_orchestrates_hyperopt_and_backtests(tmp_path: Path):
             config_path=tmp_path / "config.json",
             output_dir=tmp_path / "walk_forward",
             spaces=("buy",),
+            pairs=("BTC/USDT", "ETH/USDT"),
+            timeframe="1d",
             freqtrade_bin="freqtrade",
             strategy_path=strategy_path,
             random_state=7,
@@ -206,6 +208,10 @@ def test_run_walk_forward_orchestrates_hyperopt_and_backtests(tmp_path: Path):
     assert "--random-state" not in commands[1]
     assert "-j" not in commands[1]
     assert commands[1][commands[1].index("--cache") + 1] == "none"
+    for command in commands:
+        pairs_index = command.index("--pairs")
+        assert command[pairs_index + 1 : pairs_index + 3] == ["BTC/USDT", "ETH/USDT"]
+        assert command[command.index("--timeframe") + 1] == "1d"
     assert params_file.read_text(encoding="utf-8") == '{"existing": true}\n'
 
     with summary_file.open(encoding="utf-8") as handle:
