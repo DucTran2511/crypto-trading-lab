@@ -7,17 +7,27 @@
 
 ## Sprint Status
 
-- [x] **Sprint 21: Daily momentum ranking (top-3 of top-20 universe)**
-  Fourteen strategy variants have now been rejected. The strategy, timeframe,
-  universe-by-volume, and dynamic pair-selection spaces have all been searched.
-  This sprint tested the remaining dimension: *pair selection by signal* —
-  each UTC day, rank the existing top-20 universe by trailing 1d return and
-  restrict entries to today's top-3. Results are documented in
-  `docs/22-daily-momentum-results.md`. The `docs/21-daily-momentum-ranking.md`
-  §21.8 kill criterion now applies: do not add another spot indicator,
-  timeframe, or ranking lookback as the next step.
+- [/] **Sprint 23: Higher-timeframe sweep (1d primary, MTF combo conditional)**
+  Fourteen strategy variants have been rejected across 5m and 1h timeframes.
+  Sprint 21 fired its kill criterion, but a single untested cell remains:
+  **1d as primary trading timeframe**. The fee-economics argument (§23.1) makes
+  this a defensible categorical exception to §21.8, not "another variant" — at
+  1d the round-trip fee burden is 10–20× lower than at 5m. This sprint is
+  two-tier with a hard gate between tiers: Tier 1 runs all five baselines on 1d
+  primary against the 4 majors over a 3-year window; Tier 2 (a single
+  `MultiTimeframeConfirmation` strategy combining 1w + 1d + 4h) **only runs if
+  Tier 1 produces ≥ 1 Step 3 survivor**. Full plan in
+  `docs/23-higher-timeframe-sweep.md`. If both tiers reject, §23.8 applies with
+  no further escape hatches — next sprint must be FreqAI, perps+funding, or
+  stop.
 
 ## Previous Sprints (done)
+
+- [x] **Sprint 21: Daily momentum ranking (top-3 of top-20 universe)** — see
+  `docs/21-daily-momentum-ranking.md`. Three ranked variants passed the
+  same-window screen; all three failed 7-fold walk-forward acceptance.
+  Fourteen strategies tested, fourteen rejected. See
+  `docs/22-daily-momentum-results.md`.
 
 - [x] **Sprint 19: Pair universe expansion (top-20 USDT spot)** — see
   `docs/19-pair-universe-expansion.md`. Only `RSITrend` passed the
@@ -33,8 +43,165 @@
 
 ## Up Next
 
-The next sprint should address a structurally different direction: FreqAI on
-engineered features, or perps plus funding-rate arbitrage.
+If Sprint 23 produces zero survivors, §23.8 applies with no further escape
+hatches: next sprint must address a structurally different direction (FreqAI
+on engineered features, perps + funding-rate arbitrage, or stop).
+
+### Sprint 23 tasks (per-agent assignments)
+
+> Full spec: `docs/23-higher-timeframe-sweep.md`. Tier rubric: cheap models
+> for transcription, mid-tier for code-from-spec, high-tier only for design
+> under ambiguity. Do **not** route any of these to Opus Thinking, Codex 5.5
+> high+, or Devin without explicit escalation.
+>
+> **Hard gate between Tier 1 and Tier 2.** Tasks H+I only run if Task F
+> produces ≥ 1 Step 3 survivor. If Task F produces zero survivors, jump
+> directly to Tasks G + L and skip H–K entirely.
+
+- [ ] **A. Create feature branch + confirm 1d backtest window and stoploss table** — _Codex 5.4 low_
+  - Branch: `git checkout -b <agent>/sprint-23-higher-timeframes` in the
+    agent's worktree.
+  - Per `docs/23-higher-timeframe-sweep.md` §23.2.1, the Tier 1 backtest
+    window is `2022-01-01` → `2025-05-01`. Per §23.4, per-strategy 1d
+    stoploss and `minimal_roi` are pre-registered. Confirm both — do **not**
+    treat either as hyperopt parameters. Document any deliberate deviation
+    in this file's session log.
+  - No code edits in this task beyond the branch creation.
+
+- [ ] **B. Download 1d OHLCV for 4 majors over 2022-01-01 → 2025-05-01** — _Codex 5.4 low_
+  - Command:
+    ```bash
+    freqtrade download-data -c user_data/config.json \
+      --pairs BTC/USDT ETH/USDT SOL/USDT BNB/USDT \
+      --timeframes 1d \
+      --timerange=20220101-20250501
+    ```
+  - The candles land in `user_data/data/okx/` and are gitignored. Verify
+    file existence and row counts (~1216 daily candles per pair).
+  - **Also** download 1w and 4h for the same pairs and window — needed only
+    in Tier 2 (Task H), but cheap to download in this task so Tier 2 isn't
+    blocked on a data step later.
+  - Acceptance: all 3 timeframes × 4 pairs land on disk without errors.
+
+- [ ] **C. Implement five `*Daily` strategy subclasses + smoke tests** — _Codex 5.4 medium_
+  - Per `docs/23-higher-timeframe-sweep.md` §23.3.1, add:
+    - `user_data/strategies/EMACrossoverDaily.py`
+    - `user_data/strategies/DonchianBreakoutDaily.py`
+    - `user_data/strategies/BollingerMeanReversionDaily.py`
+    - `user_data/strategies/RSITrendDaily.py`
+    - `user_data/strategies/MACDVolumeDaily.py`
+  - Each subclass inherits from the corresponding base, overrides only
+    `timeframe`, `stoploss`, and `minimal_roi` per §23.4. Do **not** modify
+    `populate_indicators` / `populate_entry_trend` / `populate_exit_trend`.
+  - Reuse the `try: from user_data.strategies.X import Y / except
+    ModuleNotFoundError` shim from the Sprint 21 `*DailyRanked` files for
+    Freqtrade strategy resolver compatibility.
+  - Smoke tests in `tests/test_strategy_smoke.py` (or a new
+    `tests/test_daily_strategies.py`): import each subclass, instantiate,
+    call `populate_indicators` / `populate_entry_trend` /
+    `populate_exit_trend` on a small synthetic 1d DataFrame.
+  - Acceptance: `ruff check .` clean, `pytest` green (75 + at least 5 new
+    tests pass).
+
+- [ ] **D. Tier 1 same-window backtests** — _Codex 5.4 low_
+  - Run:
+    ```bash
+    python scripts/run_baselines.py \
+      --strategies EMACrossoverDaily DonchianBreakoutDaily BollingerMeanReversionDaily RSITrendDaily MACDVolumeDaily \
+      --pairs BTC/USDT ETH/USDT SOL/USDT BNB/USDT \
+      --timerange=20220101-20250501
+    ```
+  - Screen criteria (identical to docs/19 §19.6 Step 1): ≥ 50 trades AND
+    max drawdown < 30%.
+  - Capture per-strategy + per-pair trade counts in the session log; the
+    distribution across pairs is informative even when the screen fails.
+  - List Step 1 survivors. Pass them as `--strategy` arguments into Task F.
+
+- [ ] **E. (Conditional) `MultiTimeframeConfirmation` smoke test stub** — _Codex 5.4 low_
+  - **Only if Task D produces ≥ 1 survivor.** Otherwise mark this task as
+    not applicable and proceed to G + L.
+  - Add a no-op smoke test stub for `MultiTimeframeConfirmation` so Task H
+    can drop the implementation into a slot that already has test
+    scaffolding. Do **not** implement the strategy here — Task H owns the
+    implementation.
+
+- [ ] **F. Tier 1 walk-forward for screen survivors** — _Antigravity Gemini Flash medium (after D)_
+  - For each strategy that passed Task D: run
+    ```bash
+    python scripts/walk_forward.py \
+      --strategy <StrategyName> \
+      --start 2022-01-01 --end 2025-05-01 \
+      --in-sample 365d --out-sample 90d --step 90d \
+      --loss SharpeHyperOptLoss --epochs 100 \
+      --freqtrade-bin .venv/bin/freqtrade \
+      -j 1 \
+      --output-dir user_data/walk_forward_results/<StrategyName>
+    ```
+  - **Window sizes differ from prior sprints** per §23.6 Step 2 — they are
+    the 1d-appropriate analogue of 90d/30d/30d for 5m. The acceptance
+    criteria are unchanged.
+  - Acceptance (per §23.6 Step 3, unchanged): ≥ 3 OOS folds, avg OOS Sharpe
+    > 0, avg OOS profit > 0, no single fold drawdown > 5%.
+  - This is the largest compute block of Tier 1.
+
+- [ ] **G. Write results doc `docs/24-higher-timeframe-results.md`** — _Antigravity Gemini Flash high (after F)_
+  - Follow the structure of `docs/22-daily-momentum-results.md` exactly:
+    scope, same-window screen results table, per-pair trade-count table,
+    per-fold walk-forward tables for any survivors, explicit pass/fail
+    against §23.6 acceptance criteria.
+  - If Task F produces ≥ 1 survivor, leave a placeholder section for the
+    Tier 2 results and re-edit after Task I. Otherwise document the
+    rejection definitively and invoke §23.8.
+  - Update `docs/README.md` and AGENTS.md docs table to add entry 24.
+
+- [ ] **H. (Conditional) Implement `MultiTimeframeConfirmation` + smoke test** — _Codex 5.4 medium (only if Task F produces ≥ 1 survivor)_
+  - Per `docs/23-higher-timeframe-sweep.md` §23.3.2:
+    - `user_data/strategies/MultiTimeframeConfirmation.py`.
+    - 1d primary, `informative_pairs()` returns `(pair, "4h")` and
+      `(pair, "1w")` per active pair.
+    - Indicators: 1w EMA-200 slope (using `merge_informative_pair` with
+      `ffill=True`), 4h RSI(14).
+    - Entry: `(1w_ema200_slope > 0) & (parent_entry_signal == 1) &
+      (4h_rsi < 70)` where `parent_entry_signal` is taken from the best
+      Tier 1 survivor (passed via class attribute or explicit subclass).
+    - Exit: parent strategy's exit, unchanged.
+    - `startup_candle_count >= 1400` (200 weeks × 7 daily candles).
+  - Smoke test: verify `merge_informative_pair` uses closed candles only
+    (no look-ahead). Specifically, assert that for a 1d candle at date `D`,
+    the merged 4h value reflects `4h close <= D - 4h` and the merged 1w
+    value reflects `1w close <= D - 1d`.
+  - Acceptance: `ruff check .` clean, `pytest` green.
+
+- [ ] **I. (Conditional) Tier 2 same-window + walk-forward for MTF combo** — _Antigravity Gemini Flash medium (after H)_
+  - Run `scripts/run_baselines.py` on `MultiTimeframeConfirmation` alone over
+    `20220101-20250501`. Then run `scripts/walk_forward.py` if it passes the
+    screen.
+  - Same 4-criterion acceptance gate.
+  - Append results to `docs/24-higher-timeframe-results.md` Tier 2 section.
+
+- [ ] **J. (Conditional) Regime-filter experiments** — _Antigravity Gemini Flash medium (after F or I, only for Step 3 survivors)_
+  - Run `scripts/regime_filter_experiments.py` for each survivor.
+  - This is the **only** legitimate place to evaluate regime gating on top
+    of a strategy that has already passed walk-forward acceptance.
+
+- [ ] **K. (Conditional) Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after G + J, only if any strategy passes acceptance)_
+  - `freqtrade trade -c user_data/config.json --strategy <StrategyName>`.
+  - Track per-week trade count and win rate vs backtest expectation.
+  - **No live-money deployment in this sprint.**
+
+- [ ] **L. Update `TASKS.md` at sprint end** — _Codex 5.4 low_
+  - Mark Sprint 23 done. If no survivor: invoke §23.8 and write a
+    one-paragraph follow-up memo in the session log proposing FreqAI, perps
+    + funding, or "stop here" as the next sprint. Surface the decision to
+    the ESC lane.
+
+- [ ] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
+  - Surface any design-level question rather than deciding locally.
+    Examples: "the 1d walk-forward windows produce only 4 folds — should we
+    extend the window?", "Task H's `MultiTimeframeConfirmation` should use
+    Tier 1's best survivor as the entry signal — which one if 2 survive?",
+    "the `merge_informative_pair` smoke test reveals a 1-candle look-ahead
+    — should we accept it or rewrite?".
 
 ### Sprint 21 tasks (per-agent assignments)
 
