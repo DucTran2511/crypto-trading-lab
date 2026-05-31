@@ -122,7 +122,7 @@ ranges introduced. If the parent class hyperopts an `ema_fast` from 5 to 50
 candles, that range is reused unchanged — but those 5–50 candles are now days
 instead of 5-minute bars.
 
-### 23.3.2 MTF combination strategy (Task I, conditional)
+### 23.3.2 MTF combination strategy (Task H, conditional)
 
 `user_data/strategies/MultiTimeframeConfirmation.py`:
 
@@ -141,7 +141,7 @@ instead of 5-minute bars.
 > are looked up by their **closed** timestamp, then forward-filled to the 1d
 > primary candle's timestamp. No look-ahead is possible if `merge_informative_pair`
 > is used per the Freqtrade docs (which sets `ffill=True`). The smoke test in
-> Task E must verify the merge is using closed candles only.
+> Task H must verify the merge is using closed candles only.
 
 ## 23.4 Per-Strategy Stoploss and ROI (1d)
 
