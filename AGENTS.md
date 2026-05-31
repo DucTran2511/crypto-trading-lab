@@ -142,22 +142,32 @@ walk-forward acceptance. See `docs/22-daily-momentum-results.md`.
 **Fourteen strategies tested, fourteen rejected** — five 5m baselines and one
 bull-only variant on BTC/ETH/SOL/BNB, two 1h candidates on the same majors, the
 strongest 5m baseline (`RSITrend`) on the top-20 universe, and five
-daily-momentum-ranked top-20 variants. Strategy, timeframe, universe-by-volume,
-and dynamic pair-selection spaces have all been searched.
+daily-momentum-ranked top-20 variants. Strategy, universe-by-volume, and
+dynamic pair-selection spaces have all been searched. **1d as primary trading
+timeframe** remains the one untested cell in the (strategy, timeframe,
+universe, selection) grid.
 
-**Current sprint:** no active research sprint is open. The kill criterion in
-`docs/21-daily-momentum-ranking.md` §21.8 applies: do not add another spot
-indicator, timeframe, or ranking lookback as the next step.
+**Current sprint:** Sprint 23 — higher-timeframe sweep. A two-tier sprint with
+a hard gate between tiers. Tier 1 runs the five existing baselines on 1d
+primary against the 4 majors over a 3-year window (2022-01-01 → 2025-05-01).
+Tier 2 (a single `MultiTimeframeConfirmation` strategy combining 1w + 1d + 4h)
+**only runs if Tier 1 produces ≥ 1 Step 3 survivor**. Full plan in
+`docs/23-higher-timeframe-sweep.md`. This is a defensible categorical
+exception to the Sprint 21 §21.8 kill criterion (the fee-economics argument in
+§23.1 — 1d round-trip fee burden is 10–20× lower than at 5m). §23.8 has no
+further escape hatches.
 **See `TASKS.md` for active tasks and per-agent assignments.**
 
 Roadmap priority (from `docs/11-roadmap.md`, updated for current state):
-1. Escalate to FreqAI (ML on engineered features) or perps + funding-rate
-   arbitrage. See `docs/21-daily-momentum-ranking.md` §21.8 and
-   `docs/22-daily-momentum-results.md`.
-2. Switch live data to Binance.vision as default (still deferred).
-3. Live monitoring stack (logs, Telegram, heartbeat).
-4. Paper-trade validation (4+ weeks) once a strategy clears acceptance.
-5. Live micro-size deployment — still gated on ≥ 6 months of paper-trade
+1. Execute Sprint 23 (higher-timeframe sweep, 1d primary). See
+   `docs/23-higher-timeframe-sweep.md` and `TASKS.md`.
+2. If Sprint 23 also rejects: escalate to FreqAI (ML on engineered features),
+   perps + funding-rate arbitrage, or stop the lab. See
+   `docs/23-higher-timeframe-sweep.md` §23.8.
+3. Switch live data to Binance.vision as default (still deferred).
+4. Live monitoring stack (logs, Telegram, heartbeat).
+5. Paper-trade validation (4+ weeks) once a strategy clears acceptance.
+6. Live micro-size deployment — still gated on ≥ 6 months of paper-trade
    logs matching backtest expectation.
 
 ---
@@ -202,6 +212,7 @@ Full docs in `docs/` (read in order):
 | 20 | `docs/20-pair-universe-results.md` | Top-20 universe same-window + walk-forward rejection |
 | 21 | `docs/21-daily-momentum-ranking.md` | Daily-momentum-ranked top-3 from top-20 universe sprint plan |
 | 22 | `docs/22-daily-momentum-results.md` | Daily momentum ranking screen, walk-forward rejection, and kill-criterion decision |
+| 23 | `docs/23-higher-timeframe-sweep.md` | Sprint 23 plan — 1d primary sweep (Tier 1) + conditional MTF combo (Tier 2); the last untested cell before escalating beyond indicator-on-spot |
 
 ---
 
