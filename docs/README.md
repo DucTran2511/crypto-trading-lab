@@ -28,6 +28,7 @@ This folder is the long-form docs for `crypto-trading-lab`. Start here, then dri
 22. [Daily momentum ranking results](22-daily-momentum-results.md) — same-window screen, three walk-forward rejections, and Sprint 21 kill-criterion decision.
 23. [Higher-timeframe sweep sprint plan](23-higher-timeframe-sweep.md) — Sprint 23 two-tier plan: 1d primary on 4 majors (Tier 1) + conditional 1w/1d/4h `MultiTimeframeConfirmation` (Tier 2); defensible categorical exception to §21.8 on fee-economics grounds; last untested cell before escalating beyond indicator-on-spot.
 24. [Higher-timeframe sweep results](24-higher-timeframe-results.md) — corrected 1d same-window screen, zero Step 1 survivors, Tier 2 skipped, and §23.8 escalation decision.
+25. [Perps + funding-rate arbitrage sprint plan](25-perps-funding-arb.md) — Sprint 25 three-tier plan: OKX BTC/ETH-USDT-SWAP cash-and-carry historical edge analysis (Tier 1), 4-week paper-trade of paired-leg position manager on testnet (Tier 2), real money deferred to next sprint (Tier 3); first hypothesis category change post-§23.8.
 
 ## Reference
 
