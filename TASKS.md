@@ -232,15 +232,19 @@ on engineered features, perps + funding-rate arbitrage, or stop).
     `MultiTimeframeConfirmation` because Task F produced zero Step 3
     survivors, so there was no Tier 2 strategy to backtest or walk forward.
 
-- [ ] **J. (Conditional) Regime-filter experiments** — _Antigravity Gemini Flash medium (after F or I, only for Step 3 survivors)_
+- [x] **J. (Conditional) Regime-filter experiments** — _Antigravity Gemini Flash medium (after F or I, only for Step 3 survivors)_
   - Run `scripts/regime_filter_experiments.py` for each survivor.
   - This is the **only** legitimate place to evaluate regime gating on top
     of a strategy that has already passed walk-forward acceptance.
+  - Result: not applicable. Sprint 23 produced no Step 3 survivors, so there
+    is no accepted strategy eligible for regime-filter experiments.
 
-- [ ] **K. (Conditional) Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after G + J, only if any strategy passes acceptance)_
+- [x] **K. (Conditional) Start 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after G + J, only if any strategy passes acceptance)_
   - `freqtrade trade -c user_data/config.json --strategy <StrategyName>`.
   - Track per-week trade count and win rate vs backtest expectation.
   - **No live-money deployment in this sprint.**
+  - Result: not applicable. No strategy passed the acceptance gate, so no
+    paper-trade dry-run was started.
 
 - [ ] **L. Update `TASKS.md` at sprint end** — _Codex 5.4 low_
   - Mark Sprint 23 done. If no survivor: invoke §23.8 and write a
@@ -821,3 +825,5 @@ on engineered features, perps + funding-rate arbitrage, or stop).
 | 2026-05-31 | Codex | Completed Sprint 23 Task G: documented the corrected higher-timeframe rejection in docs/24, updated docs indexes, skipped Tier 2, and invoked §23.8 |
 | 2026-05-31 | Codex | Closed Sprint 23 Task H as not applicable because Task F produced zero Step 3 survivors |
 | 2026-05-31 | Codex | Closed Sprint 23 Task I as not applicable because Tier 2 never opened and no `MultiTimeframeConfirmation` strategy was implemented |
+| 2026-05-31 | Codex | Closed Sprint 23 Task J as not applicable because no strategy passed walk-forward acceptance for regime-filter experiments |
+| 2026-05-31 | Codex | Closed Sprint 23 Task K as not applicable because no strategy passed the paper-trade acceptance gate |
