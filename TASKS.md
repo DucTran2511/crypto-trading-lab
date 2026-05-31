@@ -76,7 +76,7 @@ on engineered features, perps + funding-rate arbitrage, or stop).
     `RSITrendDaily` -0.10 / `{"0": 0.20}`,
     `MACDVolumeDaily` -0.10 / `{"0": 0.20}`.
 
-- [ ] **B. Download 1d OHLCV for 4 majors over 2022-01-01 → 2025-05-01** — _Codex 5.4 low_
+- [x] **B. Download 1d OHLCV for 4 majors over 2022-01-01 → 2025-05-01** — _Codex 5.4 low_
   - Command:
     ```bash
     freqtrade download-data -c user_data/config.json \
@@ -90,6 +90,12 @@ on engineered features, perps + funding-rate arbitrage, or stop).
     in Tier 2 (Task H), but cheap to download in this task so Tier 2 isn't
     blocked on a data step later.
   - Acceptance: all 3 timeframes × 4 pairs land on disk without errors.
+  - Result: downloaded/prepended OKX spot OHLCV for `1d`, `1w`, and `4h`.
+    All 12 files exist under `user_data/data/okx/`. Verified rows:
+    BTC 1222/229/7367, ETH 1222/229/7367, SOL 1222/229/7367,
+    BNB 868/179/5243 for `1d`/`1w`/`4h` respectively. BNB starts
+    `2022-12-21` on OKX, so it has fewer candles than the full-window
+    BTC/ETH/SOL files; no download errors occurred.
 
 - [ ] **C. Implement five `*Daily` strategy subclasses + smoke tests** — _Codex 5.4 medium_
   - Per `docs/23-higher-timeframe-sweep.md` §23.3.1, add:
@@ -768,3 +774,4 @@ on engineered features, perps + funding-rate arbitrage, or stop).
 | 2026-05-30 | Codex | Closed Sprint 21 Task J as not applicable because no ranked strategy passed the paper-trade acceptance gate |
 | 2026-05-30 | Codex | Closed Sprint 21 Task K and invoked the kill criterion: next sprint should leave spot-indicator variants and evaluate either FreqAI engineered-feature models or a perps plus funding-rate arbitrage track |
 | 2026-05-31 | Codex | Completed Sprint 23 Task A: created `codex/sprint-23-higher-timeframes` and confirmed the 2022-01-01 to 2025-05-01 1d window plus pre-registered stoploss/ROI table with no deviations |
+| 2026-05-31 | Codex | Completed Sprint 23 Task B: downloaded/prepended OKX 1d, 1w, and 4h candles for BTC/ETH/SOL/BNB; all files landed, with BNB limited to OKX data starting 2022-12-21 |
