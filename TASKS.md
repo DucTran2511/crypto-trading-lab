@@ -189,7 +189,7 @@ on engineered features, perps + funding-rate arbitrage, or stop).
     `--timeframe` for future runs, but Sprint 23's Tier 1 hard gate stops
     here.
 
-- [ ] **G. Write results doc `docs/24-higher-timeframe-results.md`** — _Antigravity Gemini Flash high (after F)_
+- [x] **G. Write results doc `docs/24-higher-timeframe-results.md`** — _Antigravity Gemini Flash high (after F)_
   - Follow the structure of `docs/22-daily-momentum-results.md` exactly:
     scope, same-window screen results table, per-pair trade-count table,
     per-fold walk-forward tables for any survivors, explicit pass/fail
@@ -198,8 +198,11 @@ on engineered features, perps + funding-rate arbitrage, or stop).
     Tier 2 results and re-edit after Task I. Otherwise document the
     rejection definitively and invoke §23.8.
   - Update `docs/README.md` and AGENTS.md docs table to add entry 24.
+  - Result: added `docs/24-higher-timeframe-results.md`, updated
+    `docs/README.md` and the AGENTS.md docs table, documented the corrected
+    1d same-window rejection, skipped Tier 2, and invoked §23.8.
 
-- [ ] **H. (Conditional) Implement `MultiTimeframeConfirmation` + smoke test** — _Codex 5.4 medium (only if Task F produces ≥ 1 survivor)_
+- [x] **H. (Conditional) Implement `MultiTimeframeConfirmation` + smoke test** — _Codex 5.4 medium (only if Task F produces ≥ 1 survivor)_
   - Per `docs/23-higher-timeframe-sweep.md` §23.3.2:
     - `user_data/strategies/MultiTimeframeConfirmation.py`.
     - 1d primary, `informative_pairs()` returns `(pair, "4h")` and
@@ -216,6 +219,8 @@ on engineered features, perps + funding-rate arbitrage, or stop).
     the merged 4h value reflects `4h close <= D - 4h` and the merged 1w
     value reflects `1w close <= D - 1d`.
   - Acceptance: `ruff check .` clean, `pytest` green.
+  - Result: not applicable. Task F produced zero Step 3 survivors, so the
+    Tier 2 `MultiTimeframeConfirmation` implementation gate did not open.
 
 - [ ] **I. (Conditional) Tier 2 same-window + walk-forward for MTF combo** — _Antigravity Gemini Flash medium (after H)_
   - Run `scripts/run_baselines.py` on `MultiTimeframeConfirmation` alone over
@@ -810,3 +815,5 @@ on engineered features, perps + funding-rate arbitrage, or stop).
 | 2026-05-31 | Codex | Completed Sprint 23 Task D: fixed baseline runner pair/timeframe forwarding, reran the valid Tier 1 four-major 1d screen, and found zero Step 1 survivors |
 | 2026-05-31 | Codex | Completed Sprint 23 Task E: added the conditional `MultiTimeframeConfirmation` smoke test stub without implementing the strategy |
 | 2026-05-31 | Codex | Completed Sprint 23 Task F as not applicable: no corrected 1d same-window screen survivors advanced to walk-forward; added pair/timeframe forwarding to the walk-forward harness |
+| 2026-05-31 | Codex | Completed Sprint 23 Task G: documented the corrected higher-timeframe rejection in docs/24, updated docs indexes, skipped Tier 2, and invoked §23.8 |
+| 2026-05-31 | Codex | Closed Sprint 23 Task H as not applicable because Task F produced zero Step 3 survivors |

@@ -213,6 +213,7 @@ Full docs in `docs/` (read in order):
 | 21 | `docs/21-daily-momentum-ranking.md` | Daily-momentum-ranked top-3 from top-20 universe sprint plan |
 | 22 | `docs/22-daily-momentum-results.md` | Daily momentum ranking screen, walk-forward rejection, and kill-criterion decision |
 | 23 | `docs/23-higher-timeframe-sweep.md` | Sprint 23 plan — 1d primary sweep (Tier 1) + conditional MTF combo (Tier 2); the last untested cell before escalating beyond indicator-on-spot |
+| 24 | `docs/24-higher-timeframe-results.md` | Higher-timeframe sweep results: corrected 1d screen, zero survivors, Tier 2 skipped, and §23.8 escalation |
 
 ---
 
