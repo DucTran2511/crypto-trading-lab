@@ -92,6 +92,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Freqtrade executable to run.",
     )
     parser.add_argument(
+        "--timeframe",
+        default=None,
+        help="Optional Freqtrade timeframe override, e.g. 1d.",
+    )
+    parser.add_argument(
         "--pairs",
         nargs="+",
         default=list(DEFAULT_PAIRS),
@@ -108,6 +113,7 @@ def run_backtest(
     results_dir: Path,
     freqtrade_bin: str,
     pairs: Sequence[str],
+    timeframe: str | None = None,
     runner: Runner = subprocess.run,
 ) -> Path | None:
     print(f"Running backtest for {strategy}...", file=sys.stderr)
@@ -130,6 +136,8 @@ def run_backtest(
         "--pairs",
         *pairs,
     ]
+    if timeframe:
+        cmd.extend(["--timeframe", timeframe])
     res = runner(cmd, capture_output=True, text=True, check=False)
     if res.returncode != 0:
         print(f"Error running backtest for {strategy}:", file=sys.stderr)
@@ -272,6 +280,7 @@ def run_baselines(
     results_dir: Path,
     freqtrade_bin: str,
     pairs: Sequence[str],
+    timeframe: str | None = None,
     runner: Runner = subprocess.run,
 ) -> tuple[Path, Path] | None:
     results_dir.mkdir(parents=True, exist_ok=True)
@@ -285,6 +294,7 @@ def run_baselines(
             results_dir=results_dir,
             freqtrade_bin=freqtrade_bin,
             pairs=pairs,
+            timeframe=timeframe,
             runner=runner,
         )
         if zip_path:
@@ -316,6 +326,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         results_dir=args.results_dir,
         freqtrade_bin=args.freqtrade_bin,
         pairs=args.pairs,
+        timeframe=args.timeframe,
     )
     if summary_files is None:
         return 1

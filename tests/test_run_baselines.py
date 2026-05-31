@@ -68,6 +68,7 @@ def test_run_backtest_builds_command_and_reads_last_result(tmp_path: Path):
         results_dir=tmp_path,
         freqtrade_bin="freqtrade",
         pairs=["BTC/USDT", "ETH/USDT"],
+        timeframe="1d",
         runner=fake_runner,
     )
 
@@ -77,7 +78,9 @@ def test_run_backtest_builds_command_and_reads_last_result(tmp_path: Path):
     assert command[command.index("--strategy") + 1] == "RSITrend"
     assert command[command.index("--timerange") + 1] == "20250101-20250501"
     assert command[command.index("--cache") + 1] == "none"
-    assert command[command.index("--pairs") + 1 :] == ["BTC/USDT", "ETH/USDT"]
+    pairs_index = command.index("--pairs")
+    assert command[pairs_index + 1 : pairs_index + 3] == ["BTC/USDT", "ETH/USDT"]
+    assert command[command.index("--timeframe") + 1] == "1d"
 
 
 def test_parse_backtest_zip_extracts_comparable_metrics(tmp_path: Path):
