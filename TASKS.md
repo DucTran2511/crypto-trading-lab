@@ -58,7 +58,7 @@ on engineered features, perps + funding-rate arbitrage, or stop).
 > produces ≥ 1 Step 3 survivor. If Task F produces zero survivors, jump
 > directly to Tasks G + L and skip H–K entirely.
 
-- [ ] **A. Create feature branch + confirm 1d backtest window and stoploss table** — _Codex 5.4 low_
+- [x] **A. Create feature branch + confirm 1d backtest window and stoploss table** — _Codex 5.4 low_
   - Branch: `git checkout -b <agent>/sprint-23-higher-timeframes` in the
     agent's worktree.
   - Per `docs/23-higher-timeframe-sweep.md` §23.2.1, the Tier 1 backtest
@@ -67,6 +67,14 @@ on engineered features, perps + funding-rate arbitrage, or stop).
     treat either as hyperopt parameters. Document any deliberate deviation
     in this file's session log.
   - No code edits in this task beyond the branch creation.
+  - Result: created `codex/sprint-23-higher-timeframes`; confirmed Tier 1
+    backtest window `2022-01-01` → `2025-05-01`; confirmed pre-registered 1d
+    stoploss/ROI table with no deviations and no hyperopt treatment:
+    `EMACrossoverDaily` -0.10 / `{"0": 0.20}`,
+    `DonchianBreakoutDaily` -0.08 / `{"0": 0.25}`,
+    `BollingerMeanReversionDaily` -0.06 / `{"0": 0.08}`,
+    `RSITrendDaily` -0.10 / `{"0": 0.20}`,
+    `MACDVolumeDaily` -0.10 / `{"0": 0.20}`.
 
 - [ ] **B. Download 1d OHLCV for 4 majors over 2022-01-01 → 2025-05-01** — _Codex 5.4 low_
   - Command:
@@ -759,3 +767,4 @@ on engineered features, perps + funding-rate arbitrage, or stop).
 | 2026-05-30 | Codex | Closed Sprint 21 Task I as not applicable because Task G produced no passing Step 3 survivors for regime-filter experiments |
 | 2026-05-30 | Codex | Closed Sprint 21 Task J as not applicable because no ranked strategy passed the paper-trade acceptance gate |
 | 2026-05-30 | Codex | Closed Sprint 21 Task K and invoked the kill criterion: next sprint should leave spot-indicator variants and evaluate either FreqAI engineered-feature models or a perps plus funding-rate arbitrage track |
+| 2026-05-31 | Codex | Completed Sprint 23 Task A: created `codex/sprint-23-higher-timeframes` and confirmed the 2022-01-01 to 2025-05-01 1d window plus pre-registered stoploss/ROI table with no deviations |
