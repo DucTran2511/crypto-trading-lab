@@ -147,20 +147,24 @@ daily-momentum-ranked top-20 variants, and five 1d primary baselines on the
 four majors. Strategy, universe-by-volume, dynamic pair-selection, and primary
 timeframe spaces have all been searched for indicator-on-OKX-spot.
 
-**Current sprint:** none open. Section 23.8 now applies with no further escape
-hatches: the next sprint must be FreqAI/ML on engineered features, perps plus
-funding-rate arbitrage, or stop.
-**See `TASKS.md` for the latest session log and closeout.**
+**Current sprint:** Sprint 25 — perps + funding-rate arbitrage (cash-and-carry
+on OKX). Three-tier plan with hard gates between tiers: Tier 1 is a read-only
+historical edge analysis on BTC-USDT-SWAP + ETH-USDT-SWAP funding rates,
+Tier 2 (conditional) is a 4-week paper-trade of a paired-leg position
+manager on OKX testnet, Tier 3 (real money) is explicitly out of scope for
+this sprint. See `docs/25-perps-funding-arb.md` and `TASKS.md` for the
+full spec and per-agent task breakdown.
 
 Roadmap priority (from `docs/11-roadmap.md`, updated for current state):
-1. Choose the post-Sprint-23 direction: FreqAI/ML on engineered features,
-   perps + funding-rate arbitrage, or stop the lab. See
-   `docs/23-higher-timeframe-sweep.md` §23.8 and
-   `docs/24-higher-timeframe-results.md`.
-2. Switch live data to Binance.vision as default (still deferred).
-3. Live monitoring stack (logs, Telegram, heartbeat).
-4. Paper-trade validation (4+ weeks) once a strategy clears acceptance.
-5. Live micro-size deployment — still gated on ≥ 6 months of paper-trade
+1. Execute Sprint 25 — perps + funding-rate arbitrage. Tier 1 first; Tier 2
+   conditional on Tier 1 acceptance; Tier 3 (real money) is a separate
+   sprint after Sprint 25 closes.
+2. If Sprint 25 Tier 1 or Tier 2 rejects: §25.8 applies. Remaining options
+   are FreqAI/ML on engineered features or stop the lab.
+3. Switch live data to Binance.vision as default (still deferred).
+4. Live monitoring stack (logs, Telegram, heartbeat).
+5. Paper-trade validation (4+ weeks) once a strategy clears acceptance.
+6. Live micro-size deployment — still gated on ≥ 6 months of paper-trade
    logs matching backtest expectation.
 
 ---
@@ -207,6 +211,7 @@ Full docs in `docs/` (read in order):
 | 22 | `docs/22-daily-momentum-results.md` | Daily momentum ranking screen, walk-forward rejection, and kill-criterion decision |
 | 23 | `docs/23-higher-timeframe-sweep.md` | Sprint 23 plan — 1d primary sweep (Tier 1) + conditional MTF combo (Tier 2); the last untested cell before escalating beyond indicator-on-spot |
 | 24 | `docs/24-higher-timeframe-results.md` | Higher-timeframe sweep results: corrected 1d screen, zero survivors, Tier 2 skipped, and §23.8 escalation |
+| 25 | `docs/25-perps-funding-arb.md` | Sprint 25 plan — OKX perps + funding-rate cash-and-carry; three tiers (historical edge → paper-trade → real money) with hard gates; §25.8 kill criterion narrows the post-§23.8 options to FreqAI or stop |
 
 ---
 

@@ -7,14 +7,14 @@
 
 ## Sprint Status
 
-- [x] **Sprint 23: Higher-timeframe sweep (1d primary, MTF combo conditional)**
-  Complete and rejected. The corrected 1d same-window screen produced zero
-  Step 1 survivors because all five daily baselines failed the 50-trade floor.
-  Tier 1 walk-forward, Tier 2 `MultiTimeframeConfirmation`, regime-filter
-  experiments, and paper trading were skipped by the hard gates. See
-  `docs/24-higher-timeframe-results.md`. Section 23.8 now applies with no
-  further escape hatches: next sprint must be FreqAI, perps + funding-rate
-  arbitrage, or stop.
+- [/] **Sprint 25: Perps + funding-rate arbitrage (cash-and-carry on OKX)**
+  Three-tier plan with hard gates between tiers. Tier 1 is a read-only
+  historical edge analysis on BTC-USDT-SWAP + ETH-USDT-SWAP funding rates
+  over the last 24 months; Tier 2 (conditional on Tier 1 acceptance) is a
+  4-week paper-trade of a paired-leg position manager on OKX testnet;
+  Tier 3 (real money) is explicitly out of scope for this sprint. See
+  `docs/25-perps-funding-arb.md` for the full spec, pre-registered
+  acceptance criteria, and kill criterion.
 
 ## Previous Sprints (done)
 
@@ -23,6 +23,8 @@
   `docs/24-higher-timeframe-results.md`. All five daily baselines failed the
   corrected 1d same-window trade-count screen. Tier 2 was skipped. Nineteen
   indicator-on-spot strategy variants have now been tested and rejected.
+  Section 23.8 fired with no further escape hatches; chose perps +
+  funding-rate arbitrage as the post-Sprint-23 direction (Sprint 25).
 
 - [x] **Sprint 21: Daily momentum ranking (top-3 of top-20 universe)** — see
   `docs/21-daily-momentum-ranking.md`. Three ranked variants passed the
@@ -44,9 +46,154 @@
 
 ## Up Next
 
-Sprint 23 produced zero survivors, so §23.8 applies with no further escape
-hatches. The next sprint must address a structurally different direction:
-FreqAI on engineered features, perps + funding-rate arbitrage, or stop.
+Sprint 25 — perps + funding-rate arbitrage — is the structurally different
+direction chosen after §23.8 fired. The full spec is in
+`docs/25-perps-funding-arb.md`. The sprint is gated on three pre-registered
+acceptance tiers; Tier 3 (real money) is explicitly out of scope and is a
+separate sprint after Sprint 25 closes.
+
+### Sprint 25 tasks (per-agent assignments)
+
+> Full spec: `docs/25-perps-funding-arb.md`. Tier rubric: cheap models for
+> transcription, mid-tier for code-from-spec, high-tier only for design
+> under ambiguity or high-blast-radius execution code. Do **not** route any
+> of these to Opus Thinking, Codex 5.5 high+, or Devin without explicit
+> escalation.
+>
+> **Hard gate between Tier 1 and Tier 2.** Tasks H+I+J run only if Task F
+> documents both BTC and ETH clearing all four §25.2.1 acceptance criteria.
+> If Tier 1 fails on either instrument, jump directly to Tasks G + L and
+> skip H–K entirely (§25.8 fires).
+>
+> **Hard rule.** Sprint 25 is dry-run only. No real money on OKX during
+> any Sprint 25 task. Tier 3 (real money) is a separate sprint per §25.2.3.
+
+- [ ] **A. Create feature branch + confirm Tier 1 instrument list + 24m window** — _Codex 5.4 low_
+  - Branch: `git checkout -b <agent>/sprint-25-perps-funding` in the
+    agent's worktree.
+  - Per `docs/25-perps-funding-arb.md` §25.2.1, Tier 1 covers
+    `BTC-USDT-SWAP` and `ETH-USDT-SWAP` over `2024-01-01` →
+    `2025-12-01` (24m ending recent). Confirm both — do **not** add
+    other instruments without ESC approval.
+  - Per §25.2.1, simulated cash-and-carry uses $250 spot + $250 perp
+    notional, OKX taker fees (spot 0.08% / perp 0.05% per leg per
+    direction), 0.05% per-leg slippage buffer.
+  - No code edits in this task beyond the branch creation.
+
+- [ ] **B. `scripts/scrape_okx_funding_rates.py` + tests** — _Codex 5.4 medium_
+  - Endpoint: `GET https://www.okx.com/api/v5/public/funding-rate-history`.
+    See OKX public-data API docs.
+  - CLI: `--inst BTC-USDT-SWAP`, `--start 2024-01-01`, `--end 2025-12-01`,
+    `--out user_data/funding_rates/<inst>-funding-history.json`.
+  - Idempotent: re-running over an existing file appends new rows only
+    (dedupe on `fundingTime`).
+  - Pagination: OKX returns at most 100 rows per page; loop with
+    `before`/`after` cursor.
+  - Tests with mocked HTTP using `responses` or `requests-mock` (whichever
+    matches the repo's existing test style). Cover happy path, pagination,
+    dedupe-on-rerun, and a 4xx error case.
+  - Acceptance: `ruff check .` clean, `pytest` green (added tests pass).
+
+- [ ] **C. `scripts/simulate_funding_arb.py` + tests** — _Codex 5.4 medium_
+  - Reads funding history from Task B's JSON files, spot 1d candles from
+    `user_data/data/okx/`, and OKX perp mark-price history (download via a
+    `--download-perp` flag that mirrors `freqtrade download-data` style).
+  - Simulation rules per `docs/25-perps-funding-arb.md` §25.2.1: open
+    paired position when funding > 0 and basis ∈ ±0.5%; hold while
+    funding > 0 AND basis ∈ ±2%; close when funding ≤ 0 OR basis blows out.
+  - Output: per-day P&L CSV + summary statistics matching the §25.2.1
+    acceptance table (net APY, worst rolling 30d drawdown, negative-funding
+    episodes per year).
+  - Tests with synthetic funding + price data — cover positive-funding
+    capture, negative-funding skip, basis-blow-up close, fee accounting.
+  - Acceptance: `ruff check .` clean, `pytest` green.
+
+- [ ] **D. Run scraper + commit funding-history JSONs** — _Antigravity Gemini Flash medium (after B)_
+  - Run `scripts/scrape_okx_funding_rates.py` for both instruments over
+    the §25.2.1 24m window.
+  - Commit the resulting JSON files (small: ~3 entries/day × 730 days × 2
+    instruments ≈ 4.4k rows, well under 1MB total). **Not** gitignored —
+    these are public-data snapshots, not user secrets.
+  - Verify row counts and timestamp coverage end-to-end.
+
+- [ ] **E. Run Tier 1 simulation for BTC + ETH** — _Antigravity Gemini Flash medium (after C, D)_
+  - Execute `scripts/simulate_funding_arb.py` for both instruments using
+    the committed funding-history JSONs.
+  - Produce per-month and aggregate summary tables matching §25.2.1.
+  - Commit per-day P&L CSVs to
+    `user_data/funding_arb_results/<inst>-tier1-pnl.csv`.
+  - Verify the four §25.2.1 acceptance criteria — pass/fail per
+    instrument, do **not** move the goalposts.
+
+- [ ] **F. Write `docs/26-perps-funding-arb-results.md` Tier 1 section** — _Antigravity Gemini Flash high (after E)_
+  - Mirror the `docs/24-higher-timeframe-results.md` shape: §26.1 Scope,
+    §26.2 Tier 1 historical simulation, §26.3 Acceptance Criteria,
+    §26.4 Decision.
+  - State pass or fail explicitly per §25.2.1 acceptance criteria. If
+    fail: §25.8 fires and §26.5 documents the next decision (Option A
+    FreqAI or Option C stop).
+  - Acceptance: ruff/pytest unaffected (docs-only); cross-references back
+    to `docs/25-perps-funding-arb.md` §25.2.1 are correct.
+
+- [ ] **G. If Tier 1 fails: close out the sprint per §25.8** — _Codex 5.4 low (after F)_
+  - Run only if Task F documents Tier 1 rejection on either instrument.
+  - Update `TASKS.md` Sprint Status → done; update `AGENTS.md` milestone
+    and current-sprint sections; surface §25.8 decision to ESC.
+  - **Do not** invoke Task H or beyond.
+
+- [ ] **H. (Conditional) `scripts/funding_arb_paper_trade.py` + tests** — _Codex 5.4 high (only if Tier 1 passes both instruments)_
+  - **High-tier slot, justified.** This is the highest-blast-radius code
+    in any sprint to date: paired-leg execution against the OKX API, even
+    on testnet. A bug means a leg closes naked or the legs sequence wrong.
+  - Implement the §25.2.2 circuit breakers exactly. All five breakers are
+    mandatory; none are configurable from a flag.
+  - Uses Freqtrade's `ccxt`-backed exchange wrapper for authenticated OKX
+    testnet calls.
+  - Tests: cover each circuit breaker as a unit case (synthetic price +
+    funding stream → assert close fires at the expected tick). Cover
+    leg-failure cases (spot fills, perp times out → spot must close).
+  - Acceptance: `ruff check .` clean, `pytest` green.
+
+- [ ] **I. (Conditional) 4-week paper-trade execution on OKX testnet** — _Antigravity Gemini Flash medium (after H)_
+  - Run `scripts/funding_arb_paper_trade.py` continuously for 4 calendar
+    weeks against OKX testnet (or, if testnet funding lags real-prod
+    funding by too much, against the prod funding feed with
+    `dry_run = true`).
+  - Log every position open/close, every circuit-breaker trigger, every
+    P&L tick to `user_data/funding_arb_results/paper-trade-<week>.csv`.
+  - **Do not** edit the circuit-breaker thresholds mid-run — that is
+    goalpost moving.
+  - Acceptance: §25.2.2 four criteria, pass/fail explicit per week.
+
+- [ ] **J. (Conditional) Extend `docs/26-perps-funding-arb-results.md` with Tier 2 section** — _Antigravity Gemini Flash high (after I)_
+  - Add §26.5 Tier 2 paper-trade results, §26.6 acceptance, §26.7
+    decision (Tier 3 next-sprint trigger or §25.8 fires).
+
+- [ ] **K. (Conditional) Decide on Tier 3 next-sprint trigger** — _Codex 5.4 low (after J)_
+  - Run only if Task J documents Tier 2 passing all four criteria.
+  - Write a one-paragraph Sprint 27 follow-up memo in the TASKS.md
+    session log: real-money sprint outline, pre-registered acceptance
+    criteria for live deployment, link to `docs/07-paper-and-live-trading.md`
+    §7.6 checklist.
+  - **Do not** write the full Sprint 27 plan in this task — that is its
+    own sprint after Sprint 25 closes.
+
+- [ ] **L. Update `TASKS.md` at sprint end** — _Codex 5.4 low (after F or J)_
+  - Mark Sprint 25 done.
+  - If Tier 1 or Tier 2 rejected: invoke §25.8 and write a follow-up
+    memo proposing FreqAI or "stop here" as the next sprint.
+  - If Tier 2 passed: archive Sprint 25 task list and queue Sprint 27
+    in the Sprint Status section as `[ ]` not yet started.
+
+- [ ] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
+  - Surface any design-level question rather than deciding locally.
+    Examples: "OKX testnet funding rates lag prod by 12h — do we run
+    paper-trade against prod feed with `dry_run = true` instead?",
+    "Tier 1 BTC passes but ETH only nets +4% APY (just below the 5%
+    threshold) — do we proceed with BTC only?", "the circuit breaker
+    at 1% daily drawdown fires too often in testnet — is the threshold
+    too tight or is testnet noise different from prod?".
+  - Do **not** make these calls in the agent worktree. ESC owns them.
 
 ### Sprint 23 tasks (per-agent assignments)
 
