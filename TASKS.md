@@ -7,7 +7,7 @@
 
 ## Sprint Status
 
-- [/] **Sprint 25: Long-hold spot trend strategies (top-20 universe, 6-year window)**
+- [x] **Sprint 25: Long-hold spot trend strategies (top-20 universe, 6-year window)**
   Three strategy candidates spanning the day-to-month hold horizon on
   long-only OKX spot: `WeeklyDonchianBreakoutSpot` (1w breakouts),
   `TimeSeriesMomentumSpot` (1d EMA stack + regime filter), and
@@ -17,7 +17,9 @@
   adjusted for long-hold horizon. The previously-queued perps + funding
   plan was abandoned per user pivot to spot-only directional research;
   see `docs/25-spot-trend-strategies.md` for the full spec and §25.8 kill
-  criterion.
+  criterion. Final result: rejected. `WeeklyDonchianBreakoutSpot` failed
+  Step 1, and both Step 1 survivors failed Step 3 walk-forward acceptance.
+  See `docs/26-spot-trend-results.md`.
 
 ## Previous Sprints (done)
 
@@ -29,9 +31,9 @@
   and rejected. Section 23.8 fired; the post-Sprint-23 direction was first
   drafted as perps + funding-rate arbitrage (PR #51, merged then closed)
   and then redirected to long-hold spot trend strategies on the wider
-  top-20 universe per user direction (current Sprint 25). Sprint 25
-  §25.1.1 documents the rationale for the wider universe being a defensible
-  exception to §23.8.
+  top-20 universe per user direction (now-completed Sprint 25). Sprint 25
+  §25.1.1 documented the rationale for the wider universe being a defensible
+  exception to §23.8; `docs/26-spot-trend-results.md` records its rejection.
 
 - [x] **Sprint 21: Daily momentum ranking (top-3 of top-20 universe)** — see
   `docs/21-daily-momentum-ranking.md`. Three ranked variants passed the
@@ -53,12 +55,15 @@
 
 ## Up Next
 
-Sprint 25 — long-hold spot trend strategies — is the next direction after
-the Sprint 23 sample-size critique and the user's pivot away from perps.
-Full spec: `docs/25-spot-trend-strategies.md`. The sprint is gated on the
-pre-registered Step 1 (same-window) and Step 3 (walk-forward) acceptance
-criteria; live deployment is explicitly governed by `docs/07` §7.6 and is
-not invoked by any Sprint 25 task.
+No implementation sprint is queued. Sprint 25 rejected under
+`docs/25-spot-trend-strategies.md` §25.8 because all Step 1 survivors failed
+Step 3. The remaining registered choices are:
+
+- Option A: start a FreqAI / ML sprint on engineered features.
+- Option C: stop the lab here.
+
+Do not queue another spot-indicator or long-hold spot strategy sprint without
+explicit escalation.
 
 ### Sprint 25 tasks (per-agent assignments)
 
@@ -214,7 +219,7 @@ not invoked by any Sprint 25 task.
     Tasks H-K. Task E was rechecked after Task F per user request; the
     committed Step 1 survivor list remains valid and required no rerun.
 
-- [ ] **G. Write `docs/26-spot-trend-results.md`** — _Antigravity Gemini Flash high (after E, F)_
+- [x] **G. Write `docs/26-spot-trend-results.md`** — _Antigravity Gemini Flash high (after E, F)_
   - Mirror the `docs/24-higher-timeframe-results.md` shape: §26.1 Scope,
     §26.2 Step 1 same-window screen, §26.3 Step 3 walk-forward,
     §26.4 Acceptance Criteria, §26.5 Decision.
@@ -223,43 +228,66 @@ not invoked by any Sprint 25 task.
     (Option A FreqAI or Option C stop).
   - Acceptance: ruff/pytest unaffected (docs-only); cross-references back
     to `docs/25-spot-trend-strategies.md` §25.6 are correct.
+  - Completed 2026-06-03: wrote `docs/26-spot-trend-results.md` and
+    linked it from `docs/README.md`. The report records the Step 1
+    screen, Step 3 walk-forward rejection of both survivors, no
+    advancement to Tasks H-K, and the §25.8 next decision: FreqAI/ML or
+    stop the lab.
 
-- [ ] **H. (Conditional) Step 4 regime-filter experiments** — _Antigravity Gemini Flash medium (after F)_
+- [x] **H. (Conditional) Step 4 regime-filter experiments** — _Antigravity Gemini Flash medium (after F)_
   - Run only if at least one strategy clears Step 3.
   - Apply bull-only / bear-excluded / trending-only filters from
     `user_data/regime/classifier.py` to each Step 3 survivor and re-run
     walk-forward.
   - §25.6 Step 4 acceptance: filtered variant must lift OOS Sharpe by
     ≥ 0.2 vs the unfiltered control.
+  - Closed 2026-06-03 as not applicable: Task F produced zero Step 3
+    survivors, so there is no accepted strategy to regime-filter.
 
-- [ ] **I. (Conditional) Step 5 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after H)_
+- [x] **I. (Conditional) Step 5 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after H)_
   - Run only if Task H produces a regime-filtered survivor.
   - 4 calendar weeks of `freqtrade trade --strategy <Survivor>
     -c user_data/config-sprint25-top20.json` with `dry_run = true`.
   - §25.6 Step 5 acceptance: realized P&L within ±50% of walk-forward
     expectation; no unhandled exceptions.
+  - Closed 2026-06-03 as not applicable: Task H did not run because Task F
+    produced zero Step 3 survivors, so there is no paper-trade candidate.
 
-- [ ] **J. (Conditional) Extend `docs/26-spot-trend-results.md` with Step 4 + Step 5 results** — _Antigravity Gemini Flash medium (after I)_
+- [x] **J. (Conditional) Extend `docs/26-spot-trend-results.md` with Step 4 + Step 5 results** — _Antigravity Gemini Flash medium (after I)_
   - Add §26.7 regime-filter results, §26.8 paper-trade results,
     §26.9 live-deployment readiness decision (gated on `docs/07` §7.6
     checklist, not auto-deploy).
+  - Closed 2026-06-03 as not applicable: added §26.7-§26.9 to
+    `docs/26-spot-trend-results.md` documenting that Step 4, Step 5, and
+    live-deployment readiness were not run because Task F produced zero
+    Step 3 survivors.
 
-- [ ] **K. (Conditional) Live-deployment readiness checklist** — _Codex 5.4 low (after F, J)_
+- [x] **K. (Conditional) Live-deployment readiness checklist** — _Codex 5.4 low (after F, J)_
   - Run only if any strategy clears Step 5.
   - Walk through `docs/07-paper-and-live-trading.md` §7.6 step-by-step
     and document each precondition's status (pass/fail/needs-action) in
     a short follow-up memo in the TASKS.md session log.
   - **Do not** flip `dry_run` to `false` in any committed config.
+  - Closed 2026-06-03 as not applicable: no strategy cleared Step 5, so
+    the `docs/07-paper-and-live-trading.md` §7.6 pre-live checklist was
+    not opened. All ten pre-live preconditions are unevaluated for
+    Sprint 25 because there is no deployment candidate; no committed
+    config changed `dry_run` to `false`.
 
-- [ ] **L. Update `TASKS.md` at sprint end** — _Codex 5.4 low (after F or J)_
+- [x] **L. Update `TASKS.md` at sprint end** — _Codex 5.4 low (after F or J)_
   - Mark Sprint 25 done.
   - If Sprint 25 rejected (§25.8 fired): write a follow-up memo proposing
     FreqAI or "stop here" as the next sprint and surface to ESC.
   - If a strategy cleared Step 5: archive the Sprint 25 task list and
     queue Sprint 27 (live-deploy preparation) in the Sprint Status
     section as `[ ]` not yet started.
+  - Closed 2026-06-03: marked Sprint 25 done and rejected. Follow-up
+    memo: §25.8 fired because all Step 1 survivors failed Step 3, so the
+    next decision is Option A (FreqAI / ML on engineered features) or
+    Option C (stop the lab). Sprint 27 live-deploy preparation was not
+    queued because no strategy cleared Step 5.
 
-- [ ] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
+- [x] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
   - Surface any design-level question rather than deciding locally.
     Examples: "3 of the top-20 pairs listed on OKX after 2020-01-01 —
     do we drop them or use a per-pair start date?", "`TimeSeriesMomentumSpot`
@@ -268,6 +296,10 @@ not invoked by any Sprint 25 task.
     filter from §25.2.2 condition (4) zeros out entries during the entire
     2022 bear market — is that the intent or a bug?".
   - Do **not** make these calls in the agent worktree. ESC owns them.
+  - Closed 2026-06-03: no mid-sprint design ambiguity required ESC
+    adjudication. The sprint-end decision was surfaced to ESC via Task L:
+    choose FreqAI / ML on engineered features or stop the lab; do not
+    continue spot-indicator variants.
 
 ### Sprint 23 tasks (per-agent assignments)
 
@@ -1069,3 +1101,9 @@ not invoked by any Sprint 25 task.
 | 2026-06-03 | Codex | Completed Sprint 25 Task D: created `config-sprint25-top20.json`, verified the top-20 pair whitelist plus dry-run spot settings and `max_open_trades = 5`, and ran the required `DonchianBreakoutDailyTop20` smoke backtest cleanly |
 | 2026-06-03 | Codex | Completed Sprint 25 Task E: ran Step 1 same-window screens and committed `sprint25-step1.csv`; `TimeSeriesMomentumSpot` and `DonchianBreakoutDailyTop20` advance to Step 3, while `WeeklyDonchianBreakoutSpot` fails trade count and drawdown gates |
 | 2026-06-03 | Codex | Completed Sprint 25 Task F: ran walk-forward on the two Step 1 survivors; both failed Step 3 acceptance, so there are no regime-filter or paper-trade candidates |
+| 2026-06-03 | Codex | Completed Sprint 25 Task G: documented the spot-trend rejection in docs/26, linked it from the docs index, and recorded the §25.8 next decision as FreqAI/ML or stopping the lab |
+| 2026-06-03 | Codex | Closed Sprint 25 Task H as not applicable because Task F produced zero Step 3 survivors for regime-filter experiments |
+| 2026-06-03 | Codex | Closed Sprint 25 Task I as not applicable because Task H produced no regime-filtered survivor for paper-trade dry-run |
+| 2026-06-03 | Codex | Closed Sprint 25 Task J as not applicable and extended docs/26 with explicit not-run sections for regime filters, paper trading, and live-deployment readiness |
+| 2026-06-03 | Codex | Closed Sprint 25 Task K as not applicable: no strategy cleared Step 5, so the docs/07 §7.6 pre-live checklist was not opened; all ten pre-live preconditions remain unevaluated and dry-run configs were left unchanged |
+| 2026-06-03 | Codex | Closed Sprint 25 Task L and ESC lane: marked Sprint 25 done and rejected under §25.8, surfaced the next decision as FreqAI/ML on engineered features or stopping the lab, and left Sprint 27 unqueued because no strategy cleared Step 5 |
