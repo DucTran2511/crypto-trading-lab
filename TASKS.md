@@ -214,7 +214,7 @@ not invoked by any Sprint 25 task.
     Tasks H-K. Task E was rechecked after Task F per user request; the
     committed Step 1 survivor list remains valid and required no rerun.
 
-- [ ] **G. Write `docs/26-spot-trend-results.md`** — _Antigravity Gemini Flash high (after E, F)_
+- [x] **G. Write `docs/26-spot-trend-results.md`** — _Antigravity Gemini Flash high (after E, F)_
   - Mirror the `docs/24-higher-timeframe-results.md` shape: §26.1 Scope,
     §26.2 Step 1 same-window screen, §26.3 Step 3 walk-forward,
     §26.4 Acceptance Criteria, §26.5 Decision.
@@ -223,6 +223,11 @@ not invoked by any Sprint 25 task.
     (Option A FreqAI or Option C stop).
   - Acceptance: ruff/pytest unaffected (docs-only); cross-references back
     to `docs/25-spot-trend-strategies.md` §25.6 are correct.
+  - Completed 2026-06-03: wrote `docs/26-spot-trend-results.md` and
+    linked it from `docs/README.md`. The report records the Step 1
+    screen, Step 3 walk-forward rejection of both survivors, no
+    advancement to Tasks H-K, and the §25.8 next decision: FreqAI/ML or
+    stop the lab.
 
 - [ ] **H. (Conditional) Step 4 regime-filter experiments** — _Antigravity Gemini Flash medium (after F)_
   - Run only if at least one strategy clears Step 3.
@@ -1069,3 +1074,4 @@ not invoked by any Sprint 25 task.
 | 2026-06-03 | Codex | Completed Sprint 25 Task D: created `config-sprint25-top20.json`, verified the top-20 pair whitelist plus dry-run spot settings and `max_open_trades = 5`, and ran the required `DonchianBreakoutDailyTop20` smoke backtest cleanly |
 | 2026-06-03 | Codex | Completed Sprint 25 Task E: ran Step 1 same-window screens and committed `sprint25-step1.csv`; `TimeSeriesMomentumSpot` and `DonchianBreakoutDailyTop20` advance to Step 3, while `WeeklyDonchianBreakoutSpot` fails trade count and drawdown gates |
 | 2026-06-03 | Codex | Completed Sprint 25 Task F: ran walk-forward on the two Step 1 survivors; both failed Step 3 acceptance, so there are no regime-filter or paper-trade candidates |
+| 2026-06-03 | Codex | Completed Sprint 25 Task G: documented the spot-trend rejection in docs/26, linked it from the docs index, and recorded the §25.8 next decision as FreqAI/ML or stopping the lab |
