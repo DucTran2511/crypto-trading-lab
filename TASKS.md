@@ -7,21 +7,32 @@
 
 ## Sprint Status
 
-- [x] **Sprint 25: Long-hold spot trend strategies (top-20 universe, 6-year window)**
-  Three strategy candidates spanning the day-to-month hold horizon on
-  long-only OKX spot: `WeeklyDonchianBreakoutSpot` (1w breakouts),
-  `TimeSeriesMomentumSpot` (1d EMA stack + regime filter), and
-  `DonchianBreakoutDailyTop20` (resurrect Sprint 23's strongest variant
-  on the wider top-20 universe). Window: 2020-01-01 → 2025-12-01. Same
-  4-criterion walk-forward acceptance from `docs/16` §16.3 with thresholds
-  adjusted for long-hold horizon. The previously-queued perps + funding
-  plan was abandoned per user pivot to spot-only directional research;
-  see `docs/25-spot-trend-strategies.md` for the full spec and §25.8 kill
-  criterion. Final result: rejected. `WeeklyDonchianBreakoutSpot` failed
-  Step 1, and both Step 1 survivors failed Step 3 walk-forward acceptance.
-  See `docs/26-spot-trend-results.md`.
+- [ ] **Sprint 27: Spot DCA-with-take-profit strategies (BTC/ETH/SOL, 1d, 5.7-year window)**
+  Three concrete entry-signal candidates sharing a single DCA-with-TP
+  base class, all long-only on OKX spot, no leverage:
+  `DCASpotRSIEntry` (oversold mean reversion), `DCASpotBBEntry`
+  (Bollinger-lower-band mean reversion), and `DCASpotPullbackEntry`
+  (bull-market dip-buy on the 50/200 EMA stack). All three share
+  pre-registered DCA mechanics: 5 legs at $50 each spaced -5% from
+  initial entry, +8% TP from running avg entry, -25% hard stop, 90-day
+  time stop. Universe BTC/ETH/SOL only — multi-year recovery history is
+  a hard requirement of the strategy class. Window 2020-04-01 →
+  2025-12-01 (SOL listing date drives start). Same §25.6 4-criterion
+  walk-forward acceptance, kept identical to isolate the entry-signal
+  variable. See `docs/27-spot-dca-with-tp.md` for the full spec, §27.1.1
+  for why this is a defensible exception to §25.8, and §27.8 for the
+  kill criterion.
 
 ## Previous Sprints (done)
+
+- [x] **Sprint 25: Long-hold spot trend strategies (top-20 universe, 6-year window)** — see
+  `docs/25-spot-trend-strategies.md` and `docs/26-spot-trend-results.md`.
+  `WeeklyDonchianBreakoutSpot` failed Step 1; both Step 1 survivors
+  (`TimeSeriesMomentumSpot`, `DonchianBreakoutDailyTop20`) failed Step 3
+  walk-forward acceptance. §25.8 fired and was extended one direction by
+  Sprint 27 (DCA-with-TP is a structurally different trade shape, not a
+  re-parameterised indicator variant — see `docs/27-spot-dca-with-tp.md`
+  §27.1.1).
 
 - [x] **Sprint 23: Higher-timeframe sweep (1d primary, 4 majors)** — see
   `docs/23-higher-timeframe-sweep.md` and
@@ -55,15 +66,211 @@
 
 ## Up Next
 
-No implementation sprint is queued. Sprint 25 rejected under
-`docs/25-spot-trend-strategies.md` §25.8 because all Step 1 survivors failed
-Step 3. The remaining registered choices are:
+Sprint 27 (spot DCA-with-take-profit strategies) is now queued under
+`docs/27-spot-dca-with-tp.md`. Per §27.1.1 this is the **last permitted
+exception** to §25.8 — DCA-with-TP is a structurally different trade
+shape (scale-in-on-adverse-move, scale-out-at-fixed-target), not another
+entry-signal-then-exit-signal indicator variant. If Sprint 27 rejects,
+§27.8 fires and the remaining registered choices revert to:
 
 - Option A: start a FreqAI / ML sprint on engineered features.
 - Option C: stop the lab here.
 
-Do not queue another spot-indicator or long-hold spot strategy sprint without
-explicit escalation.
+Do not queue another DCA variant, another spot-indicator sprint, or
+another long-hold spot strategy sprint after Sprint 27 without explicit
+escalation.
+
+### Sprint 27 tasks (per-agent assignments)
+
+> Full spec: `docs/27-spot-dca-with-tp.md`. Tier rubric: cheap models
+> for transcription, mid-tier for code-from-spec, high-tier only for
+> design under ambiguity. Do **not** route any of these to Opus
+> Thinking, Codex 5.5 high+, or Devin without explicit escalation.
+>
+> **Hard gate at Step 1.** Tasks F–K run only on Step 1 survivors. If
+> Task E rejects all three strategies, jump directly to Tasks G + L.
+>
+> **Hard gate at Step 3.** Tasks H–K run only on Step 3 survivors.
+>
+> **Hard rule.** Sprint 27 is spot-only and dry-run-only. No leverage,
+> no perps, no real money. `scripts/dca_futures_sim.py` (PR #52) is a
+> reference utility for the DCA math; it is not invoked by any Sprint 27
+> task.
+
+- [ ] **A. Create feature branch + confirm universe + window + pre-registered parameter table** — _Codex 5.4 low_
+  - Branch: `git checkout -b <agent>/sprint-27-spot-dca` in the agent's
+    worktree.
+  - Per `docs/27-spot-dca-with-tp.md` §27.2.5, the universe is
+    `BTC/USDT`, `ETH/USDT`, `SOL/USDT` on OKX spot. No wider universe.
+  - Per §27.2.6, the backtest window is `2020-04-01` → `2025-12-01`
+    (SOL listing date drives the start).
+  - Per §27.4, DCA spacing (-5%), max legs (5), TP (+8%), hard stop
+    (-0.25), and time stop (90 days) are pre-registered class
+    attributes. Confirm — do **not** treat any of them as hyperopt
+    parameters.
+  - No code edits in this task beyond the branch creation.
+
+- [ ] **B. Download 1d OHLCV for BTC/ETH/SOL over 2020-04-01 → 2025-12-01** — _Codex 5.4 low_
+  - Command:
+    ```bash
+    freqtrade download-data -c user_data/config.json \
+      --pairs BTC/USDT ETH/USDT SOL/USDT \
+      --timeframes 1d \
+      --timerange=20200401-20251201
+    ```
+  - The candles land in `user_data/data/okx/` and are gitignored.
+    Verify file existence and approximate row counts
+    (~2070 daily candles per pair for full-window pairs; SOL may
+    start a few weeks after 2020-04-01 depending on OKX listing date).
+  - Acceptance: 3 files land on disk without errors. Document any pair
+    with < 80% expected coverage in this file's session log.
+
+- [ ] **C. Implement `DCASpotBase` + three concrete entry-signal subclasses + tests** — _Codex 5.4 medium_
+  - Per §27.3.1:
+    - `user_data/strategies/DCASpotBase.py` — abstract base inheriting
+      from `IStrategy` and owning `adjust_trade_position`, `custom_exit`,
+      `stoploss = -0.25`, `minimal_roi = {"0": 100.0}`,
+      `position_adjustment_enable = True`,
+      `max_entry_position_adjustment = 4`,
+      `process_only_new_candles = True`. The base must implement the
+      §27.2.1 DCA + TP + time-stop mechanics. `populate_*` methods on
+      the base can raise `NotImplementedError` (subclasses are required
+      to override).
+    - `user_data/strategies/DCASpotRSIEntry.py` — concrete subclass
+      implementing the §27.2.2 RSI(14)-cross-up-through-30 initial
+      entry.
+    - `user_data/strategies/DCASpotBBEntry.py` — concrete subclass
+      implementing the §27.2.3 close-below-BollingerLower(20, 2.0)
+      initial entry.
+    - `user_data/strategies/DCASpotPullbackEntry.py` — concrete subclass
+      implementing the §27.2.4 three-condition (close > EMA200,
+      close < EMA50, EMA50 > EMA200) initial entry.
+  - Reuse the `try: from user_data.strategies.X import Y / except
+    ModuleNotFoundError` shim from prior `*Daily` and `*Spot` files for
+    the subclass imports of `DCASpotBase`.
+  - Tests per §27.3.3:
+    - `tests/test_dca_spot_base.py` — DCA leg fires at -5% from initial
+      entry (not avg entry); max 5 legs; TP fires when
+      `current_rate ≥ avg_entry × 1.08`; time stop fires at 90 days.
+    - `tests/test_dca_spot_rsi_entry.py` — smoke test +
+      no-look-ahead assertion on RSI-cross signal.
+    - `tests/test_dca_spot_bb_entry.py` — smoke test +
+      no-look-ahead assertion on BB-lower-band signal.
+    - `tests/test_dca_spot_pullback_entry.py` — smoke test +
+      no-look-ahead assertion on EMA-stack signal.
+  - Acceptance: `ruff check .` clean, `pytest` green (at least 4 new
+    test files contributing several new passing tests).
+
+- [ ] **D. Build `config-sprint27-dca.json` + verify pair_whitelist** — _Codex 5.4 medium_
+  - Copy `user_data/config.json` to `user_data/config-sprint27-dca.json`.
+  - Set `pair_whitelist` to `["BTC/USDT", "ETH/USDT", "SOL/USDT"]`.
+  - Confirm `dry_run = true`, `dry_run_wallet = 500`, `trading_mode = spot`.
+  - Set `stake_amount = 50`, `max_open_trades = 3` per §27.3.2 and
+    §27.5.
+  - Add `"position_adjustment_enable": true` so the backtest engine
+    invokes the base class's `adjust_trade_position` callback.
+  - Set `timeframe = "1d"`.
+  - **Do not** modify the committed `user_data/config.json`.
+  - Acceptance: `freqtrade backtesting -c user_data/config-sprint27-dca.json
+    --strategy DCASpotRSIEntry --timerange=20240101-20240301` runs
+    cleanly (a dry smoke-run, no acceptance criteria attached).
+
+- [ ] **E. Step 1 same-window backtest sweep** — _Antigravity Flash medium (after C, D)_
+  - For each of the three strategies, run:
+    ```bash
+    freqtrade backtesting -c user_data/config-sprint27-dca.json \
+      --strategy <StrategyName> \
+      --timerange=20200401-20251201 \
+      --export trades \
+      --export-filename user_data/backtest_results/sprint27-<StrategyName>.json
+    ```
+  - Aggregate the three runs into a single CSV at
+    `user_data/backtest_results/sprint27-step1.csv` with columns:
+    `strategy, timeframe, trades, total_profit_pct,
+    max_drawdown_account_pct, sharpe, profit_factor, win_rate_pct,
+    trade_count_pass, drawdown_pass, total_profit_pass, step1_pass,
+    decision`.
+  - Apply the §27.6 Step 1 acceptance criteria exactly: ≥ 30 trades,
+    max DD < 30%, total profit > 0%. **Do not relax any criterion.**
+  - Acceptance: `sprint27-step1.csv` exists and is committable.
+
+- [ ] **F. Step 3 walk-forward for Step 1 survivors** — _Antigravity Flash medium (after E)_
+  - For each Step 1 survivor, run:
+    ```bash
+    python scripts/walk_forward.py \
+      --strategy <StrategyName> \
+      --config user_data/config-sprint27-dca.json \
+      --start 2020-04-01 --end 2025-12-01 \
+      --in-sample 730d --out-sample 180d --step 180d \
+      --loss SharpeHyperOptLoss --epochs 0
+    ```
+  - `--epochs 0` because §27.4 forbids hyperopt; the harness's
+    no-hyperopt-fallback (added during Sprint 25) handles this case.
+  - Outputs land in `user_data/walk_forward_results/<StrategyName>/`.
+  - Aggregate fold metrics into
+    `user_data/walk_forward_results/<StrategyName>/walk_forward_summary.csv`.
+  - Apply the §27.6 Step 3 acceptance criteria exactly: ≥ 4 profitable
+    OOS folds, avg OOS Sharpe > 0, avg OOS profit > 0%, worst OOS DD
+    ≤ 10%. **Do not relax any criterion.**
+  - Acceptance: one summary CSV per Step 1 survivor.
+
+- [ ] **G. Write `docs/28-spot-dca-results.md`** — _Antigravity Flash high (after E, F)_
+  - Same structure as `docs/26-spot-trend-results.md`:
+    §28.1 scope, §28.2 Step 1 screen results table, §28.3 Step 3
+    walk-forward results table, §28.4 acceptance criteria verification,
+    §28.5 decision (accept / reject), §28.6 next decision (§27.8 fires
+    or proceed to Task H).
+  - Honest reporting only: state which strategies passed/failed which
+    criteria, no goalpost moving, no rescue.
+  - If §27.8 fires, restate the remaining options (FreqAI / stop)
+    from §27.8 verbatim.
+
+- [ ] **H. (Conditional) Step 4 regime-filter experiments** — _Antigravity Flash medium (after F)_
+  - Run only if at least one strategy clears Step 3.
+  - Apply bull-only / bear-excluded / trending-only filters from
+    `user_data/regime/classifier.py` to the *entry signal* of each
+    Step 3 survivor (not to the DCA mechanics) and re-run walk-forward.
+  - Acceptance: each filtered variant lifts unfiltered OOS Sharpe by
+    ≥ 0.2. Otherwise §27.8 fires.
+
+- [ ] **I. (Conditional) Step 5 4-week paper-trade dry-run** — _Antigravity Flash medium (after H)_
+  - Run only if Task H produces a regime-filtered survivor.
+  - 4 calendar weeks of `freqtrade trade --strategy <Survivor>
+    --config user_data/config-sprint27-dca.json` in dry-run mode.
+  - Capture P&L logs. Acceptance: realized P&L within ±50% of the
+    walk-forward simulation. **Do not** flip `dry_run` to `false` in
+    any committed config.
+
+- [ ] **J. (Conditional) Extend `docs/28-spot-dca-results.md` with Step 4 + Step 5 results** — _Antigravity Flash medium (after I)_
+  - Add §28.7 regime-filter results, §28.8 paper-trade results,
+    §28.9 live-deployment readiness decision (gated on `docs/07` §7.6
+    pre-live checklist completion in Task K).
+
+- [ ] **K. (Conditional) Live-deployment readiness checklist** — _Codex 5.4 low (after F, J)_
+  - Run only if any strategy clears Step 5.
+  - Walk through `docs/07-paper-and-live-trading.md` §7.6 step-by-step
+    and record evaluation in this file's session log.
+  - **Do not** flip `dry_run` to `false` in any committed config.
+
+- [ ] **L. Update `TASKS.md` at sprint end** — _Codex 5.4 low (after F or J)_
+  - Mark Sprint 27 done.
+  - If Sprint 27 rejected (§27.8 fired): write a follow-up memo
+    proposing FreqAI or "stop here" as the next sprint and surface to
+    ESC.
+  - If a strategy cleared Step 5: archive the Sprint 27 task list and
+    queue Sprint 29 (live-deploy preparation) in the Sprint Status
+    section as `[ ]` not yet started.
+
+- [ ] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
+  - Surface any design-level question rather than deciding locally.
+    Examples: "SOL/USDT listing on OKX is 2020-04-08 — do we start the
+    universe-wide backtest at 2020-04-01 with SOL silent for the first
+    week, or push the global start to 2020-04-08?", "`DCASpotRSIEntry`
+    Step 1 produces 28 trades (2 below the ≥ 30 floor) but +24% profit
+    and 6% DD — do we relax the screen or reject?", "the +8% TP fires
+    on 78% of ladders within the first 2 legs without ever DCAing —
+    is that the intent or do we need a minimum-leg gate?".
+  - Do **not** make these calls in the agent worktree. ESC owns them.
 
 ### Sprint 25 tasks (per-agent assignments)
 

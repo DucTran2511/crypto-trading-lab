@@ -30,6 +30,7 @@ This folder is the long-form docs for `crypto-trading-lab`. Start here, then dri
 24. [Higher-timeframe sweep results](24-higher-timeframe-results.md) — corrected 1d same-window screen, zero Step 1 survivors, Tier 2 skipped, and §23.8 escalation decision.
 25. [Long-hold spot trend strategies sprint plan](25-spot-trend-strategies.md) — Sprint 25 plan: three long-only spot strategies (`WeeklyDonchianBreakoutSpot`, `TimeSeriesMomentumSpot`, `DonchianBreakoutDailyTop20`) on top-20 USDT spot over 2020-01-01 → 2025-12-01; addresses Sprint 23's sample-size critique by widening the universe and extending the window; §25.1.1 documents this as the last permitted exception to §23.8.
 26. [Spot trend strategy results](26-spot-trend-results.md) — Sprint 25 Step 1 same-window screen and Step 3 walk-forward rejection; two strategies passed Step 1, both failed Step 3, and §25.8 now points to FreqAI/ML or stopping the lab.
+27. [Spot DCA-with-take-profit sprint plan](27-spot-dca-with-tp.md) — Sprint 27 plan: three DCA-with-TP entry-signal variants (`DCASpotRSIEntry`, `DCASpotBBEntry`, `DCASpotPullbackEntry`) on BTC/ETH/SOL spot only, 2020-04-01 → 2025-12-01; pre-registered +8% TP, -25% hard stop, 90-day time stop, max 5 legs at -5% spacing; structurally different trade shape (scale-in on adverse moves) from the 22 prior indicator variants; §27.1.1 documents this as the last permitted exception to §25.8 before escalating to FreqAI or stopping.
 
 ## Reference
 
