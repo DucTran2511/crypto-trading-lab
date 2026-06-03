@@ -89,7 +89,7 @@ not invoked by any Sprint 25 task.
     of them as hyperopt parameters.
   - No code edits in this task beyond the branch creation.
 
-- [ ] **B. Download 1d + 1w OHLCV for top-20 over 2020-01-01 → 2025-12-01** — _Codex 5.4 low_
+- [x] **B. Download 1d + 1w OHLCV for top-20 over 2020-01-01 → 2025-12-01** — _Codex 5.4 low_
   - Command:
     ```bash
     freqtrade download-data -c user_data/config.json \
@@ -103,6 +103,19 @@ not invoked by any Sprint 25 task.
     2020-01-01 will have fewer).
   - Acceptance: 2 timeframes × 20 pairs = 40 files land on disk without
     errors. Document any pair with < 80% expected coverage.
+  - Completed 2026-06-03: all 40 expected files exist under
+    `user_data/data/okx/` after rerunning with `--prepend`. Coverage
+    verification used expected full-window counts of ~2,191 daily and
+    ~313 weekly candles. Pairs below 80% expected coverage: `PEPE/USDT`
+    (2023-05-01 start, 1d 1,128 / 1w 161), `TON/USDT` (2022-04-29 /
+    2022-04-25, 1d 1,495 / 1w 214), `PEOPLE/USDT` (2021-11-26 /
+    2021-11-22, 1d 1,649 / 1w 235), `ORDI/USDT` (2023-05-20 /
+    2023-05-15, 1d 1,109 / 1w 159), `TURBO/USDT` (2023-05-22,
+    1d 1,107 / 1w 158), `SUI/USDT` (2023-05-03 / 2023-05-01,
+    1d 1,126 / 1w 161), `FLOKI/USDT` (2022-12-16 / 2022-12-12,
+    1d 1,264 / 1w 181), `WLD/USDT` (2023-07-24, 1d 1,044 / 1w 149),
+    `ENS/USDT` (2021-11-09 / 2021-11-08, 1d 1,666 / 1w 237), and
+    `BNB/USDT` (2022-12-21 / 2022-12-19, 1d 1,259 / 1w 180).
 
 - [ ] **C. Implement three strategy files + smoke tests** — _Codex 5.4 medium_
   - Per §25.3.1:
@@ -1024,3 +1037,4 @@ not invoked by any Sprint 25 task.
 | 2026-05-31 | Codex | Closed Sprint 23 Task K as not applicable because no strategy passed the paper-trade acceptance gate |
 | 2026-05-31 | Codex | Closed Sprint 23 Task L and ESC lane: marked Sprint 23 done, invoked §23.8, and surfaced the next-sprint decision as FreqAI, perps plus funding, or stop |
 | 2026-06-03 | Codex | Completed Sprint 25 Task A: created `codex/sprint-25-spot-trend`, confirmed the existing top-20 OKX snapshot is readable, locked the 2020-01-01 to 2025-12-01 window, and verified the §25.4 timeframe/stoploss/ROI/lookback table remains pre-registered and non-hyperopt |
+| 2026-06-03 | Codex | Completed Sprint 25 Task B: downloaded/prepended OKX 1d and 1w candles for the top-20 universe; all 40 files exist, with PEPE, TON, PEOPLE, ORDI, TURBO, SUI, FLOKI, WLD, ENS, and BNB below 80% nominal full-window coverage due to later OKX data starts |
