@@ -7,7 +7,7 @@
 
 ## Sprint Status
 
-- [/] **Sprint 25: Long-hold spot trend strategies (top-20 universe, 6-year window)**
+- [x] **Sprint 25: Long-hold spot trend strategies (top-20 universe, 6-year window)**
   Three strategy candidates spanning the day-to-month hold horizon on
   long-only OKX spot: `WeeklyDonchianBreakoutSpot` (1w breakouts),
   `TimeSeriesMomentumSpot` (1d EMA stack + regime filter), and
@@ -17,7 +17,9 @@
   adjusted for long-hold horizon. The previously-queued perps + funding
   plan was abandoned per user pivot to spot-only directional research;
   see `docs/25-spot-trend-strategies.md` for the full spec and §25.8 kill
-  criterion.
+  criterion. Final result: rejected. `WeeklyDonchianBreakoutSpot` failed
+  Step 1, and both Step 1 survivors failed Step 3 walk-forward acceptance.
+  See `docs/26-spot-trend-results.md`.
 
 ## Previous Sprints (done)
 
@@ -29,9 +31,9 @@
   and rejected. Section 23.8 fired; the post-Sprint-23 direction was first
   drafted as perps + funding-rate arbitrage (PR #51, merged then closed)
   and then redirected to long-hold spot trend strategies on the wider
-  top-20 universe per user direction (current Sprint 25). Sprint 25
-  §25.1.1 documents the rationale for the wider universe being a defensible
-  exception to §23.8.
+  top-20 universe per user direction (now-completed Sprint 25). Sprint 25
+  §25.1.1 documented the rationale for the wider universe being a defensible
+  exception to §23.8; `docs/26-spot-trend-results.md` records its rejection.
 
 - [x] **Sprint 21: Daily momentum ranking (top-3 of top-20 universe)** — see
   `docs/21-daily-momentum-ranking.md`. Three ranked variants passed the
@@ -53,12 +55,15 @@
 
 ## Up Next
 
-Sprint 25 — long-hold spot trend strategies — is the next direction after
-the Sprint 23 sample-size critique and the user's pivot away from perps.
-Full spec: `docs/25-spot-trend-strategies.md`. The sprint is gated on the
-pre-registered Step 1 (same-window) and Step 3 (walk-forward) acceptance
-criteria; live deployment is explicitly governed by `docs/07` §7.6 and is
-not invoked by any Sprint 25 task.
+No implementation sprint is queued. Sprint 25 rejected under
+`docs/25-spot-trend-strategies.md` §25.8 because all Step 1 survivors failed
+Step 3. The remaining registered choices are:
+
+- Option A: start a FreqAI / ML sprint on engineered features.
+- Option C: stop the lab here.
+
+Do not queue another spot-indicator or long-hold spot strategy sprint without
+explicit escalation.
 
 ### Sprint 25 tasks (per-agent assignments)
 
@@ -269,15 +274,20 @@ not invoked by any Sprint 25 task.
     Sprint 25 because there is no deployment candidate; no committed
     config changed `dry_run` to `false`.
 
-- [ ] **L. Update `TASKS.md` at sprint end** — _Codex 5.4 low (after F or J)_
+- [x] **L. Update `TASKS.md` at sprint end** — _Codex 5.4 low (after F or J)_
   - Mark Sprint 25 done.
   - If Sprint 25 rejected (§25.8 fired): write a follow-up memo proposing
     FreqAI or "stop here" as the next sprint and surface to ESC.
   - If a strategy cleared Step 5: archive the Sprint 25 task list and
     queue Sprint 27 (live-deploy preparation) in the Sprint Status
     section as `[ ]` not yet started.
+  - Closed 2026-06-03: marked Sprint 25 done and rejected. Follow-up
+    memo: §25.8 fired because all Step 1 survivors failed Step 3, so the
+    next decision is Option A (FreqAI / ML on engineered features) or
+    Option C (stop the lab). Sprint 27 live-deploy preparation was not
+    queued because no strategy cleared Step 5.
 
-- [ ] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
+- [x] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
   - Surface any design-level question rather than deciding locally.
     Examples: "3 of the top-20 pairs listed on OKX after 2020-01-01 —
     do we drop them or use a per-pair start date?", "`TimeSeriesMomentumSpot`
@@ -286,6 +296,10 @@ not invoked by any Sprint 25 task.
     filter from §25.2.2 condition (4) zeros out entries during the entire
     2022 bear market — is that the intent or a bug?".
   - Do **not** make these calls in the agent worktree. ESC owns them.
+  - Closed 2026-06-03: no mid-sprint design ambiguity required ESC
+    adjudication. The sprint-end decision was surfaced to ESC via Task L:
+    choose FreqAI / ML on engineered features or stop the lab; do not
+    continue spot-indicator variants.
 
 ### Sprint 23 tasks (per-agent assignments)
 
@@ -1092,3 +1106,4 @@ not invoked by any Sprint 25 task.
 | 2026-06-03 | Codex | Closed Sprint 25 Task I as not applicable because Task H produced no regime-filtered survivor for paper-trade dry-run |
 | 2026-06-03 | Codex | Closed Sprint 25 Task J as not applicable and extended docs/26 with explicit not-run sections for regime filters, paper trading, and live-deployment readiness |
 | 2026-06-03 | Codex | Closed Sprint 25 Task K as not applicable: no strategy cleared Step 5, so the docs/07 §7.6 pre-live checklist was not opened; all ten pre-live preconditions remain unevaluated and dry-run configs were left unchanged |
+| 2026-06-03 | Codex | Closed Sprint 25 Task L and ESC lane: marked Sprint 25 done and rejected under §25.8, surfaced the next decision as FreqAI/ML on engineered features or stopping the lab, and left Sprint 27 unqueued because no strategy cleared Step 5 |
