@@ -135,38 +135,43 @@ crypto-trading-lab/
 
 ## Current Status & Roadmap
 
-**Last milestone:** Sprint 23 — higher-timeframe sweep is complete. The
-corrected 1d same-window screen produced zero Step 1 survivors because all five
-daily baselines failed the 50-trade floor on the 4-major universe. Tier 2 was
-skipped. See `docs/24-higher-timeframe-results.md`.
+**Last milestone:** Sprint 25 — long-hold spot trend strategies completed
+and rejected. `WeeklyDonchianBreakoutSpot` failed Step 1; both Step 1
+survivors (`TimeSeriesMomentumSpot`, `DonchianBreakoutDailyTop20`) failed
+Step 3 walk-forward acceptance. §25.8 fired. See
+`docs/26-spot-trend-results.md`.
 
-**Nineteen strategies tested, nineteen rejected** — five 5m baselines and one
-bull-only variant on BTC/ETH/SOL/BNB, two 1h candidates on the same majors, the
-strongest 5m baseline (`RSITrend`) on the top-20 universe, five
-daily-momentum-ranked top-20 variants, and five 1d primary baselines on the
-four majors. Strategy, universe-by-volume, dynamic pair-selection, and primary
-timeframe spaces have all been searched on the 4-major universe. The
-top-20 × 1d-and-1w × 6-year-window cell (Sprint 25) remains untested and is
-where Sprint 23's sample-size critique is being addressed.
+**Twenty-two strategies tested, twenty-two rejected** — five 5m baselines
+and one bull-only variant on BTC/ETH/SOL/BNB, two 1h candidates on the
+same majors, the strongest 5m baseline (`RSITrend`) on the top-20 universe,
+five daily-momentum-ranked top-20 variants, five 1d primary baselines on
+the four majors, and three long-hold spot trend candidates on the top-20
+universe over a 6-year window. The full entry-signal-then-exit-signal
+trade shape on long-only spot has been exhausted. The remaining untested
+dimension is the **scale-in-on-adverse-move, scale-out-at-fixed-target**
+trade shape (Sprint 27).
 
-**Current sprint:** Sprint 25 — long-hold spot trend strategies. Three
-strategy candidates spanning the day-to-month hold horizon on long-only OKX
-spot: `WeeklyDonchianBreakoutSpot` (1w breakouts), `TimeSeriesMomentumSpot`
-(1d EMA stack + regime filter), and `DonchianBreakoutDailyTop20` (resurrect
-Sprint 23's strongest variant on the wider top-20 universe). Window
-2020-01-01 → 2025-12-01. The previously-queued perps + funding plan was
-abandoned per user pivot to spot-only directional research. See
-`docs/25-spot-trend-strategies.md` and `TASKS.md` for the full spec and
-per-agent task breakdown.
+**Current sprint:** Sprint 27 — spot DCA-with-take-profit strategies. Three
+concrete entry-signal candidates sharing one DCA-with-TP base class:
+`DCASpotRSIEntry` (oversold mean reversion), `DCASpotBBEntry`
+(Bollinger-lower-band mean reversion), and `DCASpotPullbackEntry`
+(bull-market dip-buy on the 50/200 EMA stack). Pre-registered DCA
+mechanics: 5 legs of $50 spaced -5% from initial entry, +8% TP from
+running avg entry, -25% hard stop, 90-day time stop. Universe BTC/ETH/SOL
+on OKX spot (multi-year recovery history). Window 2020-04-01 →
+2025-12-01. §27.1.1 documents the rationale for treating DCA-with-TP as
+a structurally different trade shape (and thus a defensible exception
+to §25.8). See `docs/27-spot-dca-with-tp.md` and `TASKS.md` for the full
+spec and per-agent task breakdown.
 
 Roadmap priority (from `docs/11-roadmap.md`, updated for current state):
-1. Execute Sprint 25 — long-hold spot trend strategies. Step 1 same-window
-   screen first; Step 3 walk-forward conditional on Step 1 survivors;
-   Steps 4 and 5 (regime filter + paper-trade) conditional on Step 3
-   survivors.
-2. If Sprint 25 rejects: §25.8 applies. Remaining options are FreqAI/ML on
-   engineered features or stop the lab. No further "different angle on
-   indicators" sprints permitted.
+1. Execute Sprint 27 — spot DCA-with-take-profit strategies. Step 1
+   same-window screen first; Step 3 walk-forward conditional on Step 1
+   survivors; Steps 4 and 5 (regime filter + paper-trade) conditional on
+   Step 3 survivors.
+2. If Sprint 27 rejects: §27.8 applies. Remaining options are FreqAI/ML
+   on engineered features or stop the lab. No further "different DCA
+   variant" or "different spot strategy" sprints permitted.
 3. Switch live data to Binance.vision as default (still deferred).
 4. Live monitoring stack (logs, Telegram, heartbeat).
 5. Paper-trade validation (4+ weeks) once a strategy clears acceptance.
@@ -218,6 +223,8 @@ Full docs in `docs/` (read in order):
 | 23 | `docs/23-higher-timeframe-sweep.md` | Sprint 23 plan — 1d primary sweep (Tier 1) + conditional MTF combo (Tier 2); the last untested cell before escalating beyond indicator-on-spot |
 | 24 | `docs/24-higher-timeframe-results.md` | Higher-timeframe sweep results: corrected 1d screen, zero survivors, Tier 2 skipped, and §23.8 escalation |
 | 25 | `docs/25-spot-trend-strategies.md` | Sprint 25 plan — long-hold spot trend strategies; three candidates (`WeeklyDonchianBreakoutSpot`, `TimeSeriesMomentumSpot`, `DonchianBreakoutDailyTop20`) on top-20 USDT spot universe over 2020-01-01 → 2025-12-01; §25.1.1 documents the wider-universe rationale as the last permitted exception to §23.8 |
+| 26 | `docs/26-spot-trend-results.md` | Sprint 25 results — Step 1 screen rejected `WeeklyDonchianBreakoutSpot`; Step 3 walk-forward rejected both survivors (`TimeSeriesMomentumSpot`, `DonchianBreakoutDailyTop20`); §25.8 fired |
+| 27 | `docs/27-spot-dca-with-tp.md` | Sprint 27 plan — spot DCA-with-take-profit strategies; three entry-signal candidates (`DCASpotRSIEntry`, `DCASpotBBEntry`, `DCASpotPullbackEntry`) on BTC/ETH/SOL over 2020-04-01 → 2025-12-01; §27.1.1 documents the structurally-different-trade-shape rationale as the last permitted exception to §25.8 |
 
 ---
 
