@@ -21,7 +21,7 @@ class WeeklyDonchianBreakoutSpot(DonchianBreakout):
     timeframe = "1w"
     stoploss = -0.20
     minimal_roi = {"0": 100.0}
-    startup_candle_count: int = 240
+    startup_candle_count: int = 100
 
     entry_window = _FixedParameter(20)
     exit_window = _FixedParameter(10)
