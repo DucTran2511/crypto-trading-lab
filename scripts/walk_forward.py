@@ -17,6 +17,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
@@ -38,6 +39,8 @@ CSV_COLUMNS = [
     "out_sample_total_profit_pct",
     "params_file",
 ]
+TEMPORARY_COMMAND_RETRIES = 2
+TEMPORARY_COMMAND_RETRY_DELAY_SECONDS = 5
 
 
 @dataclass(frozen=True)
@@ -255,7 +258,17 @@ def append_strategy_path_option(command: list[str], config: WalkForwardConfig) -
 
 
 def run_command(command: list[str], log_file: Path, runner: CommandRunner) -> CommandResult:
-    result = runner(command)
+    result = run_with_temporary_exchange_retries(command, runner)
+    write_command_log(command, result, log_file)
+    if result.returncode != 0:
+        tail = "\n".join((result.stderr or result.stdout).splitlines()[-20:])
+        raise WalkForwardError(
+            f"Command failed with exit code {result.returncode}: {' '.join(command)}\n{tail}"
+        )
+    return result
+
+
+def write_command_log(command: list[str], result: CommandResult, log_file: Path) -> None:
     log_file.parent.mkdir(parents=True, exist_ok=True)
     log_file.write_text(
         "$ " + " ".join(command) + "\n\n"
@@ -265,12 +278,51 @@ def run_command(command: list[str], log_file: Path, runner: CommandRunner) -> Co
         f"{result.stderr}\n",
         encoding="utf-8",
     )
-    if result.returncode != 0:
-        tail = "\n".join((result.stderr or result.stdout).splitlines()[-20:])
-        raise WalkForwardError(
-            f"Command failed with exit code {result.returncode}: {' '.join(command)}\n{tail}"
-        )
+
+
+def run_with_temporary_exchange_retries(
+    command: list[str],
+    runner: CommandRunner,
+) -> CommandResult:
+    result = runner(command)
+    for _ in range(TEMPORARY_COMMAND_RETRIES):
+        if result.returncode == 0 or not is_temporary_exchange_error(result):
+            return result
+        time.sleep(TEMPORARY_COMMAND_RETRY_DELAY_SECONDS)
+        result = runner(command)
     return result
+
+
+def run_hyperopt_or_use_static_params(
+    config: WalkForwardConfig,
+    fold: FoldWindow,
+    log_file: Path,
+    runner: CommandRunner,
+) -> bool:
+    command = build_hyperopt_command(config, fold)
+    result = run_with_temporary_exchange_retries(command, runner)
+    write_command_log(command, result, log_file)
+    if result.returncode == 0:
+        return True
+    if is_no_hyperopt_parameter_error(result):
+        return False
+
+    tail = "\n".join((result.stderr or result.stdout).splitlines()[-20:])
+    raise WalkForwardError(
+        f"Command failed with exit code {result.returncode}: {' '.join(command)}\n{tail}"
+    )
+
+
+def is_no_hyperopt_parameter_error(result: CommandResult) -> bool:
+    text = f"{result.stdout}\n{result.stderr}"
+    return "space is included into the hyperoptimization" in text and (
+        "no parameter for this space was found" in text
+    )
+
+
+def is_temporary_exchange_error(result: CommandResult) -> bool:
+    text = f"{result.stdout}\n{result.stderr}"
+    return "ExchangeNotAvailable" in text or "Could not load markets" in text
 
 
 def strategy_params_file(config: WalkForwardConfig) -> Path:
@@ -522,11 +574,18 @@ def run_walk_forward(
                 f"backtest {fold.out_sample_timerange}",
                 file=sys.stderr,
             )
-            run_command(
-                build_hyperopt_command(config, fold),
+            hyperopt_ran = run_hyperopt_or_use_static_params(
+                config,
+                fold,
                 logs_dir / f"fold_{fold.index:03d}_hyperopt.log",
                 runner,
             )
+            if not hyperopt_ran:
+                print(
+                    f"Fold {fold.index}: no hyperopt parameters found; "
+                    "using static strategy defaults",
+                    file=sys.stderr,
+                )
             fold_params_file = copy_fold_params(params_file, params_dir, fold, config.strategy)
 
             in_export = exports_dir / f"fold_{fold.index:03d}_in_sample.json"

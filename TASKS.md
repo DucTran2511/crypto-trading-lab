@@ -77,7 +77,7 @@ not invoked by any Sprint 25 task.
 > in PR #52 is a standalone utility and is not invoked by any Sprint 25
 > task.
 
-- [ ] **A. Create feature branch + confirm universe snapshot + window + stoploss table** — _Codex 5.4 low_
+- [x] **A. Create feature branch + confirm universe snapshot + window + stoploss table** — _Codex 5.4 low_
   - Branch: `git checkout -b <agent>/sprint-25-spot-trend` in the
     agent's worktree.
   - Per `docs/25-spot-trend-strategies.md` §25.2.4, the universe is the
@@ -89,7 +89,7 @@ not invoked by any Sprint 25 task.
     of them as hyperopt parameters.
   - No code edits in this task beyond the branch creation.
 
-- [ ] **B. Download 1d + 1w OHLCV for top-20 over 2020-01-01 → 2025-12-01** — _Codex 5.4 low_
+- [x] **B. Download 1d + 1w OHLCV for top-20 over 2020-01-01 → 2025-12-01** — _Codex 5.4 low_
   - Command:
     ```bash
     freqtrade download-data -c user_data/config.json \
@@ -103,8 +103,21 @@ not invoked by any Sprint 25 task.
     2020-01-01 will have fewer).
   - Acceptance: 2 timeframes × 20 pairs = 40 files land on disk without
     errors. Document any pair with < 80% expected coverage.
+  - Completed 2026-06-03: all 40 expected files exist under
+    `user_data/data/okx/` after rerunning with `--prepend`. Coverage
+    verification used expected full-window counts of ~2,191 daily and
+    ~313 weekly candles. Pairs below 80% expected coverage: `PEPE/USDT`
+    (2023-05-01 start, 1d 1,128 / 1w 161), `TON/USDT` (2022-04-29 /
+    2022-04-25, 1d 1,495 / 1w 214), `PEOPLE/USDT` (2021-11-26 /
+    2021-11-22, 1d 1,649 / 1w 235), `ORDI/USDT` (2023-05-20 /
+    2023-05-15, 1d 1,109 / 1w 159), `TURBO/USDT` (2023-05-22,
+    1d 1,107 / 1w 158), `SUI/USDT` (2023-05-03 / 2023-05-01,
+    1d 1,126 / 1w 161), `FLOKI/USDT` (2022-12-16 / 2022-12-12,
+    1d 1,264 / 1w 181), `WLD/USDT` (2023-07-24, 1d 1,044 / 1w 149),
+    `ENS/USDT` (2021-11-09 / 2021-11-08, 1d 1,666 / 1w 237), and
+    `BNB/USDT` (2022-12-21 / 2022-12-19, 1d 1,259 / 1w 180).
 
-- [ ] **C. Implement three strategy files + smoke tests** — _Codex 5.4 medium_
+- [x] **C. Implement three strategy files + smoke tests** — _Codex 5.4 medium_
   - Per §25.3.1:
     - `user_data/strategies/WeeklyDonchianBreakoutSpot.py` — thin subclass
       of `DonchianBreakout` overriding `timeframe`, `stoploss`,
@@ -129,8 +142,11 @@ not invoked by any Sprint 25 task.
     on any data at index `t+1` or later).
   - Acceptance: `ruff check .` clean, `pytest` green (80 + at least 3
     new tests pass).
+  - Completed 2026-06-03: added all three Sprint 25 strategy files and
+    focused smoke/no-look-ahead tests. Verified `ruff check .` and
+    `pytest` (`103 passed, 1 skipped`).
 
-- [ ] **D. Build `config-sprint25-top20.json` + verify pair_whitelist** — _Codex 5.4 medium_
+- [x] **D. Build `config-sprint25-top20.json` + verify pair_whitelist** — _Codex 5.4 medium_
   - Copy `user_data/config.json` to `user_data/config-sprint25-top20.json`.
   - Replace `pair_whitelist` with the contents of
     `user_data/universes/top20_okx_2024-07-01.json` `pairs` field.
@@ -140,8 +156,14 @@ not invoked by any Sprint 25 task.
   - Acceptance: `freqtrade backtesting -c user_data/config-sprint25-top20.json
     --strategy DonchianBreakoutDailyTop20 --timerange=20240101-20240301`
     runs cleanly (a dry smoke-run, no acceptance criteria attached).
+  - Completed 2026-06-03: created `user_data/config-sprint25-top20.json`
+    with the top-20 whitelist, `dry_run = true`, `dry_run_wallet = 500`,
+    `trading_mode = spot`, `max_open_trades = 5`, and default
+    `timeframe = 1d` so the registered smoke command uses the daily data.
+    The required `DonchianBreakoutDailyTop20` smoke backtest ran cleanly
+    over 2024-01-01 to 2024-03-01 with 21 trades and 16.71% total profit.
 
-- [ ] **E. Step 1 same-window backtest sweep** — _Antigravity Gemini Flash medium (after C, D)_
+- [x] **E. Step 1 same-window backtest sweep** — _Antigravity Gemini Flash medium (after C, D)_
   - Per §25.6 Step 1, run a single full-window backtest per strategy:
     ```bash
     freqtrade backtesting -c user_data/config-sprint25-top20.json \
@@ -155,8 +177,17 @@ not invoked by any Sprint 25 task.
     < 30%, total profit > 0%. Pass/fail per strategy, do **not** move
     the goalposts.
   - Commit summary CSV to `user_data/backtest_results/sprint25-step1.csv`.
+  - Completed 2026-06-03: committed `sprint25-step1.csv`. Corrected
+    `WeeklyDonchianBreakoutSpot.startup_candle_count` from the inherited
+    5m value of 240 to 100 weekly candles before the final weekly screen.
+    Step 1 results: `WeeklyDonchianBreakoutSpot` failed (29 trades,
+    20.84% total profit, 30.62% max DD); `TimeSeriesMomentumSpot`
+    passed (102 trades, 1223.67% total profit, 1.90% max DD);
+    `DonchianBreakoutDailyTop20` passed (282 trades, 80.66% total
+    profit, 28.93% max DD). Step 3 survivors:
+    `TimeSeriesMomentumSpot`, `DonchianBreakoutDailyTop20`.
 
-- [ ] **F. Step 3 walk-forward for Step 1 survivors** — _Antigravity Gemini Flash medium (after E)_
+- [x] **F. Step 3 walk-forward for Step 1 survivors** — _Antigravity Gemini Flash medium (after E)_
   - For each Step 1 survivor, run walk-forward:
     ```bash
     python scripts/walk_forward.py \
@@ -173,6 +204,15 @@ not invoked by any Sprint 25 task.
   - Apply the §25.6 Step 3 acceptance gate exactly: ≥ 4 of 8 OOS folds
     profitable, avg OOS Sharpe > 0, avg OOS profit > 0, worst OOS DD
     ≤ 10%. Pass/fail per strategy.
+  - Completed 2026-06-03: ran both Step 1 survivors with the registered
+    730d/180d/180d walk-forward command. The registered date/window setup
+    generated 7 complete folds. `TimeSeriesMomentumSpot` failed Step 3
+    with 3 profitable OOS folds, avg OOS Sharpe -0.62, avg OOS profit
+    6.99%, and worst OOS DD 35.57%. `DonchianBreakoutDailyTop20` failed
+    Step 3 with 3 profitable OOS folds, avg OOS Sharpe 0.28, avg OOS
+    profit 13.63%, and worst OOS DD 19.20%. No strategy advances to
+    Tasks H-K. Task E was rechecked after Task F per user request; the
+    committed Step 1 survivor list remains valid and required no rerun.
 
 - [ ] **G. Write `docs/26-spot-trend-results.md`** — _Antigravity Gemini Flash high (after E, F)_
   - Mirror the `docs/24-higher-timeframe-results.md` shape: §26.1 Scope,
@@ -1023,3 +1063,9 @@ not invoked by any Sprint 25 task.
 | 2026-05-31 | Codex | Closed Sprint 23 Task J as not applicable because no strategy passed walk-forward acceptance for regime-filter experiments |
 | 2026-05-31 | Codex | Closed Sprint 23 Task K as not applicable because no strategy passed the paper-trade acceptance gate |
 | 2026-05-31 | Codex | Closed Sprint 23 Task L and ESC lane: marked Sprint 23 done, invoked §23.8, and surfaced the next-sprint decision as FreqAI, perps plus funding, or stop |
+| 2026-06-03 | Codex | Completed Sprint 25 Task A: created `codex/sprint-25-spot-trend`, confirmed the existing top-20 OKX snapshot is readable, locked the 2020-01-01 to 2025-12-01 window, and verified the §25.4 timeframe/stoploss/ROI/lookback table remains pre-registered and non-hyperopt |
+| 2026-06-03 | Codex | Completed Sprint 25 Task B: downloaded/prepended OKX 1d and 1w candles for the top-20 universe; all 40 files exist, with PEPE, TON, PEOPLE, ORDI, TURBO, SUI, FLOKI, WLD, ENS, and BNB below 80% nominal full-window coverage due to later OKX data starts |
+| 2026-06-03 | Codex | Completed Sprint 25 Task C: implemented `WeeklyDonchianBreakoutSpot`, `TimeSeriesMomentumSpot`, and `DonchianBreakoutDailyTop20` with smoke/no-look-ahead coverage; verified `ruff check .` and `pytest` (`103 passed, 1 skipped`) |
+| 2026-06-03 | Codex | Completed Sprint 25 Task D: created `config-sprint25-top20.json`, verified the top-20 pair whitelist plus dry-run spot settings and `max_open_trades = 5`, and ran the required `DonchianBreakoutDailyTop20` smoke backtest cleanly |
+| 2026-06-03 | Codex | Completed Sprint 25 Task E: ran Step 1 same-window screens and committed `sprint25-step1.csv`; `TimeSeriesMomentumSpot` and `DonchianBreakoutDailyTop20` advance to Step 3, while `WeeklyDonchianBreakoutSpot` fails trade count and drawdown gates |
+| 2026-06-03 | Codex | Completed Sprint 25 Task F: ran walk-forward on the two Step 1 survivors; both failed Step 3 acceptance, so there are no regime-filter or paper-trade candidates |
