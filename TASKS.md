@@ -248,10 +248,14 @@ not invoked by any Sprint 25 task.
   - Closed 2026-06-03 as not applicable: Task H did not run because Task F
     produced zero Step 3 survivors, so there is no paper-trade candidate.
 
-- [ ] **J. (Conditional) Extend `docs/26-spot-trend-results.md` with Step 4 + Step 5 results** — _Antigravity Gemini Flash medium (after I)_
+- [x] **J. (Conditional) Extend `docs/26-spot-trend-results.md` with Step 4 + Step 5 results** — _Antigravity Gemini Flash medium (after I)_
   - Add §26.7 regime-filter results, §26.8 paper-trade results,
     §26.9 live-deployment readiness decision (gated on `docs/07` §7.6
     checklist, not auto-deploy).
+  - Closed 2026-06-03 as not applicable: added §26.7-§26.9 to
+    `docs/26-spot-trend-results.md` documenting that Step 4, Step 5, and
+    live-deployment readiness were not run because Task F produced zero
+    Step 3 survivors.
 
 - [ ] **K. (Conditional) Live-deployment readiness checklist** — _Codex 5.4 low (after F, J)_
   - Run only if any strategy clears Step 5.
@@ -1081,3 +1085,4 @@ not invoked by any Sprint 25 task.
 | 2026-06-03 | Codex | Completed Sprint 25 Task G: documented the spot-trend rejection in docs/26, linked it from the docs index, and recorded the §25.8 next decision as FreqAI/ML or stopping the lab |
 | 2026-06-03 | Codex | Closed Sprint 25 Task H as not applicable because Task F produced zero Step 3 survivors for regime-filter experiments |
 | 2026-06-03 | Codex | Closed Sprint 25 Task I as not applicable because Task H produced no regime-filtered survivor for paper-trade dry-run |
+| 2026-06-03 | Codex | Closed Sprint 25 Task J as not applicable and extended docs/26 with explicit not-run sections for regime filters, paper trading, and live-deployment readiness |

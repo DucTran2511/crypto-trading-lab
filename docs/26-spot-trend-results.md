@@ -194,4 +194,44 @@ registered options are:
 No further "different angle on indicators" spot sprint should be queued without
 explicit escalation.
 
+## 26.7 Regime-Filter Results
+
+Not run.
+
+Step 4 was conditional on at least one strategy clearing the Step 3
+walk-forward gate. Both Step 1 survivors failed Step 3:
+
+- `TimeSeriesMomentumSpot` failed on profitable-fold count, average OOS
+  Sharpe, and worst OOS drawdown.
+- `DonchianBreakoutDailyTop20` failed on profitable-fold count and worst OOS
+  drawdown.
+
+Because there was no accepted unfiltered control, bull-only, bear-excluded,
+and trending-only regime filters were not evaluated. Running filters after a
+failed control would be a post-hoc rescue attempt, not the pre-registered
+Sprint 25 validation path.
+
+## 26.8 Paper-Trade Results
+
+Not run.
+
+Step 5 was conditional on a regime-filtered Step 4 survivor. Step 4 did not run
+because Step 3 produced zero survivors, so no strategy qualified for the
+4-week dry-run paper-trade test.
+
+No `freqtrade trade` command was run for Sprint 25. No live or real-money
+configuration was changed.
+
+## 26.9 Live-Deployment Readiness
+
+Not ready.
+
+The live-deployment checklist from [07. Paper & Live Trading](07-paper-and-live-trading.md)
+§7.6 is not opened for Sprint 25 because no strategy passed Step 5. The
+decision is therefore:
+
+- Do not paper-trade Sprint 25 strategies.
+- Do not prepare live deployment for Sprint 25 strategies.
+- Keep `dry_run = true` in all committed configs.
+
 [Back to docs index](README.md)
