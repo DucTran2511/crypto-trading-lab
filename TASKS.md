@@ -77,7 +77,7 @@ not invoked by any Sprint 25 task.
 > in PR #52 is a standalone utility and is not invoked by any Sprint 25
 > task.
 
-- [ ] **A. Create feature branch + confirm universe snapshot + window + stoploss table** — _Codex 5.4 low_
+- [x] **A. Create feature branch + confirm universe snapshot + window + stoploss table** — _Codex 5.4 low_
   - Branch: `git checkout -b <agent>/sprint-25-spot-trend` in the
     agent's worktree.
   - Per `docs/25-spot-trend-strategies.md` §25.2.4, the universe is the
@@ -1023,3 +1023,4 @@ not invoked by any Sprint 25 task.
 | 2026-05-31 | Codex | Closed Sprint 23 Task J as not applicable because no strategy passed walk-forward acceptance for regime-filter experiments |
 | 2026-05-31 | Codex | Closed Sprint 23 Task K as not applicable because no strategy passed the paper-trade acceptance gate |
 | 2026-05-31 | Codex | Closed Sprint 23 Task L and ESC lane: marked Sprint 23 done, invoked §23.8, and surfaced the next-sprint decision as FreqAI, perps plus funding, or stop |
+| 2026-06-03 | Codex | Completed Sprint 25 Task A: created `codex/sprint-25-spot-trend`, confirmed the existing top-20 OKX snapshot is readable, locked the 2020-01-01 to 2025-12-01 window, and verified the §25.4 timeframe/stoploss/ROI/lookback table remains pre-registered and non-hyperopt |
