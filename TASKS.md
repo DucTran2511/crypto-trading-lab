@@ -187,7 +187,7 @@ not invoked by any Sprint 25 task.
     profit, 28.93% max DD). Step 3 survivors:
     `TimeSeriesMomentumSpot`, `DonchianBreakoutDailyTop20`.
 
-- [ ] **F. Step 3 walk-forward for Step 1 survivors** — _Antigravity Gemini Flash medium (after E)_
+- [x] **F. Step 3 walk-forward for Step 1 survivors** — _Antigravity Gemini Flash medium (after E)_
   - For each Step 1 survivor, run walk-forward:
     ```bash
     python scripts/walk_forward.py \
@@ -204,6 +204,15 @@ not invoked by any Sprint 25 task.
   - Apply the §25.6 Step 3 acceptance gate exactly: ≥ 4 of 8 OOS folds
     profitable, avg OOS Sharpe > 0, avg OOS profit > 0, worst OOS DD
     ≤ 10%. Pass/fail per strategy.
+  - Completed 2026-06-03: ran both Step 1 survivors with the registered
+    730d/180d/180d walk-forward command. The registered date/window setup
+    generated 7 complete folds. `TimeSeriesMomentumSpot` failed Step 3
+    with 3 profitable OOS folds, avg OOS Sharpe -0.62, avg OOS profit
+    6.99%, and worst OOS DD 35.57%. `DonchianBreakoutDailyTop20` failed
+    Step 3 with 3 profitable OOS folds, avg OOS Sharpe 0.28, avg OOS
+    profit 13.63%, and worst OOS DD 19.20%. No strategy advances to
+    Tasks H-K. Task E was rechecked after Task F per user request; the
+    committed Step 1 survivor list remains valid and required no rerun.
 
 - [ ] **G. Write `docs/26-spot-trend-results.md`** — _Antigravity Gemini Flash high (after E, F)_
   - Mirror the `docs/24-higher-timeframe-results.md` shape: §26.1 Scope,
@@ -1059,3 +1068,4 @@ not invoked by any Sprint 25 task.
 | 2026-06-03 | Codex | Completed Sprint 25 Task C: implemented `WeeklyDonchianBreakoutSpot`, `TimeSeriesMomentumSpot`, and `DonchianBreakoutDailyTop20` with smoke/no-look-ahead coverage; verified `ruff check .` and `pytest` (`103 passed, 1 skipped`) |
 | 2026-06-03 | Codex | Completed Sprint 25 Task D: created `config-sprint25-top20.json`, verified the top-20 pair whitelist plus dry-run spot settings and `max_open_trades = 5`, and ran the required `DonchianBreakoutDailyTop20` smoke backtest cleanly |
 | 2026-06-03 | Codex | Completed Sprint 25 Task E: ran Step 1 same-window screens and committed `sprint25-step1.csv`; `TimeSeriesMomentumSpot` and `DonchianBreakoutDailyTop20` advance to Step 3, while `WeeklyDonchianBreakoutSpot` fails trade count and drawdown gates |
+| 2026-06-03 | Codex | Completed Sprint 25 Task F: ran walk-forward on the two Step 1 survivors; both failed Step 3 acceptance, so there are no regime-filter or paper-trade candidates |

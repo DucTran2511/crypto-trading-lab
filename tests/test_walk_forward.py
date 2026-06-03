@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+import scripts.walk_forward as walk_forward
 from scripts.walk_forward import (
     BacktestMetrics,
     CommandResult,
@@ -15,6 +16,7 @@ from scripts.walk_forward import (
     generate_folds,
     parse_date,
     parse_duration_days,
+    run_command,
     run_walk_forward,
 )
 
@@ -144,6 +146,30 @@ def test_extract_backtest_metrics_from_zip(tmp_path: Path):
     )
 
 
+def test_run_command_retries_temporary_exchange_errors(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setattr(walk_forward, "TEMPORARY_COMMAND_RETRY_DELAY_SECONDS", 0)
+    calls = 0
+
+    def fake_runner(command: list[str]) -> CommandResult:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return CommandResult(
+                returncode=2,
+                stdout="",
+                stderr="Could not load markets due to ExchangeNotAvailable",
+            )
+        return CommandResult(returncode=0, stdout="ok", stderr="")
+
+    result = run_command(["freqtrade", "backtesting"], tmp_path / "command.log", fake_runner)
+
+    assert result.returncode == 0
+    assert calls == 2
+
+
 def test_run_walk_forward_orchestrates_hyperopt_and_backtests(tmp_path: Path):
     strategy_path = tmp_path / "strategies"
     strategy_path.mkdir()
@@ -222,3 +248,69 @@ def test_run_walk_forward_orchestrates_hyperopt_and_backtests(tmp_path: Path):
     assert rows[0]["out_sample_sharpe"] == "0.5"
     assert Path(rows[0]["params_file"]).read_text(encoding="utf-8") == '{"fold_param": 1}\n'
     assert (tmp_path / "walk_forward" / "walk_forward_stability.png").exists()
+
+
+def test_run_walk_forward_uses_static_defaults_when_strategy_has_no_hyperopt_params(
+    tmp_path: Path,
+):
+    commands: list[list[str]] = []
+
+    def fake_runner(command: list[str]) -> CommandResult:
+        commands.append(command)
+        subcommand = command[1]
+        if subcommand == "hyperopt":
+            return CommandResult(
+                returncode=2,
+                stdout="",
+                stderr=(
+                    "The 'buy' space is included into the hyperoptimization but no parameter "
+                    "for this space was found in your Strategy."
+                ),
+            )
+
+        export_path = Path(command[command.index("--export-filename") + 1])
+        export_path.parent.mkdir(parents=True, exist_ok=True)
+        export_path.write_text(
+            json.dumps(
+                {
+                    "strategy": {
+                        "StaticMomentum": {
+                            "sharpe": 0.25,
+                            "max_drawdown_pct": 2.0,
+                            "profit_total_pct": 1.0,
+                        }
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        return CommandResult(returncode=0, stdout="backtest ok", stderr="")
+
+    summary_file = run_walk_forward(
+        WalkForwardConfig(
+            strategy="StaticMomentum",
+            start=date(2025, 1, 1),
+            end=date(2025, 4, 1),
+            in_sample_days=60,
+            out_sample_days=30,
+            step_days=30,
+            loss="SharpeHyperOptLoss",
+            epochs=25,
+            config_path=tmp_path / "config.json",
+            output_dir=tmp_path / "walk_forward",
+            spaces=("buy",),
+            random_state=7,
+            no_plot=True,
+        ),
+        runner=fake_runner,
+    )
+
+    assert [command[1] for command in commands] == ["hyperopt", "backtesting", "backtesting"]
+
+    with summary_file.open(encoding="utf-8") as handle:
+        rows = list(csv.DictReader(handle))
+
+    assert len(rows) == 1
+    assert rows[0]["in_sample_sharpe"] == "0.25"
+    assert rows[0]["out_sample_total_profit_pct"] == "1.0"
+    assert Path(rows[0]["params_file"]).read_text(encoding="utf-8") == "{}\n"
