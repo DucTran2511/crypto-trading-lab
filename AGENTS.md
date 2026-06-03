@@ -137,30 +137,36 @@ crypto-trading-lab/
 
 **Last milestone:** Sprint 23 — higher-timeframe sweep is complete. The
 corrected 1d same-window screen produced zero Step 1 survivors because all five
-daily baselines failed the 50-trade floor. Tier 2 was skipped. See
-`docs/24-higher-timeframe-results.md`.
+daily baselines failed the 50-trade floor on the 4-major universe. Tier 2 was
+skipped. See `docs/24-higher-timeframe-results.md`.
 
 **Nineteen strategies tested, nineteen rejected** — five 5m baselines and one
 bull-only variant on BTC/ETH/SOL/BNB, two 1h candidates on the same majors, the
 strongest 5m baseline (`RSITrend`) on the top-20 universe, five
 daily-momentum-ranked top-20 variants, and five 1d primary baselines on the
 four majors. Strategy, universe-by-volume, dynamic pair-selection, and primary
-timeframe spaces have all been searched for indicator-on-OKX-spot.
+timeframe spaces have all been searched on the 4-major universe. The
+top-20 × 1d-and-1w × 6-year-window cell (Sprint 25) remains untested and is
+where Sprint 23's sample-size critique is being addressed.
 
-**Current sprint:** Sprint 25 — perps + funding-rate arbitrage (cash-and-carry
-on OKX). Three-tier plan with hard gates between tiers: Tier 1 is a read-only
-historical edge analysis on BTC-USDT-SWAP + ETH-USDT-SWAP funding rates,
-Tier 2 (conditional) is a 4-week paper-trade of a paired-leg position
-manager on OKX testnet, Tier 3 (real money) is explicitly out of scope for
-this sprint. See `docs/25-perps-funding-arb.md` and `TASKS.md` for the
-full spec and per-agent task breakdown.
+**Current sprint:** Sprint 25 — long-hold spot trend strategies. Three
+strategy candidates spanning the day-to-month hold horizon on long-only OKX
+spot: `WeeklyDonchianBreakoutSpot` (1w breakouts), `TimeSeriesMomentumSpot`
+(1d EMA stack + regime filter), and `DonchianBreakoutDailyTop20` (resurrect
+Sprint 23's strongest variant on the wider top-20 universe). Window
+2020-01-01 → 2025-12-01. The previously-queued perps + funding plan was
+abandoned per user pivot to spot-only directional research. See
+`docs/25-spot-trend-strategies.md` and `TASKS.md` for the full spec and
+per-agent task breakdown.
 
 Roadmap priority (from `docs/11-roadmap.md`, updated for current state):
-1. Execute Sprint 25 — perps + funding-rate arbitrage. Tier 1 first; Tier 2
-   conditional on Tier 1 acceptance; Tier 3 (real money) is a separate
-   sprint after Sprint 25 closes.
-2. If Sprint 25 Tier 1 or Tier 2 rejects: §25.8 applies. Remaining options
-   are FreqAI/ML on engineered features or stop the lab.
+1. Execute Sprint 25 — long-hold spot trend strategies. Step 1 same-window
+   screen first; Step 3 walk-forward conditional on Step 1 survivors;
+   Steps 4 and 5 (regime filter + paper-trade) conditional on Step 3
+   survivors.
+2. If Sprint 25 rejects: §25.8 applies. Remaining options are FreqAI/ML on
+   engineered features or stop the lab. No further "different angle on
+   indicators" sprints permitted.
 3. Switch live data to Binance.vision as default (still deferred).
 4. Live monitoring stack (logs, Telegram, heartbeat).
 5. Paper-trade validation (4+ weeks) once a strategy clears acceptance.
@@ -211,7 +217,7 @@ Full docs in `docs/` (read in order):
 | 22 | `docs/22-daily-momentum-results.md` | Daily momentum ranking screen, walk-forward rejection, and kill-criterion decision |
 | 23 | `docs/23-higher-timeframe-sweep.md` | Sprint 23 plan — 1d primary sweep (Tier 1) + conditional MTF combo (Tier 2); the last untested cell before escalating beyond indicator-on-spot |
 | 24 | `docs/24-higher-timeframe-results.md` | Higher-timeframe sweep results: corrected 1d screen, zero survivors, Tier 2 skipped, and §23.8 escalation |
-| 25 | `docs/25-perps-funding-arb.md` | Sprint 25 plan — OKX perps + funding-rate cash-and-carry; three tiers (historical edge → paper-trade → real money) with hard gates; §25.8 kill criterion narrows the post-§23.8 options to FreqAI or stop |
+| 25 | `docs/25-spot-trend-strategies.md` | Sprint 25 plan — long-hold spot trend strategies; three candidates (`WeeklyDonchianBreakoutSpot`, `TimeSeriesMomentumSpot`, `DonchianBreakoutDailyTop20`) on top-20 USDT spot universe over 2020-01-01 → 2025-12-01; §25.1.1 documents the wider-universe rationale as the last permitted exception to §23.8 |
 
 ---
 
