@@ -229,20 +229,24 @@ not invoked by any Sprint 25 task.
     advancement to Tasks H-K, and the §25.8 next decision: FreqAI/ML or
     stop the lab.
 
-- [ ] **H. (Conditional) Step 4 regime-filter experiments** — _Antigravity Gemini Flash medium (after F)_
+- [x] **H. (Conditional) Step 4 regime-filter experiments** — _Antigravity Gemini Flash medium (after F)_
   - Run only if at least one strategy clears Step 3.
   - Apply bull-only / bear-excluded / trending-only filters from
     `user_data/regime/classifier.py` to each Step 3 survivor and re-run
     walk-forward.
   - §25.6 Step 4 acceptance: filtered variant must lift OOS Sharpe by
     ≥ 0.2 vs the unfiltered control.
+  - Closed 2026-06-03 as not applicable: Task F produced zero Step 3
+    survivors, so there is no accepted strategy to regime-filter.
 
-- [ ] **I. (Conditional) Step 5 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after H)_
+- [x] **I. (Conditional) Step 5 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after H)_
   - Run only if Task H produces a regime-filtered survivor.
   - 4 calendar weeks of `freqtrade trade --strategy <Survivor>
     -c user_data/config-sprint25-top20.json` with `dry_run = true`.
   - §25.6 Step 5 acceptance: realized P&L within ±50% of walk-forward
     expectation; no unhandled exceptions.
+  - Closed 2026-06-03 as not applicable: Task H did not run because Task F
+    produced zero Step 3 survivors, so there is no paper-trade candidate.
 
 - [ ] **J. (Conditional) Extend `docs/26-spot-trend-results.md` with Step 4 + Step 5 results** — _Antigravity Gemini Flash medium (after I)_
   - Add §26.7 regime-filter results, §26.8 paper-trade results,
@@ -1075,3 +1079,5 @@ not invoked by any Sprint 25 task.
 | 2026-06-03 | Codex | Completed Sprint 25 Task E: ran Step 1 same-window screens and committed `sprint25-step1.csv`; `TimeSeriesMomentumSpot` and `DonchianBreakoutDailyTop20` advance to Step 3, while `WeeklyDonchianBreakoutSpot` fails trade count and drawdown gates |
 | 2026-06-03 | Codex | Completed Sprint 25 Task F: ran walk-forward on the two Step 1 survivors; both failed Step 3 acceptance, so there are no regime-filter or paper-trade candidates |
 | 2026-06-03 | Codex | Completed Sprint 25 Task G: documented the spot-trend rejection in docs/26, linked it from the docs index, and recorded the §25.8 next decision as FreqAI/ML or stopping the lab |
+| 2026-06-03 | Codex | Closed Sprint 25 Task H as not applicable because Task F produced zero Step 3 survivors for regime-filter experiments |
+| 2026-06-03 | Codex | Closed Sprint 25 Task I as not applicable because Task H produced no regime-filtered survivor for paper-trade dry-run |
