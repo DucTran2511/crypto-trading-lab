@@ -83,11 +83,15 @@ class attributes**, not hyperopt parameters (§27.4).
   `current_rate ≥ avg_entry × 1.08` (running weighted-average entry
   including fees, +8%).
 - **Hard stoploss.** Class attribute `stoploss = -0.25` on the position
-  as a whole (Freqtrade computes stoploss against the average entry).
-  This is a catastrophe stop — it fires only if all 5 legs are filled
-  and price continues 5% below the deepest leg (-25% from initial
-  entry, which is `-0.0625` from avg_entry of a 5-leg ladder centred
-  near -10%). Behaves as expected of a "no further bag-holding" rule.
+  as a whole — Freqtrade fires the stop when `current_rate ≤ avg_entry
+  × (1 + stoploss)`, i.e. **25% below the running avg entry**. With
+  all 5 equal-USD legs filled, avg entry sits at ≈11% below initial
+  (`5 / (1/1.0 + 1/0.95 + 1/0.90 + 1/0.85 + 1/0.80) = 0.8944`), so the
+  stop fires near **-32.9% from initial entry** — about 16% below the
+  deepest DCA leg at -20%. Catastrophe stop only: it does not trip on
+  partial ladders unless price has fallen far past the bottom of the
+  intended ladder. Dollar loss when the stop fires on a full ladder is
+  `$250 × 0.25 = $62.50` (matches §27.5).
 - **Time stop.** If `current_time - trade.open_date_utc > 90 days`,
   exit the position at market regardless of P&L. Prevents indefinite
   ladder-holding through extended bear markets.
@@ -244,10 +248,13 @@ Goalpost-move attempts during execution are blocked.
 | `max_open_trades` | `3` | Config-side; one ladder per pair. |
 
 Rationale:
-- **+8% TP, -25% stop = ~3.1:1 reward-to-risk** at the wallet level once
-  all 5 legs are filled. Standard for mean-reversion DCA. Tighter TPs
-  produce more wins but bleed on the rare full-ladder loss; wider TPs
-  reduce win rate without lifting expected value.
+- **+8% TP, -25% stop = ~1:3.1 reward-to-risk** at the wallet level once
+  all 5 legs are filled (8 / 25 = 0.32). Standard, deliberately
+  unfavourable per-trade R:R for mean-reversion DCA: the strategy wins
+  small and often on the TP path and loses big and rarely on the
+  catastrophe-stop path. Tighter TPs produce more wins but bleed on the
+  rare full-ladder loss; wider TPs reduce win rate without lifting
+  expected value.
 - **5 legs, -5% spacing** caps the price-range covered by a single
   ladder at -20% (initial entry → deepest leg). On BTC/ETH the realised
   20-day drawdown exceeded -20% only 3 times in the 2020-2025 window
