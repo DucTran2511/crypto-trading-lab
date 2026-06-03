@@ -7,24 +7,31 @@
 
 ## Sprint Status
 
-- [/] **Sprint 25: Perps + funding-rate arbitrage (cash-and-carry on OKX)**
-  Three-tier plan with hard gates between tiers. Tier 1 is a read-only
-  historical edge analysis on BTC-USDT-SWAP + ETH-USDT-SWAP funding rates
-  over the last 24 months; Tier 2 (conditional on Tier 1 acceptance) is a
-  4-week paper-trade of a paired-leg position manager on OKX testnet;
-  Tier 3 (real money) is explicitly out of scope for this sprint. See
-  `docs/25-perps-funding-arb.md` for the full spec, pre-registered
-  acceptance criteria, and kill criterion.
+- [/] **Sprint 25: Long-hold spot trend strategies (top-20 universe, 6-year window)**
+  Three strategy candidates spanning the day-to-month hold horizon on
+  long-only OKX spot: `WeeklyDonchianBreakoutSpot` (1w breakouts),
+  `TimeSeriesMomentumSpot` (1d EMA stack + regime filter), and
+  `DonchianBreakoutDailyTop20` (resurrect Sprint 23's strongest variant
+  on the wider top-20 universe). Window: 2020-01-01 → 2025-12-01. Same
+  4-criterion walk-forward acceptance from `docs/16` §16.3 with thresholds
+  adjusted for long-hold horizon. The previously-queued perps + funding
+  plan was abandoned per user pivot to spot-only directional research;
+  see `docs/25-spot-trend-strategies.md` for the full spec and §25.8 kill
+  criterion.
 
 ## Previous Sprints (done)
 
 - [x] **Sprint 23: Higher-timeframe sweep (1d primary, 4 majors)** — see
   `docs/23-higher-timeframe-sweep.md` and
   `docs/24-higher-timeframe-results.md`. All five daily baselines failed the
-  corrected 1d same-window trade-count screen. Tier 2 was skipped. Nineteen
-  indicator-on-spot strategy variants have now been tested and rejected.
-  Section 23.8 fired with no further escape hatches; chose perps +
-  funding-rate arbitrage as the post-Sprint-23 direction (Sprint 25).
+  corrected 1d same-window trade-count screen on the 4-major universe.
+  Tier 2 was skipped. Nineteen indicator-on-spot strategy variants tested
+  and rejected. Section 23.8 fired; the post-Sprint-23 direction was first
+  drafted as perps + funding-rate arbitrage (PR #51, merged then closed)
+  and then redirected to long-hold spot trend strategies on the wider
+  top-20 universe per user direction (current Sprint 25). Sprint 25
+  §25.1.1 documents the rationale for the wider universe being a defensible
+  exception to §23.8.
 
 - [x] **Sprint 21: Daily momentum ranking (top-3 of top-20 universe)** — see
   `docs/21-daily-momentum-ranking.md`. Three ranked variants passed the
@@ -46,153 +53,180 @@
 
 ## Up Next
 
-Sprint 25 — perps + funding-rate arbitrage — is the structurally different
-direction chosen after §23.8 fired. The full spec is in
-`docs/25-perps-funding-arb.md`. The sprint is gated on three pre-registered
-acceptance tiers; Tier 3 (real money) is explicitly out of scope and is a
-separate sprint after Sprint 25 closes.
+Sprint 25 — long-hold spot trend strategies — is the next direction after
+the Sprint 23 sample-size critique and the user's pivot away from perps.
+Full spec: `docs/25-spot-trend-strategies.md`. The sprint is gated on the
+pre-registered Step 1 (same-window) and Step 3 (walk-forward) acceptance
+criteria; live deployment is explicitly governed by `docs/07` §7.6 and is
+not invoked by any Sprint 25 task.
 
 ### Sprint 25 tasks (per-agent assignments)
 
-> Full spec: `docs/25-perps-funding-arb.md`. Tier rubric: cheap models for
-> transcription, mid-tier for code-from-spec, high-tier only for design
-> under ambiguity or high-blast-radius execution code. Do **not** route any
-> of these to Opus Thinking, Codex 5.5 high+, or Devin without explicit
-> escalation.
+> Full spec: `docs/25-spot-trend-strategies.md`. Tier rubric: cheap models
+> for transcription, mid-tier for code-from-spec, high-tier only for design
+> under ambiguity. Do **not** route any of these to Opus Thinking, Codex 5.5
+> high+, or Devin without explicit escalation.
 >
-> **Hard gate between Tier 1 and Tier 2.** Tasks H+I+J run only if Task F
-> documents both BTC and ETH clearing all four §25.2.1 acceptance criteria.
-> If Tier 1 fails on either instrument, jump directly to Tasks G + L and
-> skip H–K entirely (§25.8 fires).
+> **Hard gate at Step 1.** Tasks F–K run only on Step 1 survivors. If Task
+> E rejects all three strategies, jump directly to Tasks G + L.
 >
-> **Hard rule.** Sprint 25 is dry-run only. No real money on OKX during
-> any Sprint 25 task. Tier 3 (real money) is a separate sprint per §25.2.3.
+> **Hard gate at Step 3.** Tasks H–K run only on Step 3 survivors.
+>
+> **Hard rule.** Sprint 25 is spot-only and dry-run-only. No leverage,
+> no perps, no real money. The `scripts/dca_futures_sim.py` tool merged
+> in PR #52 is a standalone utility and is not invoked by any Sprint 25
+> task.
 
-- [ ] **A. Create feature branch + confirm Tier 1 instrument list + 24m window** — _Codex 5.4 low_
-  - Branch: `git checkout -b <agent>/sprint-25-perps-funding` in the
+- [ ] **A. Create feature branch + confirm universe snapshot + window + stoploss table** — _Codex 5.4 low_
+  - Branch: `git checkout -b <agent>/sprint-25-spot-trend` in the
     agent's worktree.
-  - Per `docs/25-perps-funding-arb.md` §25.2.1, Tier 1 covers
-    `BTC-USDT-SWAP` and `ETH-USDT-SWAP` over `2024-01-01` →
-    `2025-12-01` (24m ending recent). Confirm both — do **not** add
-    other instruments without ESC approval.
-  - Per §25.2.1, simulated cash-and-carry uses $250 spot + $250 perp
-    notional, OKX taker fees (spot 0.08% / perp 0.05% per leg per
-    direction), 0.05% per-leg slippage buffer.
+  - Per `docs/25-spot-trend-strategies.md` §25.2.4, the universe is the
+    existing `user_data/universes/top20_okx_2024-07-01.json`
+    snapshot. Verify it exists and is readable; do **not** rebuild it.
+  - Per §25.2.5, the backtest window is `2020-01-01` → `2025-12-01`.
+  - Per §25.4, per-strategy `timeframe`, `stoploss`, `minimal_roi`, and
+    lookback windows are pre-registered. Confirm — do **not** treat any
+    of them as hyperopt parameters.
   - No code edits in this task beyond the branch creation.
 
-- [ ] **B. `scripts/scrape_okx_funding_rates.py` + tests** — _Codex 5.4 medium_
-  - Endpoint: `GET https://www.okx.com/api/v5/public/funding-rate-history`.
-    See OKX public-data API docs.
-  - CLI: `--inst BTC-USDT-SWAP`, `--start 2024-01-01`, `--end 2025-12-01`,
-    `--out user_data/funding_rates/<inst>-funding-history.json`.
-  - Idempotent: re-running over an existing file appends new rows only
-    (dedupe on `fundingTime`).
-  - Pagination: OKX returns at most 100 rows per page; loop with
-    `before`/`after` cursor.
-  - Tests with mocked HTTP using `responses` or `requests-mock` (whichever
-    matches the repo's existing test style). Cover happy path, pagination,
-    dedupe-on-rerun, and a 4xx error case.
-  - Acceptance: `ruff check .` clean, `pytest` green (added tests pass).
+- [ ] **B. Download 1d + 1w OHLCV for top-20 over 2020-01-01 → 2025-12-01** — _Codex 5.4 low_
+  - Command:
+    ```bash
+    freqtrade download-data -c user_data/config.json \
+      --pairs $(jq -r '.pairs | join(" ")' user_data/universes/top20_okx_2024-07-01.json) \
+      --timeframes 1d 1w \
+      --timerange=20200101-20251201
+    ```
+  - The candles land in `user_data/data/okx/` and are gitignored. Verify
+    file existence and approximate row counts (~2191 daily, ~313 weekly
+    candles per pair for full-window pairs; pairs that listed after
+    2020-01-01 will have fewer).
+  - Acceptance: 2 timeframes × 20 pairs = 40 files land on disk without
+    errors. Document any pair with < 80% expected coverage.
 
-- [ ] **C. `scripts/simulate_funding_arb.py` + tests** — _Codex 5.4 medium_
-  - Reads funding history from Task B's JSON files, spot 1d candles from
-    `user_data/data/okx/`, and OKX perp mark-price history (download via a
-    `--download-perp` flag that mirrors `freqtrade download-data` style).
-  - Simulation rules per `docs/25-perps-funding-arb.md` §25.2.1: open
-    paired position when funding > 0 and basis ∈ ±0.5%; hold while
-    funding > 0 AND basis ∈ ±2%; close when funding ≤ 0 OR basis blows out.
-  - Output: per-day P&L CSV + summary statistics matching the §25.2.1
-    acceptance table (net APY, worst rolling 30d drawdown, negative-funding
-    episodes per year).
-  - Tests with synthetic funding + price data — cover positive-funding
-    capture, negative-funding skip, basis-blow-up close, fee accounting.
-  - Acceptance: `ruff check .` clean, `pytest` green.
+- [ ] **C. Implement three strategy files + smoke tests** — _Codex 5.4 medium_
+  - Per §25.3.1:
+    - `user_data/strategies/WeeklyDonchianBreakoutSpot.py` — thin subclass
+      of `DonchianBreakout` overriding `timeframe`, `stoploss`,
+      `minimal_roi`, breakout lookback (20 weeks), and exit lookback
+      (10 weeks).
+    - `user_data/strategies/TimeSeriesMomentumSpot.py` — full new strategy
+      implementing the §25.2.2 4-condition entry and death-cross exit.
+    - `user_data/strategies/DonchianBreakoutDailyTop20.py` — thin subclass
+      of `DonchianBreakoutDaily` (universe override is config-side; this
+      file exists only to keep the strategy name distinct in backtest
+      output).
+  - Reuse the `try: from user_data.strategies.X import Y / except
+    ModuleNotFoundError` shim from prior `*Daily` files.
+  - Smoke tests in `tests/test_weekly_donchian_breakout_spot.py`,
+    `tests/test_time_series_momentum_spot.py`, and
+    `tests/test_donchian_breakout_daily_top20.py`. Each test imports the
+    subclass, instantiates it, and calls `populate_indicators` /
+    `populate_entry_trend` / `populate_exit_trend` on a small synthetic
+    DataFrame matching the strategy's timeframe.
+  - `tests/test_time_series_momentum_spot.py` MUST also include a
+    no-look-ahead unit test (entry signal at index `t` does not depend
+    on any data at index `t+1` or later).
+  - Acceptance: `ruff check .` clean, `pytest` green (80 + at least 3
+    new tests pass).
 
-- [ ] **D. Run scraper + commit funding-history JSONs** — _Antigravity Gemini Flash medium (after B)_
-  - Run `scripts/scrape_okx_funding_rates.py` for both instruments over
-    the §25.2.1 24m window.
-  - Commit the resulting JSON files (small: ~3 entries/day × 730 days × 2
-    instruments ≈ 4.4k rows, well under 1MB total). **Not** gitignored —
-    these are public-data snapshots, not user secrets.
-  - Verify row counts and timestamp coverage end-to-end.
+- [ ] **D. Build `config-sprint25-top20.json` + verify pair_whitelist** — _Codex 5.4 medium_
+  - Copy `user_data/config.json` to `user_data/config-sprint25-top20.json`.
+  - Replace `pair_whitelist` with the contents of
+    `user_data/universes/top20_okx_2024-07-01.json` `pairs` field.
+  - Confirm `dry_run = true`, `dry_run_wallet = 500`, `trading_mode = spot`.
+  - Set `max_open_trades = 5` per §25.5.
+  - **Do not** modify the committed `user_data/config.json`.
+  - Acceptance: `freqtrade backtesting -c user_data/config-sprint25-top20.json
+    --strategy DonchianBreakoutDailyTop20 --timerange=20240101-20240301`
+    runs cleanly (a dry smoke-run, no acceptance criteria attached).
 
-- [ ] **E. Run Tier 1 simulation for BTC + ETH** — _Antigravity Gemini Flash medium (after C, D)_
-  - Execute `scripts/simulate_funding_arb.py` for both instruments using
-    the committed funding-history JSONs.
-  - Produce per-month and aggregate summary tables matching §25.2.1.
-  - Commit per-day P&L CSVs to
-    `user_data/funding_arb_results/<inst>-tier1-pnl.csv`.
-  - Verify the four §25.2.1 acceptance criteria — pass/fail per
-    instrument, do **not** move the goalposts.
+- [ ] **E. Step 1 same-window backtest sweep** — _Antigravity Gemini Flash medium (after C, D)_
+  - Per §25.6 Step 1, run a single full-window backtest per strategy:
+    ```bash
+    freqtrade backtesting -c user_data/config-sprint25-top20.json \
+      --strategy WeeklyDonchianBreakoutSpot \
+      --timerange=20200101-20251201 \
+      --timeframe 1w
+    ```
+    (and analogous for `TimeSeriesMomentumSpot` with `--timeframe 1d`,
+    and `DonchianBreakoutDailyTop20` with `--timeframe 1d`).
+  - Apply the §25.6 Step 1 acceptance gate exactly: ≥ 30 trades, max DD
+    < 30%, total profit > 0%. Pass/fail per strategy, do **not** move
+    the goalposts.
+  - Commit summary CSV to `user_data/backtest_results/sprint25-step1.csv`.
 
-- [ ] **F. Write `docs/26-perps-funding-arb-results.md` Tier 1 section** — _Antigravity Gemini Flash high (after E)_
+- [ ] **F. Step 3 walk-forward for Step 1 survivors** — _Antigravity Gemini Flash medium (after E)_
+  - For each Step 1 survivor, run walk-forward:
+    ```bash
+    python scripts/walk_forward.py \
+      --strategy <StrategyName> \
+      --start 2020-01-01 --end 2025-12-01 \
+      --in-sample 730d --out-sample 180d --step 180d \
+      --loss SharpeHyperOptLoss --epochs 100 \
+      --freqtrade-bin .venv/bin/freqtrade \
+      --pairs <top-20 list> \
+      --timeframe <strategy-timeframe> \
+      -j 1 \
+      --output-dir user_data/walk_forward_results/<StrategyName>
+    ```
+  - Apply the §25.6 Step 3 acceptance gate exactly: ≥ 4 of 8 OOS folds
+    profitable, avg OOS Sharpe > 0, avg OOS profit > 0, worst OOS DD
+    ≤ 10%. Pass/fail per strategy.
+
+- [ ] **G. Write `docs/26-spot-trend-results.md`** — _Antigravity Gemini Flash high (after E, F)_
   - Mirror the `docs/24-higher-timeframe-results.md` shape: §26.1 Scope,
-    §26.2 Tier 1 historical simulation, §26.3 Acceptance Criteria,
-    §26.4 Decision.
-  - State pass or fail explicitly per §25.2.1 acceptance criteria. If
-    fail: §25.8 fires and §26.5 documents the next decision (Option A
-    FreqAI or Option C stop).
+    §26.2 Step 1 same-window screen, §26.3 Step 3 walk-forward,
+    §26.4 Acceptance Criteria, §26.5 Decision.
+  - State pass/fail explicitly per §25.6 Step 1 + Step 3 criteria. If
+    all three reject: §25.8 fires and §26.6 documents the next decision
+    (Option A FreqAI or Option C stop).
   - Acceptance: ruff/pytest unaffected (docs-only); cross-references back
-    to `docs/25-perps-funding-arb.md` §25.2.1 are correct.
+    to `docs/25-spot-trend-strategies.md` §25.6 are correct.
 
-- [ ] **G. If Tier 1 fails: close out the sprint per §25.8** — _Codex 5.4 low (after F)_
-  - Run only if Task F documents Tier 1 rejection on either instrument.
-  - Update `TASKS.md` Sprint Status → done; update `AGENTS.md` milestone
-    and current-sprint sections; surface §25.8 decision to ESC.
-  - **Do not** invoke Task H or beyond.
+- [ ] **H. (Conditional) Step 4 regime-filter experiments** — _Antigravity Gemini Flash medium (after F)_
+  - Run only if at least one strategy clears Step 3.
+  - Apply bull-only / bear-excluded / trending-only filters from
+    `user_data/regime/classifier.py` to each Step 3 survivor and re-run
+    walk-forward.
+  - §25.6 Step 4 acceptance: filtered variant must lift OOS Sharpe by
+    ≥ 0.2 vs the unfiltered control.
 
-- [ ] **H. (Conditional) `scripts/funding_arb_paper_trade.py` + tests** — _Codex 5.4 high (only if Tier 1 passes both instruments)_
-  - **High-tier slot, justified.** This is the highest-blast-radius code
-    in any sprint to date: paired-leg execution against the OKX API, even
-    on testnet. A bug means a leg closes naked or the legs sequence wrong.
-  - Implement the §25.2.2 circuit breakers exactly. All five breakers are
-    mandatory; none are configurable from a flag.
-  - Uses Freqtrade's `ccxt`-backed exchange wrapper for authenticated OKX
-    testnet calls.
-  - Tests: cover each circuit breaker as a unit case (synthetic price +
-    funding stream → assert close fires at the expected tick). Cover
-    leg-failure cases (spot fills, perp times out → spot must close).
-  - Acceptance: `ruff check .` clean, `pytest` green.
+- [ ] **I. (Conditional) Step 5 4-week paper-trade dry-run** — _Antigravity Gemini Flash medium (after H)_
+  - Run only if Task H produces a regime-filtered survivor.
+  - 4 calendar weeks of `freqtrade trade --strategy <Survivor>
+    -c user_data/config-sprint25-top20.json` with `dry_run = true`.
+  - §25.6 Step 5 acceptance: realized P&L within ±50% of walk-forward
+    expectation; no unhandled exceptions.
 
-- [ ] **I. (Conditional) 4-week paper-trade execution on OKX testnet** — _Antigravity Gemini Flash medium (after H)_
-  - Run `scripts/funding_arb_paper_trade.py` continuously for 4 calendar
-    weeks against OKX testnet (or, if testnet funding lags real-prod
-    funding by too much, against the prod funding feed with
-    `dry_run = true`).
-  - Log every position open/close, every circuit-breaker trigger, every
-    P&L tick to `user_data/funding_arb_results/paper-trade-<week>.csv`.
-  - **Do not** edit the circuit-breaker thresholds mid-run — that is
-    goalpost moving.
-  - Acceptance: §25.2.2 four criteria, pass/fail explicit per week.
+- [ ] **J. (Conditional) Extend `docs/26-spot-trend-results.md` with Step 4 + Step 5 results** — _Antigravity Gemini Flash medium (after I)_
+  - Add §26.7 regime-filter results, §26.8 paper-trade results,
+    §26.9 live-deployment readiness decision (gated on `docs/07` §7.6
+    checklist, not auto-deploy).
 
-- [ ] **J. (Conditional) Extend `docs/26-perps-funding-arb-results.md` with Tier 2 section** — _Antigravity Gemini Flash high (after I)_
-  - Add §26.5 Tier 2 paper-trade results, §26.6 acceptance, §26.7
-    decision (Tier 3 next-sprint trigger or §25.8 fires).
-
-- [ ] **K. (Conditional) Decide on Tier 3 next-sprint trigger** — _Codex 5.4 low (after J)_
-  - Run only if Task J documents Tier 2 passing all four criteria.
-  - Write a one-paragraph Sprint 27 follow-up memo in the TASKS.md
-    session log: real-money sprint outline, pre-registered acceptance
-    criteria for live deployment, link to `docs/07-paper-and-live-trading.md`
-    §7.6 checklist.
-  - **Do not** write the full Sprint 27 plan in this task — that is its
-    own sprint after Sprint 25 closes.
+- [ ] **K. (Conditional) Live-deployment readiness checklist** — _Codex 5.4 low (after F, J)_
+  - Run only if any strategy clears Step 5.
+  - Walk through `docs/07-paper-and-live-trading.md` §7.6 step-by-step
+    and document each precondition's status (pass/fail/needs-action) in
+    a short follow-up memo in the TASKS.md session log.
+  - **Do not** flip `dry_run` to `false` in any committed config.
 
 - [ ] **L. Update `TASKS.md` at sprint end** — _Codex 5.4 low (after F or J)_
   - Mark Sprint 25 done.
-  - If Tier 1 or Tier 2 rejected: invoke §25.8 and write a follow-up
-    memo proposing FreqAI or "stop here" as the next sprint.
-  - If Tier 2 passed: archive Sprint 25 task list and queue Sprint 27
-    in the Sprint Status section as `[ ]` not yet started.
+  - If Sprint 25 rejected (§25.8 fired): write a follow-up memo proposing
+    FreqAI or "stop here" as the next sprint and surface to ESC.
+  - If a strategy cleared Step 5: archive the Sprint 25 task list and
+    queue Sprint 27 (live-deploy preparation) in the Sprint Status
+    section as `[ ]` not yet started.
 
 - [ ] **ESC. Escalation lane** — _Sonnet 4.6 Thinking_
   - Surface any design-level question rather than deciding locally.
-    Examples: "OKX testnet funding rates lag prod by 12h — do we run
-    paper-trade against prod feed with `dry_run = true` instead?",
-    "Tier 1 BTC passes but ETH only nets +4% APY (just below the 5%
-    threshold) — do we proceed with BTC only?", "the circuit breaker
-    at 1% daily drawdown fires too often in testnet — is the threshold
-    too tight or is testnet noise different from prod?".
+    Examples: "3 of the top-20 pairs listed on OKX after 2020-01-01 —
+    do we drop them or use a per-pair start date?", "`TimeSeriesMomentumSpot`
+    Step 1 produces 28 trades (2 below the ≥ 30 floor) but +18% profit
+    and 5% DD — do we relax the screen or reject?", "the 5d realized vol
+    filter from §25.2.2 condition (4) zeros out entries during the entire
+    2022 bear market — is that the intent or a bug?".
   - Do **not** make these calls in the agent worktree. ESC owns them.
 
 ### Sprint 23 tasks (per-agent assignments)
