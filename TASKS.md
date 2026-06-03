@@ -117,7 +117,7 @@ not invoked by any Sprint 25 task.
     `ENS/USDT` (2021-11-09 / 2021-11-08, 1d 1,666 / 1w 237), and
     `BNB/USDT` (2022-12-21 / 2022-12-19, 1d 1,259 / 1w 180).
 
-- [ ] **C. Implement three strategy files + smoke tests** — _Codex 5.4 medium_
+- [x] **C. Implement three strategy files + smoke tests** — _Codex 5.4 medium_
   - Per §25.3.1:
     - `user_data/strategies/WeeklyDonchianBreakoutSpot.py` — thin subclass
       of `DonchianBreakout` overriding `timeframe`, `stoploss`,
@@ -142,6 +142,9 @@ not invoked by any Sprint 25 task.
     on any data at index `t+1` or later).
   - Acceptance: `ruff check .` clean, `pytest` green (80 + at least 3
     new tests pass).
+  - Completed 2026-06-03: added all three Sprint 25 strategy files and
+    focused smoke/no-look-ahead tests. Verified `ruff check .` and
+    `pytest` (`103 passed, 1 skipped`).
 
 - [ ] **D. Build `config-sprint25-top20.json` + verify pair_whitelist** — _Codex 5.4 medium_
   - Copy `user_data/config.json` to `user_data/config-sprint25-top20.json`.
@@ -1038,3 +1041,4 @@ not invoked by any Sprint 25 task.
 | 2026-05-31 | Codex | Closed Sprint 23 Task L and ESC lane: marked Sprint 23 done, invoked §23.8, and surfaced the next-sprint decision as FreqAI, perps plus funding, or stop |
 | 2026-06-03 | Codex | Completed Sprint 25 Task A: created `codex/sprint-25-spot-trend`, confirmed the existing top-20 OKX snapshot is readable, locked the 2020-01-01 to 2025-12-01 window, and verified the §25.4 timeframe/stoploss/ROI/lookback table remains pre-registered and non-hyperopt |
 | 2026-06-03 | Codex | Completed Sprint 25 Task B: downloaded/prepended OKX 1d and 1w candles for the top-20 universe; all 40 files exist, with PEPE, TON, PEOPLE, ORDI, TURBO, SUI, FLOKI, WLD, ENS, and BNB below 80% nominal full-window coverage due to later OKX data starts |
+| 2026-06-03 | Codex | Completed Sprint 25 Task C: implemented `WeeklyDonchianBreakoutSpot`, `TimeSeriesMomentumSpot`, and `DonchianBreakoutDailyTop20` with smoke/no-look-ahead coverage; verified `ruff check .` and `pytest` (`103 passed, 1 skipped`) |
