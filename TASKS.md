@@ -146,7 +146,7 @@ not invoked by any Sprint 25 task.
     focused smoke/no-look-ahead tests. Verified `ruff check .` and
     `pytest` (`103 passed, 1 skipped`).
 
-- [ ] **D. Build `config-sprint25-top20.json` + verify pair_whitelist** — _Codex 5.4 medium_
+- [x] **D. Build `config-sprint25-top20.json` + verify pair_whitelist** — _Codex 5.4 medium_
   - Copy `user_data/config.json` to `user_data/config-sprint25-top20.json`.
   - Replace `pair_whitelist` with the contents of
     `user_data/universes/top20_okx_2024-07-01.json` `pairs` field.
@@ -156,6 +156,12 @@ not invoked by any Sprint 25 task.
   - Acceptance: `freqtrade backtesting -c user_data/config-sprint25-top20.json
     --strategy DonchianBreakoutDailyTop20 --timerange=20240101-20240301`
     runs cleanly (a dry smoke-run, no acceptance criteria attached).
+  - Completed 2026-06-03: created `user_data/config-sprint25-top20.json`
+    with the top-20 whitelist, `dry_run = true`, `dry_run_wallet = 500`,
+    `trading_mode = spot`, `max_open_trades = 5`, and default
+    `timeframe = 1d` so the registered smoke command uses the daily data.
+    The required `DonchianBreakoutDailyTop20` smoke backtest ran cleanly
+    over 2024-01-01 to 2024-03-01 with 21 trades and 16.71% total profit.
 
 - [ ] **E. Step 1 same-window backtest sweep** — _Antigravity Gemini Flash medium (after C, D)_
   - Per §25.6 Step 1, run a single full-window backtest per strategy:
@@ -1042,3 +1048,4 @@ not invoked by any Sprint 25 task.
 | 2026-06-03 | Codex | Completed Sprint 25 Task A: created `codex/sprint-25-spot-trend`, confirmed the existing top-20 OKX snapshot is readable, locked the 2020-01-01 to 2025-12-01 window, and verified the §25.4 timeframe/stoploss/ROI/lookback table remains pre-registered and non-hyperopt |
 | 2026-06-03 | Codex | Completed Sprint 25 Task B: downloaded/prepended OKX 1d and 1w candles for the top-20 universe; all 40 files exist, with PEPE, TON, PEOPLE, ORDI, TURBO, SUI, FLOKI, WLD, ENS, and BNB below 80% nominal full-window coverage due to later OKX data starts |
 | 2026-06-03 | Codex | Completed Sprint 25 Task C: implemented `WeeklyDonchianBreakoutSpot`, `TimeSeriesMomentumSpot`, and `DonchianBreakoutDailyTop20` with smoke/no-look-ahead coverage; verified `ruff check .` and `pytest` (`103 passed, 1 skipped`) |
+| 2026-06-03 | Codex | Completed Sprint 25 Task D: created `config-sprint25-top20.json`, verified the top-20 pair whitelist plus dry-run spot settings and `max_open_trades = 5`, and ran the required `DonchianBreakoutDailyTop20` smoke backtest cleanly |
