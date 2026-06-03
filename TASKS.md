@@ -257,12 +257,17 @@ not invoked by any Sprint 25 task.
     live-deployment readiness were not run because Task F produced zero
     Step 3 survivors.
 
-- [ ] **K. (Conditional) Live-deployment readiness checklist** — _Codex 5.4 low (after F, J)_
+- [x] **K. (Conditional) Live-deployment readiness checklist** — _Codex 5.4 low (after F, J)_
   - Run only if any strategy clears Step 5.
   - Walk through `docs/07-paper-and-live-trading.md` §7.6 step-by-step
     and document each precondition's status (pass/fail/needs-action) in
     a short follow-up memo in the TASKS.md session log.
   - **Do not** flip `dry_run` to `false` in any committed config.
+  - Closed 2026-06-03 as not applicable: no strategy cleared Step 5, so
+    the `docs/07-paper-and-live-trading.md` §7.6 pre-live checklist was
+    not opened. All ten pre-live preconditions are unevaluated for
+    Sprint 25 because there is no deployment candidate; no committed
+    config changed `dry_run` to `false`.
 
 - [ ] **L. Update `TASKS.md` at sprint end** — _Codex 5.4 low (after F or J)_
   - Mark Sprint 25 done.
@@ -1086,3 +1091,4 @@ not invoked by any Sprint 25 task.
 | 2026-06-03 | Codex | Closed Sprint 25 Task H as not applicable because Task F produced zero Step 3 survivors for regime-filter experiments |
 | 2026-06-03 | Codex | Closed Sprint 25 Task I as not applicable because Task H produced no regime-filtered survivor for paper-trade dry-run |
 | 2026-06-03 | Codex | Closed Sprint 25 Task J as not applicable and extended docs/26 with explicit not-run sections for regime filters, paper trading, and live-deployment readiness |
+| 2026-06-03 | Codex | Closed Sprint 25 Task K as not applicable: no strategy cleared Step 5, so the docs/07 §7.6 pre-live checklist was not opened; all ten pre-live preconditions remain unevaluated and dry-run configs were left unchanged |
